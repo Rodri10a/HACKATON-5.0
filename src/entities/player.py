@@ -6,7 +6,7 @@ Control del jugador, stats, nivel y armas
 
 import pygame
 from base_entity import BaseEntity
-from settings import *
+from src.settings import *
 
 class Player(BaseEntity):
     '''

@@ -5,7 +5,7 @@ Clase base que heredarán jugador, enemigos y proyectiles
 """
 
 import pygame
-from settings import *
+from src.settings import *
 
 class BaseEntity:
     '''

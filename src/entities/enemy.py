@@ -7,7 +7,7 @@ IA básica de persecución y diferentes tipos de fauna paraguaya
 import pygame
 import random
 from base_entity import BaseEntity
-from settings import *
+from src.settings import *
 
 class Enemy(BaseEntity):
     '''

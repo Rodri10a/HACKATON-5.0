@@ -7,7 +7,7 @@ Diferentes armas con comportamientos únicos
 import pygame
 import math
 import random
-from settings import *
+from src.settings import *
 
 class Weapon:
     '''
