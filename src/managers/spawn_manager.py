@@ -12,7 +12,7 @@ from settings import *
 
 
 class SpawnManager:
-    """Gestor de spawning de enemigos con escalado de dificultad"""
+    """Gestor de spawning de enemigos con oleadas con escalado de dificultad"""
     
     def __init__(self, mapa, camara, jugador):
         """
@@ -34,6 +34,7 @@ class SpawnManager:
         self.tiempo_entre_spawns = TIEMPO_ENTRE_SPAWNS
         self.timer_spawn = 0
         self.enemigos_por_spawn = ENEMIGOS_POR_SPAWN
+        self.enemigos_por_spawn_base = ENEMIGOS_POR_SPAWN
         
         # Tiempo de juego (para escalar dificultad)
         self.tiempo_juego = 0
@@ -41,7 +42,23 @@ class SpawnManager:
         
         # Límite de enemigos en pantalla
         self.max_enemigos = MAX_ENEMIGOS_PANTALLA
-    
+
+        # sistema de spawn basado en oleadas
+        self.estado_oleada = "NORMAL"
+        self.tiempo_estado = 0
+
+        # Duracion de los estados
+        self.duracion_normal = 25
+        self.duracion_horda = 12
+        self.duracion_descanso = 8
+
+        # spawns por estado
+        self.factores_spawn = {
+            "NORMAL": 1.0 ,
+            "HORDA": 0.4,
+            "DESCANSO": 1.6
+        }
+
     def actualizar(self, dt):
         """
         Actualizar spawns y enemigos
@@ -54,6 +71,9 @@ class SpawnManager:
         
         # Actualizar timers de spawn
         self.timer_spawn += dt
+
+        # Actualizar estado de oleada
+        self.actualizar_oleada(dt)
         
         # Escalar dificultad cada minuto
         if int(self.tiempo_juego) > self.ultimo_escalado and int(self.tiempo_juego) % 60 == 0:
@@ -71,6 +91,39 @@ class SpawnManager:
         
         # Eliminar enemigos muertos
         self.limpiar_enemigos_muertos()
+
+    # Methodo para actualizar el estado de la oleada
+    def actualizar_oleada(self, dt):
+        self.tiempo_estado += dt
+
+        if self.estado_oleada == "NORMAL" and self.tiempo_estado >= self.duracion_normal:
+            self.estado_oleada = "HORDA"
+            self.tiempo_estado = 0
+        elif self.estado_oleada == "HORDA" and self.tiempo_estado >= self.duracion_horda:
+            self.estado_oleada = "DESCANSO"
+            self.tiempo_estado = 0
+        elif self.estado_oleada == "DESCANSO" and self.tiempo_estado >= self.duracion_descanso:
+            self.estado_oleada = "NORMAL"
+            self.tiempo_estado = 0
+
+        factor = self.factores_spawn[self.estado_oleada]
+        self.tiempo_entre_spawns = max(SPAWN_MINIMO, TIEMPO_ENTRE_SPAWNS * factor)
+        self.enemigos_por_spawn = max(1, int(self.enemigos_por_spawn_base * factor))
+
+        print(f"[OLEADA] Estado: {self.estado_oleada}, Enemigos por spawn: {self.enemigos_por_spawn}, Tiempo spawn: {self.tiempo_entre_spawns:.2f}")
+
+
+    def escalar_dificultad(self):
+        """Aumentar dificultad progresivamente"""
+        # Reducir tiempo entre spawns (hasta un mínimo)
+        if self.tiempo_entre_spawns > SPAWN_MINIMO:
+            self.tiempo_entre_spawns -= SPAWN_REDUCCION_POR_MINUTO
+            self.tiempo_entre_spawns = max(SPAWN_MINIMO, self.tiempo_entre_spawns)
+        
+        # Aumentar cantidad de enemigos por spawn cada 2 minutos
+        if int(self.tiempo_juego) % AUMENTO_ENEMIGOS_CADA == 0:
+            self.enemigos_por_spawn += 1
+    
     
     def spawnear_enemigos(self):
         """Crear nuevos enemigos"""
@@ -111,27 +164,19 @@ class SpawnManager:
                     peso = 0
                 else:
                     peso = int(peso * (self.tiempo_juego / 300))
+
+            # En hordas aparecen más enemigos fuertes
+            if self.estado_oleada == "HORDA":
+                peso = max(1 ,int(peso *1.5))
+
             
             # Agregar tipo 'peso' veces a la lista
             for _ in range(int(peso)):
                 opciones.append(tipo)
         
         # Elegir aleatoriamente
-        if opciones:
-            return random.choice(opciones)
-        else:
-            return "CARPINCHO"  # Fallback
+        return random.choice(opciones) if opciones else "CARPINCHO"
     
-    def escalar_dificultad(self):
-        """Aumentar dificultad progresivamente"""
-        # Reducir tiempo entre spawns (hasta un mínimo)
-        if self.tiempo_entre_spawns > SPAWN_MINIMO:
-            self.tiempo_entre_spawns -= SPAWN_REDUCCION_POR_MINUTO
-            self.tiempo_entre_spawns = max(SPAWN_MINIMO, self.tiempo_entre_spawns)
-        
-        # Aumentar cantidad de enemigos por spawn cada 2 minutos
-        if int(self.tiempo_juego) % AUMENTO_ENEMIGOS_CADA == 0:
-            self.enemigos_por_spawn += 1
     
     def actualizar_enemigos(self, dt):
         """
@@ -170,9 +215,7 @@ class SpawnManager:
             # Calcular distancia
             dx = enemigo.x - x
             dy = enemigo.y - y
-            distancia = math.sqrt(dx * dx + dy * dy)
-            
-            if distancia <= rango:
+            if math.sqrt(dx * dx + dy * dy) <= rango:
                 enemigos_cercanos.append(enemigo)
         
         return enemigos_cercanos
@@ -188,8 +231,6 @@ class SpawnManager:
         Returns:
             Enemy: Enemigo más cercano, o None
         """
-        if len(self.enemigos) == 0:
-            return None
         
         enemigo_cercano = None
         distancia_minima = float('inf')
