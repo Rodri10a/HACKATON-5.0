@@ -23,6 +23,10 @@ class EnemyType(Enum):
     YACARE = "YACARE"
     TATU = "TATU"
     AGUARA_GUAZU = "AGUARA_GUAZU"
+    LUISON = "LUISON"
+    MOSQUITO = "MOSQUITO"
+    POMBERO = "POMBERO"
+    SERPIENTE = "SERPIENTE"
 
 
 # ========== TIPOS DE ARMAS ==========

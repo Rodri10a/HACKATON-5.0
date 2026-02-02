@@ -20,8 +20,8 @@ class Player(BaseEntity):
             x: Posición X inicial
             y: Posición Y inicial
         """
-        # Llamar constructor padre (cuadrado amarillo)
-        super().__init__(x, y, 50, 50, (255, 200, 0))
+        # Llamar constructor padre con sprite
+        super().__init__(x, y, 50, 50, (255, 200, 0), sprite_path="assets/sprites/player.png")
         
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
