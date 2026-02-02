@@ -177,6 +177,14 @@ class GameEngine:
             if tecla == pygame.K_ESCAPE:
                 self.pausar_juego()
             
+            # Atacar con machete al presionar ESPACIO
+            if tecla == pygame.K_SPACE:
+                # Buscar el machete y usarlo
+                for arma in self.jugador.armas_equipadas:
+                    if arma.tipo == "MACHETE" and arma.puede_usar:
+                        arma.usar(self.spawn_manager.enemigos)
+                        break
+            
             # Debug: teclas especiales
             if DEBUG_MODE:
                 if tecla == pygame.K_F1:
@@ -202,15 +210,6 @@ class GameEngine:
                 self.reiniciar_juego()
             if tecla == pygame.K_ESCAPE:
                 self.volver_al_menu()
-                
-        # JUGANDO
-        elif self.estado == GameState.JUGANDO:
-            if tecla == pygame.K_ESCAPE:
-                self.pausar_juego()
-            
-            # Atacar con machete al presionar ESPACIO
-            if tecla == pygame.K_SPACE:
-                self.jugador.usar_machete_manual(self.spawn_manager.enemigos)
     
     def manejar_click_mouse(self, pos, boton):
         """
@@ -241,7 +240,6 @@ class GameEngine:
                     self.ui_manager.mostrar_pantalla_mejora = False
                     self.jugador.subio_nivel = False
                     self.estado = GameState.JUGANDO
-            
     
     def aplicar_mejora_seleccionada(self, opcion):
         """
@@ -358,7 +356,7 @@ class GameEngine:
         # Instrucciones
         instrucciones = [
             "Usa WASD o Flechas para moverte",
-            "Las armas atacan automáticamente",
+            "Presiona ESPACIO para atacar con el machete",
             "Recolecta XP para subir de nivel",
             "¡Sobrevive el mayor tiempo posible!",
             "",
@@ -437,8 +435,8 @@ class GameEngine:
         # Detener música de gameplay
         self.assets.detener_musica()
         
-        # Reproducir música/sonido de game over
-        self.assets.reproducir_sonido("game_over")
+        # Reproducir música/sonido de game over 
+        self.assets.reproducir_sonido("game_over") 
         
         print(f"GAME OVER - Nivel: {self.jugador.nivel}, Tiempo: {int(self.jugador.tiempo_supervivencia)}s")
     
@@ -467,13 +465,13 @@ class GameEngine:
         self.jugador = None
         self.camara = None
         self.spawn_manager = None
-        self.combat_manager = None
+        self.combat_manager = None 
     
     def limpiar(self):
         """Limpiar recursos antes de salir"""
         # Detener todos los sonidos
         self.assets.detener_musica()
-        pygame.mixer.stop()
+        pygame.mixer.stop() 
         
         # Limpiar assets
         self.assets.limpiar()
