@@ -168,9 +168,9 @@ class OrbXP:
         # Crear sprite
         try:
             self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
-            self.image = pygame.transform.scale(self.image, (15, 15))
+            self.image = pygame.transform.scale(self.image, (30, 30))
         except:
-            self.image = pygame.Surface((10, 10))
+            self.image = pygame.Surface((20, 20))
             self.image.fill(COLOR_XP)
         
         self.rect = self.image.get_rect()

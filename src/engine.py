@@ -215,7 +215,7 @@ class GameEngine:
             pos: Tupla (x, y) con posición del click
             boton: Botón del mouse
         """
-        if boton != 1:
+        if boton != 1: 
             return
         
         # MEJORA - Seleccionar mejora
@@ -235,7 +235,7 @@ class GameEngine:
                     self.estado = GameState.JUGANDO
         
         
-        # MENÚ - Click en el botón INICIAR JUEGO
+        # MENÚ - Click en el botón INICIAR JUEGO 
         if self.estado == GameState.MENU:
             boton_ancho = 300
             boton_alto = 65
