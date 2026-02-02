@@ -6,15 +6,22 @@ IA básica de persecución y diferentes tipos de fauna paraguaya
 
 import pygame
 import random
-from base_entity import BaseEntity
-from src.settings import *
+import math
+from entities.base_entity import BaseEntity
+from settings import *
 
 class Enemy(BaseEntity):
-    '''
-    """
-    PSEUDOCÓDIGO:
+    """Clase de enemigo con IA básica de persecución"""
     
-    __init__(self, x, y, tipo):
+    def __init__(self, x, y, tipo):
+        """
+        Inicializar enemigo
+        
+        Args:
+            x: Posición X inicial
+            y: Posición Y inicial
+            tipo: Tipo de enemigo (string)
+        """
         # Obtener configuración del tipo de enemigo
         config = ENEMIGO_CONFIGS[tipo]
         
@@ -48,93 +55,73 @@ class Enemy(BaseEntity):
         # Estado
         self.esta_atacando = False
     
-    
     def perseguir_jugador(self, dt):
         """
         IA básica: moverse hacia el jugador
         
-        PSEUDOCÓDIGO:
-        SI self.jugador Y self.jugador.esta_vivo:
+        Args:
+            dt: Delta time en segundos
+        """
+        if self.jugador and self.jugador.esta_vivo:
             # Obtener dirección hacia jugador
             self.direccion = self.direccion_hacia(self.jugador)
             
             # Mover hacia el jugador
             self.mover(dt)
-        """
-        pass
-    
     
     def atacar_jugador(self):
-        """
-        Realizar ataque si está en rango
+        """Realizar ataque si está en rango"""
+        if not self.puede_atacar:
+            return
         
-        PSEUDOCÓDIGO:
-        SI NO self.puede_atacar:
-            RETORNAR
-        
-        SI self.colisiona_con(self.jugador):
+        if self.jugador and self.colisiona_con(self.jugador):
             self.jugador.recibir_daño(self.daño)
             self.puede_atacar = False
             self.timer_ataque = 0
             self.esta_atacando = True
-        """
-        pass
-    
     
     def actualizar_cooldown_ataque(self, dt):
         """
         Actualizar timer de ataque
         
-        PSEUDOCÓDIGO:
-        SI NO self.puede_atacar:
+        Args:
+            dt: Delta time en segundos
+        """
+        if not self.puede_atacar:
             self.timer_ataque += dt
             
-            SI self.timer_ataque >= self.cooldown_ataque:
+            if self.timer_ataque >= self.cooldown_ataque:
                 self.puede_atacar = True
                 self.timer_ataque = 0
                 self.esta_atacando = False
-        """
-        pass
-    
     
     def al_morir(self):
-        """
-        Dropear XP cuando muere
-        
-        PSEUDOCÓDIGO:
-        # Crear orbe de XP en esta posición
-        orbe = OrbXP(self.x, self.y, self.xp_drop)
-        
-        # Agregar a lista global de orbes (se maneja en combat_manager)
-        # combat_manager.orbes_xp.append(orbe)
-        
-        # Aumentar contador de enemigos matados del jugador
-        SI self.jugador:
+        """Dropear XP cuando muere"""
+        # El combat_manager creará el orbe de XP
+        if self.jugador:
             self.jugador.enemigos_matados += 1
-        """
-        pass
-    
     
     def recibir_knockback(self, direccion, fuerza):
         """
         Retroceso al recibir daño
         
-        PSEUDOCÓDIGO:
-        # Aplicar fuerza en dirección opuesta
+        Args:
+            direccion: Vector de dirección del knockback
+            fuerza: Fuerza del knockback en píxeles
+        """
         self.x += direccion.x * fuerza
         self.y += direccion.y * fuerza
         self.rect.center = (int(self.x), int(self.y))
-        """
-        pass
-    
     
     def actualizar(self, dt):
         """
         Actualización principal del enemigo
         
-        PSEUDOCÓDIGO:
-        SI NO self.esta_vivo:
-            RETORNAR
+        Args:
+            dt: Delta time en segundos
+        """
+        if not self.esta_vivo:
+            return
         
         # Perseguir al jugador
         self.perseguir_jugador(dt)
@@ -144,75 +131,104 @@ class Enemy(BaseEntity):
         
         # Actualizar cooldowns
         self.actualizar_cooldown_ataque(dt)
-        """
-        pass
 
 
 class OrbXP:
-    """
-    Orbe de experiencia que se dropea al matar enemigos
+    """Orbe de experiencia que se dropea al matar enemigos"""
     
-    PSEUDOCÓDIGO:
-    
-    __init__(self, x, y, cantidad):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, cantidad):
+        """
+        Inicializar orbe de XP
+        
+        Args:
+            x: Posición X
+            y: Posición Y
+            cantidad: Valor de XP del orbe
+        """
+        self.x = float(x)
+        self.y = float(y)
         self.cantidad = cantidad  # Valor de XP
         
         # Crear sprite pequeño dorado
         self.image = pygame.Surface((10, 10))
         self.image.fill(COLOR_XP)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect.center = (int(x), int(y))
         
-        # Animación (opcional para MVP)
+        # Animación
         self.tiempo_vida = 0
         self.flotando = True
-    
     
     def actualizar(self, dt):
         """
         Animación de flotación
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
         self.tiempo_vida += dt
         
         # Efecto de flotación sutil
         offset_y = math.sin(self.tiempo_vida * 3) * 2
         self.rect.centery = int(self.y + offset_y)
-        """
-        pass
-    
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar orbe en pantalla
         
-        PSEUDOCÓDIGO:
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
         pantalla_x = self.rect.x - camara.offset_x
         pantalla_y = self.rect.y - camara.offset_y
         
-        SI esta_en_pantalla(pantalla_x, pantalla_y):
+        # Solo dibujar si está en pantalla
+        if -50 < pantalla_x < pantalla.get_width() + 50 and -50 < pantalla_y < pantalla.get_height() + 50:
             pantalla.blit(self.image, (pantalla_x, pantalla_y))
+    
+    def distancia_a(self, entidad):
         """
-        pass
-
-
-# ========== VARIACIONES ESPECIALES (para expansión futura) ==========
-"""
-Estas clases pueden heredar de Enemy y sobrescribir comportamientos
-
-class CarpionchoElite(Enemy):
-    # Carpincho más grande y rápido que aparece cada 5 minutos
+        Calcular distancia a una entidad
+        
+        Args:
+            entidad: Objeto con atributos x, y
+            
+        Returns:
+            float: Distancia en píxeles
+        """
+        dx = self.x - entidad.x
+        dy = self.y - entidad.y
+        return math.sqrt(dx * dx + dy * dy)
     
-class YacareAcorazado(Enemy):
-    # Yacaré con más vida que solo recibe daño por detrás
+    def direccion_hacia(self, entidad):
+        """
+        Obtener dirección hacia una entidad
+        
+        Args:
+            entidad: Objeto con atributos x, y
+            
+        Returns:
+            Vector2: Vector normalizado hacia la entidad
+        """
+        vector = pygame.math.Vector2(
+            entidad.x - self.x,
+            entidad.y - self.y
+        )
+        
+        if vector.length() > 0:
+            return vector.normalize()
+        
+        return vector
     
-class TatuExcavador(Enemy):
-    # Tatú que puede atravesar el jugador y aparecer detrás
-    
-class AguaraGuazuAlfa(Enemy):
-    # Boss que aparece cada 10 minutos
-    # Tiene ataques especiales y dropea mucho XP
-"""
-'''
+    def colisiona_con(self, entidad):
+        """
+        Verificar colisión con una entidad
+        
+        Args:
+            entidad: Objeto con atributo rect
+            
+        Returns:
+            bool: True si hay colisión
+        """
+        return self.rect.colliderect(entidad.rect)

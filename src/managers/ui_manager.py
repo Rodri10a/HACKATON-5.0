@@ -1,18 +1,22 @@
-"""
-UI_MANAGER.PY - INTERFAZ DE USUARIO
-====================================
-HUD, menús, pantallas de pausa y game over
-"""
+
+# from src.settings import *
+
 
 import pygame
-from src.settings import *
+from settings import *
+
 
 class UIManager:
-    '''
-    """
-    PSEUDOCÓDIGO:
+    """Gestor de interfaz de usuario"""
     
-    __init__(self, pantalla, jugador):
+    def __init__(self, pantalla, jugador):
+        """
+        Inicializar UI manager
+        
+        Args:
+            pantalla: Surface de pygame
+            jugador: Objeto Player
+        """
         self.pantalla = pantalla
         self.jugador = jugador
         
@@ -30,12 +34,8 @@ class UIManager:
         self.opciones_mejora = []
         self.mejora_seleccionada = None
     
-    
     def dibujar_hud(self):
-        """
-        Dibujar HUD principal (vida, XP, nivel, tiempo)
-        
-        PSEUDOCÓDIGO:
+        """Dibujar HUD principal (vida, XP, nivel, tiempo)"""
         # Barra de vida
         self.dibujar_barra_vida()
         
@@ -50,18 +50,9 @@ class UIManager:
         
         # Contador de enemigos matados
         self.dibujar_estadisticas()
-        
-        SI MOSTRAR_FPS:
-            self.dibujar_fps()
-        """
-        pass
-    
     
     def dibujar_barra_vida(self):
-        """
-        Dibujar barra de vida del jugador
-        
-        PSEUDOCÓDIGO:
+        """Dibujar barra de vida del jugador"""
         x, y = POSICION_BARRA_VIDA
         ancho, alto = TAMAÑO_BARRA_VIDA
         
@@ -95,17 +86,11 @@ class UIManager:
         texto = f"{int(self.jugador.vida_actual)} / {self.jugador.vida_maxima}"
         superficie_texto = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
         texto_rect = superficie_texto.get_rect()
-        texto_rect.center = (x + ancho//2, y + alto//2)
+        texto_rect.center = (x + ancho // 2, y + alto // 2)
         self.pantalla.blit(superficie_texto, texto_rect)
-        """
-        pass
-    
     
     def dibujar_barra_xp(self):
-        """
-        Dibujar barra de experiencia
-        
-        PSEUDOCÓDIGO:
+        """Dibujar barra de experiencia"""
         x, y = POSICION_BARRA_XP
         ancho, alto = TAMAÑO_BARRA_XP
         
@@ -130,29 +115,17 @@ class UIManager:
         texto = f"XP: {int(self.jugador.xp_actual)} / {self.jugador.xp_necesaria}"
         superficie_texto = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
         self.pantalla.blit(superficie_texto, (x + 5, y + alto + 5))
-        """
-        pass
-    
     
     def dibujar_nivel(self):
-        """
-        Dibujar nivel actual del jugador
-        
-        PSEUDOCÓDIGO:
+        """Dibujar nivel actual del jugador"""
         texto = f"NIVEL {self.jugador.nivel}"
         superficie = self.fuente_grande.render(texto, True, COLOR_XP)
         rect = superficie.get_rect()
         rect.topright = (ANCHO_VENTANA - 20, 20)
         self.pantalla.blit(superficie, rect)
-        """
-        pass
-    
     
     def dibujar_tiempo(self):
-        """
-        Dibujar tiempo de supervivencia
-        
-        PSEUDOCÓDIGO:
+        """Dibujar tiempo de supervivencia"""
         minutos = int(self.jugador.tiempo_supervivencia // 60)
         segundos = int(self.jugador.tiempo_supervivencia % 60)
         
@@ -161,15 +134,9 @@ class UIManager:
         rect = superficie.get_rect()
         rect.topright = (ANCHO_VENTANA - 20, 80)
         self.pantalla.blit(superficie, rect)
-        """
-        pass
-    
     
     def dibujar_estadisticas(self):
-        """
-        Dibujar estadísticas de juego
-        
-        PSEUDOCÓDIGO:
+        """Dibujar estadísticas de juego"""
         # Enemigos matados
         texto = f"Enemigos: {self.jugador.enemigos_matados}"
         superficie = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
@@ -179,35 +146,21 @@ class UIManager:
         
         # Armas equipadas
         y_offset = 150
-        PARA arma EN self.jugador.armas_equipadas:
+        for arma in self.jugador.armas_equipadas:
             texto = f"{arma.tipo} Nv.{arma.nivel}"
             superficie = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
             rect = superficie.get_rect()
             rect.topright = (ANCHO_VENTANA - 20, y_offset)
             self.pantalla.blit(superficie, rect)
             y_offset += 25
-        """
-        pass
-    
-    
-    def dibujar_fps(self):
-        """
-        Dibujar FPS actual
-        
-        PSEUDOCÓDIGO:
-        fps = int(clock.get_fps())  # Se pasa desde el main loop
-        texto = f"FPS: {fps}"
-        superficie = self.fuente_pequeña.render(texto, True, (0, 255, 0))
-        self.pantalla.blit(superficie, (10, ALTO_VENTANA - 30))
-        """
-        pass
-    
     
     def dibujar_pantalla_mejora(self, opciones):
         """
         Pantalla de selección de mejora al subir nivel
         
-        PSEUDOCÓDIGO:
+        Args:
+            opciones: Lista de diccionarios con opciones de mejora
+        """
         # Overlay oscuro semi-transparente
         overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
         overlay.set_alpha(200)
@@ -228,19 +181,19 @@ class UIManager:
         x_inicial = (ANCHO_VENTANA - (ancho_carta * 3 + espacio * 2)) // 2
         y_carta = 200
         
-        PARA i, opcion EN enumerate(opciones):
+        for i, opcion in enumerate(opciones):
             x_carta = x_inicial + (ancho_carta + espacio) * i
             
             # Detectar hover del mouse
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            hover = (x_carta < mouse_x < x_carta + ancho_carta Y
+            hover = (x_carta < mouse_x < x_carta + ancho_carta and
                     y_carta < mouse_y < y_carta + alto_carta)
             
             # Dibujar carta
             self.dibujar_carta_mejora(
                 x_carta, y_carta, 
                 ancho_carta, alto_carta, 
-                opcion, hover
+                opcion, hover, i
             )
         
         # Instrucciones
@@ -249,17 +202,22 @@ class UIManager:
         rect = superficie.get_rect()
         rect.center = (ANCHO_VENTANA // 2, ALTO_VENTANA - 50)
         self.pantalla.blit(superficie, rect)
-        """
-        pass
     
-    
-    def dibujar_carta_mejora(self, x, y, ancho, alto, opcion, hover):
+    def dibujar_carta_mejora(self, x, y, ancho, alto, opcion, hover, indice):
         """
         Dibujar carta individual de mejora
         
-        PSEUDOCÓDIGO:
+        Args:
+            x: Posición X de la carta
+            y: Posición Y de la carta
+            ancho: Ancho de la carta
+            alto: Alto de la carta
+            opcion: Diccionario con la opción
+            hover: Si el mouse está sobre la carta
+            indice: Índice de la carta (0, 1, 2)
+        """
         # Color de fondo (más claro si hover)
-        color_fondo = (60, 60, 60) SI hover SINO (40, 40, 40)
+        color_fondo = (60, 60, 60) if hover else (40, 40, 40)
         
         # Rectángulo de la carta
         pygame.draw.rect(
@@ -269,7 +227,7 @@ class UIManager:
         )
         
         # Borde (dorado si hover)
-        color_borde = COLOR_XP SI hover SINO COLOR_TEXTO
+        color_borde = COLOR_XP if hover else COLOR_TEXTO
         pygame.draw.rect(
             self.pantalla,
             color_borde,
@@ -277,63 +235,50 @@ class UIManager:
             3
         )
         
-        # Contenido según tipo de mejora
+        # Título según tipo de mejora
         tipo = opcion["tipo"]
         
-        SI tipo == "nueva_arma":
-            nombre_arma = opcion["valor"]
-            self.dibujar_info_arma(x, y, ancho, alto, nombre_arma)
+        if tipo == "nueva_arma":
+            titulo = "NUEVA ARMA"
+            descripcion = opcion["valor"]
+        elif tipo == "mejorar_arma":
+            titulo = "MEJORAR ARMA"
+            descripcion = f"{opcion['valor']} Nv.{opcion['nivel']}"
+        else:
+            titulo = "MEJORA PASIVA"
+            descripcion = opcion["descripcion"]
         
-        SI tipo == "mejorar_arma":
-            arma = opcion["valor"]
-            self.dibujar_info_mejora_arma(x, y, ancho, alto, arma)
+        # Dibujar título
+        texto_titulo = self.fuente_media.render(titulo, True, COLOR_XP)
+        rect_titulo = texto_titulo.get_rect()
+        rect_titulo.centerx = x + ancho // 2
+        rect_titulo.top = y + 30
+        self.pantalla.blit(texto_titulo, rect_titulo)
         
-        SI tipo == "aumentar_vida_max":
-            self.dibujar_info_stat(x, y, ancho, alto, "VIDA MAX", f"+{opcion['valor']}")
+        # Dibujar descripción
+        texto_desc = self.fuente_grande.render(descripcion, True, COLOR_TEXTO)
+        rect_desc = texto_desc.get_rect()
+        rect_desc.center = (x + ancho // 2, y + alto // 2)
+        self.pantalla.blit(texto_desc, rect_desc)
         
-        SI tipo == "aumentar_velocidad":
-            self.dibujar_info_stat(x, y, ancho, alto, "VELOCIDAD", f"+{opcion['valor']}")
-        """
-        pass
-    
-    
-    def dibujar_info_arma(self, x, y, ancho, alto, nombre_arma):
-        """
-        Dibujar información de nueva arma
-        
-        PSEUDOCÓDIGO:
-        # Título "NUEVA ARMA"
-        titulo = self.fuente_media.render("NUEVA ARMA", True, COLOR_XP)
-        rect = titulo.get_rect()
-        rect.centerx = x + ancho // 2
-        rect.top = y + 20
-        self.pantalla.blit(titulo, rect)
-        
-        # Nombre del arma
-        nombre = self.fuente_grande.render(nombre_arma, True, COLOR_TEXTO)
-        rect = nombre.get_rect()
-        rect.center = (x + ancho // 2, y + alto // 2)
-        self.pantalla.blit(nombre, rect)
-        
-        # Descripción
-        config = ARMAS_CONFIG[nombre_arma]
-        desc_y = y + alto // 2 + 40
-        
-        texto_daño = f"Daño: {config['daño_base']}"
-        superficie = self.fuente_pequeña.render(texto_daño, True, COLOR_TEXTO)
-        rect = superficie.get_rect()
-        rect.centerx = x + ancho // 2
-        rect.top = desc_y
-        self.pantalla.blit(superficie, rect)
-        """
-        pass
-    
+        # Número de la carta
+        texto_num = self.fuente_pequeña.render(f"[{indice + 1}]", True, COLOR_TEXTO)
+        rect_num = texto_num.get_rect()
+        rect_num.centerx = x + ancho // 2
+        rect_num.bottom = y + alto - 20
+        self.pantalla.blit(texto_num, rect_num)
     
     def manejar_click_mejora(self, pos_mouse, opciones):
         """
         Detectar click en carta de mejora
         
-        PSEUDOCÓDIGO:
+        Args:
+            pos_mouse: Tupla (x, y) con posición del mouse
+            opciones: Lista de opciones de mejora
+            
+        Returns:
+            int: Índice de opción elegida, o None
+        """
         mouse_x, mouse_y = pos_mouse
         
         ancho_carta = 300
@@ -342,25 +287,19 @@ class UIManager:
         x_inicial = (ANCHO_VENTANA - (ancho_carta * 3 + espacio * 2)) // 2
         y_carta = 200
         
-        PARA i, opcion EN enumerate(opciones):
+        for i, opcion in enumerate(opciones):
             x_carta = x_inicial + (ancho_carta + espacio) * i
             
             # Verificar si click está dentro de la carta
-            SI (x_carta < mouse_x < x_carta + ancho_carta Y
+            if (x_carta < mouse_x < x_carta + ancho_carta and
                 y_carta < mouse_y < y_carta + alto_carta):
                 
-                RETORNAR i  # Índice de opción elegida
+                return i  # Índice de opción elegida
         
-        RETORNAR None
-        """
-        pass
-    
+        return None
     
     def dibujar_menu_pausa(self):
-        """
-        Menú de pausa
-        
-        PSEUDOCÓDIGO:
+        """Menú de pausa"""
         # Overlay
         overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
         overlay.set_alpha(180)
@@ -377,21 +316,15 @@ class UIManager:
         opciones = ["Reanudar (ESC)", "Salir al Menú (Q)"]
         y_offset = 300
         
-        PARA opcion EN opciones:
+        for opcion in opciones:
             texto = self.fuente_media.render(opcion, True, COLOR_TEXTO)
             rect = texto.get_rect()
             rect.center = (ANCHO_VENTANA // 2, y_offset)
             self.pantalla.blit(texto, rect)
             y_offset += 60
-        """
-        pass
-    
     
     def dibujar_game_over(self):
-        """
-        Pantalla de Game Over con estadísticas
-        
-        PSEUDOCÓDIGO:
+        """Pantalla de Game Over con estadísticas"""
         # Overlay rojo oscuro
         overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
         overlay.set_alpha(200)
@@ -405,14 +338,17 @@ class UIManager:
         self.pantalla.blit(titulo, rect)
         
         # Estadísticas finales
+        minutos = int(self.jugador.tiempo_supervivencia // 60)
+        segundos = int(self.jugador.tiempo_supervivencia % 60)
+        
         stats = [
             f"Nivel Alcanzado: {self.jugador.nivel}",
-            f"Tiempo Supervivido: {int(self.jugador.tiempo_supervivencia // 60)}:{int(self.jugador.tiempo_supervivencia % 60):02d}",
+            f"Tiempo Supervivido: {minutos}:{segundos:02d}",
             f"Enemigos Eliminados: {self.jugador.enemigos_matados}",
         ]
         
         y_offset = 200
-        PARA stat EN stats:
+        for stat in stats:
             texto = self.fuente_media.render(stat, True, COLOR_TEXTO)
             rect = texto.get_rect()
             rect.center = (ANCHO_VENTANA // 2, y_offset)
@@ -425,15 +361,9 @@ class UIManager:
         rect = texto.get_rect()
         rect.center = (ANCHO_VENTANA // 2, ALTO_VENTANA - 50)
         self.pantalla.blit(texto, rect)
-        """
-        pass
-    
     
     def dibujar_pantalla_inicio(self):
-        """
-        Pantalla de inicio del juego
-        
-        PSEUDOCÓDIGO:
+        """Pantalla de inicio del juego"""
         # Fondo
         self.pantalla.fill((0, 0, 0))
         
@@ -459,6 +389,19 @@ class UIManager:
         ]
         
         y_offset = 300
-        PARA line
+        for linea in instrucciones:
+            texto = self.fuente_pequeña.render(linea, True, COLOR_TEXTO)
+            rect = texto.get_rect()
+            rect.center = (ANCHO_VENTANA // 2, y_offset)
+            self.pantalla.blit(texto, rect)
+            y_offset += 35
+    
+    def actualizar(self, dt):
+        """
+        Actualizar animaciones de UI si las hay
         
-        '''
+        Args:
+            dt: Delta time en segundos
+        """
+        # Por ahora, la UI es estática
+        pass

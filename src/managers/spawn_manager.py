@@ -6,15 +6,23 @@ Controla cuándo y dónde aparecen enemigos, escalando dificultad
 
 import pygame
 import random
+import math
 from entities.enemy import Enemy
-from src.settings import *
+from settings import *
+
 
 class SpawnManager:
-    '''
-    """
-    PSEUDOCÓDIGO:
+    """Gestor de spawning de enemigos con escalado de dificultad"""
     
-    __init__(self, mapa, camara, jugador):
+    def __init__(self, mapa, camara, jugador):
+        """
+        Inicializar spawn manager
+        
+        Args:
+            mapa: Objeto Map
+            camara: Objeto Camera
+            jugador: Objeto Player
+        """
         self.mapa = mapa
         self.camara = camara
         self.jugador = jugador
@@ -29,16 +37,18 @@ class SpawnManager:
         
         # Tiempo de juego (para escalar dificultad)
         self.tiempo_juego = 0
+        self.ultimo_escalado = 0
         
         # Límite de enemigos en pantalla
-        self.max_enemigos = 300  # Para evitar lag
-    
+        self.max_enemigos = MAX_ENEMIGOS_PANTALLA
     
     def actualizar(self, dt):
         """
         Actualizar spawns y enemigos
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
         # Actualizar tiempo de juego
         self.tiempo_juego += dt
         
@@ -46,12 +56,13 @@ class SpawnManager:
         self.timer_spawn += dt
         
         # Escalar dificultad cada minuto
-        SI int(self.tiempo_juego) % 60 == 0 Y int(self.tiempo_juego) > 0:
+        if int(self.tiempo_juego) > self.ultimo_escalado and int(self.tiempo_juego) % 60 == 0:
             self.escalar_dificultad()
+            self.ultimo_escalado = int(self.tiempo_juego)
         
         # Verificar si es momento de spawnear
-        SI self.timer_spawn >= self.tiempo_entre_spawns:
-            SI len(self.enemigos) < self.max_enemigos:
+        if self.timer_spawn >= self.tiempo_entre_spawns:
+            if len(self.enemigos) < self.max_enemigos:
                 self.spawnear_enemigos()
             self.timer_spawn = 0
         
@@ -60,23 +71,17 @@ class SpawnManager:
         
         # Eliminar enemigos muertos
         self.limpiar_enemigos_muertos()
-        """
-        pass
-    
     
     def spawnear_enemigos(self):
-        """
-        Crear nuevos enemigos
-        
-        PSEUDOCÓDIGO:
-        PARA i EN range(self.enemigos_por_spawn):
+        """Crear nuevos enemigos"""
+        for i in range(self.enemigos_por_spawn):
             # Elegir tipo de enemigo según probabilidades
             tipo_enemigo = self.elegir_tipo_enemigo()
             
             # Obtener posición de spawn (fuera de pantalla)
             x, y = self.mapa.posicion_spawn_fuera_pantalla(
                 self.camara, 
-                margen=100
+                margen=SPAWN_MARGEN_PANTALLA
             )
             
             # Crear enemigo
@@ -84,190 +89,149 @@ class SpawnManager:
             enemigo.jugador = self.jugador  # Asignar referencia al jugador
             
             self.enemigos.append(enemigo)
-        """
-        pass
-    
     
     def elegir_tipo_enemigo(self):
         """
         Elegir tipo de enemigo según pesos de spawn
         
-        PSEUDOCÓDIGO:
+        Returns:
+            string: Tipo de enemigo
+        """
         # Crear lista ponderada de tipos
         opciones = []
         
-        PARA tipo, config EN ENEMIGO_CONFIGS.items():
+        for tipo, config in ENEMIGO_CONFIGS.items():
             peso = config["spawn_peso"]
             
             # Ajustar peso según tiempo de juego
             # Enemigos más fuertes aparecen más seguido con el tiempo
-            SI tipo == "AGUARA_GUAZU":  # Boss
+            if tipo == "AGUARA_GUAZU":  # Boss
                 # Solo aparece después de 5 minutos
-                SI self.tiempo_juego < 300:
+                if self.tiempo_juego < 300:
                     peso = 0
-                SINO:
-                    peso = peso * (self.tiempo_juego / 300)
+                else:
+                    peso = int(peso * (self.tiempo_juego / 300))
             
             # Agregar tipo 'peso' veces a la lista
-            PARA _ EN range(int(peso)):
+            for _ in range(int(peso)):
                 opciones.append(tipo)
         
         # Elegir aleatoriamente
-        RETORNAR random.choice(opciones)
-        """
-        pass
-    
+        if opciones:
+            return random.choice(opciones)
+        else:
+            return "CARPINCHO"  # Fallback
     
     def escalar_dificultad(self):
-        """
-        Aumentar dificultad progresivamente
-        
-        PSEUDOCÓDIGO:
+        """Aumentar dificultad progresivamente"""
         # Reducir tiempo entre spawns (hasta un mínimo)
-        SI self.tiempo_entre_spawns > SPAWN_MINIMO:
+        if self.tiempo_entre_spawns > SPAWN_MINIMO:
             self.tiempo_entre_spawns -= SPAWN_REDUCCION_POR_MINUTO
             self.tiempo_entre_spawns = max(SPAWN_MINIMO, self.tiempo_entre_spawns)
         
         # Aumentar cantidad de enemigos por spawn cada 2 minutos
-        SI int(self.tiempo_juego) % 120 == 0:
+        if int(self.tiempo_juego) % AUMENTO_ENEMIGOS_CADA == 0:
             self.enemigos_por_spawn += 1
-        """
-        pass
-    
     
     def actualizar_enemigos(self, dt):
         """
         Actualizar todos los enemigos vivos
         
-        PSEUDOCÓDIGO:
-        PARA enemigo EN self.enemigos:
-            SI enemigo.esta_vivo:
-                enemigo.actualizar(dt)
+        Args:
+            dt: Delta time en segundos
         """
-        pass
-    
+        for enemigo in self.enemigos:
+            if enemigo.esta_vivo:
+                enemigo.actualizar(dt)
     
     def limpiar_enemigos_muertos(self):
-        """
-        Eliminar enemigos muertos de la lista
-        
-        PSEUDOCÓDIGO:
-        # Filtrar solo enemigos vivos
+        """Eliminar enemigos muertos de la lista"""
         self.enemigos = [e for e in self.enemigos if e.esta_vivo]
-        """
-        pass
-    
     
     def obtener_enemigos_en_rango(self, x, y, rango):
         """
         Obtener enemigos dentro de un rango
         (Útil para detectar objetivos de armas)
         
-        PSEUDOCÓDIGO:
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+            rango: Radio de búsqueda
+            
+        Returns:
+            list: Lista de enemigos en rango
+        """
         enemigos_cercanos = []
         
-        PARA enemigo EN self.enemigos:
-            SI NO enemigo.esta_vivo:
-                CONTINUAR
+        for enemigo in self.enemigos:
+            if not enemigo.esta_vivo:
+                continue
             
             # Calcular distancia
             dx = enemigo.x - x
             dy = enemigo.y - y
-            distancia = sqrt(dx*dx + dy*dy)
+            distancia = math.sqrt(dx * dx + dy * dy)
             
-            SI distancia <= rango:
+            if distancia <= rango:
                 enemigos_cercanos.append(enemigo)
         
-        RETORNAR enemigos_cercanos
-        """
-        pass
-    
+        return enemigos_cercanos
     
     def obtener_enemigo_mas_cercano(self, x, y):
         """
         Obtener el enemigo más cercano a una posición
         
-        PSEUDOCÓDIGO:
-        SI len(self.enemigos) == 0:
-            RETORNAR None
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+            
+        Returns:
+            Enemy: Enemigo más cercano, o None
+        """
+        if len(self.enemigos) == 0:
+            return None
         
         enemigo_cercano = None
         distancia_minima = float('inf')
         
-        PARA enemigo EN self.enemigos:
-            SI NO enemigo.esta_vivo:
-                CONTINUAR
+        for enemigo in self.enemigos:
+            if not enemigo.esta_vivo:
+                continue
             
             dx = enemigo.x - x
             dy = enemigo.y - y
-            distancia = sqrt(dx*dx + dy*dy)
+            distancia = math.sqrt(dx * dx + dy * dy)
             
-            SI distancia < distancia_minima:
+            if distancia < distancia_minima:
                 distancia_minima = distancia
                 enemigo_cercano = enemigo
         
-        RETORNAR enemigo_cercano
-        """
-        pass
-    
+        return enemigo_cercano
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar todos los enemigos visibles
         
-        PSEUDOCÓDIGO:
-        PARA enemigo EN self.enemigos:
-            SI enemigo.esta_vivo:
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        for enemigo in self.enemigos:
+            if enemigo.esta_vivo:
                 # Solo dibujar si está visible
-                SI camara.esta_visible(enemigo):
+                if camara.esta_visible(enemigo):
                     enemigo.dibujar(pantalla, camara)
-        """
-        pass
-    
-    
-    def spawnear_oleada_boss(self):
-        """
-        Spawnear oleada especial de boss
-        (Llamar cada X minutos)
-        
-        PSEUDOCÓDIGO:
-        # Spawnear boss en posición aleatoria
-        x, y = self.mapa.posicion_spawn_fuera_pantalla(self.camara, 200)
-        
-        boss = Enemy(x, y, "AGUARA_GUAZU")
-        boss.jugador = self.jugador
-        
-        # Escalar stats del boss según tiempo
-        multiplicador = 1 + (self.tiempo_juego / 600)  # +100% cada 10 min
-        boss.vida_maxima *= multiplicador
-        boss.vida_actual *= multiplicador
-        boss.daño *= multiplicador
-        
-        self.enemigos.append(boss)
-        
-        # Spawnear enemigos menores alrededor del boss
-        PARA _ EN range(10):
-            offset_x = random.randint(-200, 200)
-            offset_y = random.randint(-200, 200)
-            
-            enemigo = Enemy(x + offset_x, y + offset_y, "CARPINCHO")
-            enemigo.jugador = self.jugador
-            self.enemigos.append(enemigo)
-        """
-        pass
-    
     
     def obtener_estadisticas(self):
         """
         Obtener estadísticas de spawn
         
-        PSEUDOCÓDIGO:
-        RETORNAR {
+        Returns:
+            dict: Diccionario con estadísticas
+        """
+        return {
             "enemigos_activos": len(self.enemigos),
             "enemigos_por_spawn": self.enemigos_por_spawn,
             "tiempo_entre_spawns": self.tiempo_entre_spawns,
             "tiempo_juego": int(self.tiempo_juego)
         }
-        """
-        pass
-        '''

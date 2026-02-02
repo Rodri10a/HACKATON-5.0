@@ -1,349 +1,424 @@
 """
-WEAPON.PY - SISTEMA DE ARMAS Y HERRAMIENTAS
-============================================
-Diferentes armas con comportamientos únicos
+ARMA.PY - SISTEMA DE ARMAS
+===========================
+Diferentes tipos de armas con sus mecánicas únicas
 """
 
 import pygame
 import math
 import random
-from src.settings import *
+from settings import *
+
 
 class Weapon:
-    '''
-    """
-    PSEUDOCÓDIGO:
+    """Clase base de armas"""
     
-    __init__(self, tipo, dueño):
-        self.tipo = tipo  # "MACHETE", "HACHA", "AZADA", "TERERE"
-        self.dueño = dueño  # Referencia al jugador
+    def __init__(self, tipo, dueño):
+        """
+        Inicializar arma
         
-        # Cargar configuración del arma
-        self.config = ARMAS_CONFIG[tipo]
-        
-        # Nivel del arma
+        Args:
+            tipo: Tipo de arma (string)
+            dueño: Referencia al jugador
+        """
+        self.tipo = tipo
+        self.dueño = dueño
         self.nivel = 1
-        self.nivel_maximo = len(self.config["niveles"])
         
-        # Stats actuales (del nivel 1)
-        self.stats = self.config["niveles"][0].copy()
-        
-        # Cooldown
+        # Obtener configuración del arma
+        self.config = ARMAS_CONFIG[tipo]
         self.cooldown = self.config["cooldown"]
+        self.tipo_ataque = self.config["tipo"]
+        
+        # Timer de cooldown
         self.timer_cooldown = 0
         self.puede_usar = True
         
-        # Proyectiles activos (para armas de proyectiles)
+        # Lista de proyectiles (para armas tipo proyectil)
         self.proyectiles = []
-    
-    
-    def subir_nivel(self):
-        """
-        Aumentar nivel del arma y mejorar stats
         
-        PSEUDOCÓDIGO:
-        SI self.nivel < self.nivel_maximo:
-            self.nivel += 1
-            # Actualizar stats al nuevo nivel
-            self.stats = self.config["niveles"][self.nivel - 1].copy()
-        """
-        pass
-    
+        # Lista de efectos visuales (para armas tipo AoE)
+        self.efectos = []
+        
+        # Buff activo (para armas tipo buff)
+        self.buff_activo = False
+        self.timer_buff = 0
+        self.duracion_buff = 0
     
     def actualizar(self, dt, enemigos):
         """
-        Actualizar cooldown y lógica del arma
+        Actualizar arma y sus proyectiles/efectos
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+            enemigos: Lista de enemigos
+        """
         # Actualizar cooldown
-        SI NO self.puede_usar:
+        if not self.puede_usar:
             self.timer_cooldown += dt
-            SI self.timer_cooldown >= self.cooldown:
+            if self.timer_cooldown >= self.cooldown:
                 self.puede_usar = True
                 self.timer_cooldown = 0
         
-        # SI puede usar, usar automáticamente
-        SI self.puede_usar Y hay enemigos cercanos:
+        # Si puede usar, atacar
+        if self.puede_usar and len(enemigos) > 0:
             self.usar(enemigos)
         
-        # Actualizar proyectiles si los hay
-        PARA CADA proyectil EN self.proyectiles:
+        # Actualizar proyectiles
+        proyectiles_activos = []
+        for proyectil in self.proyectiles:
             proyectil.actualizar(dt)
-            SI proyectil.debe_eliminarse:
-                self.proyectiles.remove(proyectil)
-        """
-        pass
-    
+            if not proyectil.debe_eliminarse:
+                proyectiles_activos.append(proyectil)
+        self.proyectiles = proyectiles_activos
+        
+        # Actualizar efectos
+        efectos_activos = []
+        for efecto in self.efectos:
+            efecto.actualizar(dt)
+            if not efecto.completado:
+                efectos_activos.append(efecto)
+        self.efectos = efectos_activos
+        
+        # Actualizar buff
+        if self.buff_activo:
+            self.timer_buff += dt
+            if self.timer_buff >= self.duracion_buff:
+                self.buff_activo = False
+                self.timer_buff = 0
     
     def usar(self, enemigos):
         """
         Usar el arma según su tipo
         
-        PSEUDOCÓDIGO:
-        SI self.tipo == "MACHETE":
+        Args:
+            enemigos: Lista de enemigos
+        """
+        if self.tipo_ataque == "melee":
             self.ataque_machete(enemigos)
-        
-        SINO SI self.tipo == "HACHA":
+        elif self.tipo_ataque == "proyectil":
             self.ataque_hacha(enemigos)
-        
-        SINO SI self.tipo == "AZADA":
+        elif self.tipo_ataque == "aoe":
             self.ataque_azada(enemigos)
-        
-        SINO SI self.tipo == "TERERE":
+        elif self.tipo_ataque == "buff":
             self.buff_terere()
         
-        # Marcar en cooldown
+        # Activar cooldown
         self.puede_usar = False
         self.timer_cooldown = 0
-        """
-        pass
-    
     
     def ataque_machete(self, enemigos):
         """
-        Ataque melee en área circular alrededor del jugador
+        Ataque melee circular alrededor del jugador
         
-        PSEUDOCÓDIGO:
-        alcance = self.stats["alcance"]
-        daño = self.stats["daño"]
+        Args:
+            enemigos: Lista de enemigos
+        """
+        config_nivel = self.config["niveles"][self.nivel - 1]
+        daño = config_nivel["daño"]
+        alcance = config_nivel["alcance"]
         
-        PARA CADA enemigo EN enemigos:
-            distancia = self.dueño.distancia_a(enemigo)
+        for enemigo in enemigos:
+            if not enemigo.esta_vivo:
+                continue
             
-            SI distancia <= alcance:
+            # Calcular distancia
+            dx = enemigo.x - self.dueño.x
+            dy = enemigo.y - self.dueño.y
+            distancia = math.sqrt(dx * dx + dy * dy)
+            
+            if distancia <= alcance:
                 # Aplicar daño
                 enemigo.recibir_daño(daño)
                 
                 # Aplicar knockback
-                direccion = self.dueño.direccion_hacia(enemigo)
-                enemigo.recibir_knockback(direccion, fuerza=100)
-        """
-        pass
-    
+                if distancia > 0:
+                    direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
+                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_MACHETE)
     
     def ataque_hacha(self, enemigos):
         """
-        Lanzar hacha(s) giratoria(s) hacia enemigos
+        Lanzar proyectiles de hacha hacia enemigos cercanos
         
-        PSEUDOCÓDIGO:
-        cantidad = self.stats["cantidad"]  # Número de hachas
-        daño = self.stats["daño"]
+        Args:
+            enemigos: Lista de enemigos
+        """
+        config_nivel = self.config["niveles"][self.nivel - 1]
+        daño = config_nivel["daño"]
+        cantidad = config_nivel["cantidad"]
+        velocidad = config_nivel["velocidad"]
         
         # Encontrar enemigos más cercanos
-        enemigos_ordenados = sorted(enemigos, 
-                                    key=lambda e: self.dueño.distancia_a(e))
+        enemigos_vivos = [e for e in enemigos if e.esta_vivo]
+        if not enemigos_vivos:
+            return
         
-        # Lanzar un hacha hacia cada enemigo cercano
-        PARA i EN range(min(cantidad, len(enemigos_ordenados))):
+        # Ordenar por distancia
+        enemigos_ordenados = sorted(
+            enemigos_vivos,
+            key=lambda e: math.sqrt((e.x - self.dueño.x)**2 + (e.y - self.dueño.y)**2)
+        )
+        
+        # Lanzar hachas hacia los más cercanos
+        for i in range(min(cantidad, len(enemigos_ordenados))):
             enemigo_objetivo = enemigos_ordenados[i]
             
-            # Crear proyectil
-            direccion = self.dueño.direccion_hacia(enemigo_objetivo)
-            proyectil = ProyectilHacha(
-                self.dueño.x, 
-                self.dueño.y, 
-                direccion, 
-                daño
-            )
-            self.proyectiles.append(proyectil)
-        """
-        pass
-    
+            # Calcular dirección
+            dx = enemigo_objetivo.x - self.dueño.x
+            dy = enemigo_objetivo.y - self.dueño.y
+            distancia = math.sqrt(dx * dx + dy * dy)
+            
+            if distancia > 0:
+                direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
+                
+                # Crear proyectil
+                proyectil = ProyectilHacha(
+                    self.dueño.x,
+                    self.dueño.y,
+                    direccion,
+                    velocidad,
+                    daño
+                )
+                self.proyectiles.append(proyectil)
     
     def ataque_azada(self, enemigos):
         """
-        Ataque AoE (Área de Efecto) que daña a todos en un radio
+        Ataque AoE que daña a todos los enemigos en un radio
         
-        PSEUDOCÓDIGO:
-        radio = self.stats["radio"]
-        daño = self.stats["daño"]
+        Args:
+            enemigos: Lista de enemigos
+        """
+        config_nivel = self.config["niveles"][self.nivel - 1]
+        daño = config_nivel["daño"]
+        radio = config_nivel["radio"]
         
-        # Crear efecto visual (círculo expandiéndose)
-        efecto = EfectoAzada(self.dueño.x, self.dueño.y, radio)
-        
-        PARA CADA enemigo EN enemigos:
-            distancia = self.dueño.distancia_a(enemigo)
+        for enemigo in enemigos:
+            if not enemigo.esta_vivo:
+                continue
             
-            SI distancia <= radio:
+            # Calcular distancia
+            dx = enemigo.x - self.dueño.x
+            dy = enemigo.y - self.dueño.y
+            distancia = math.sqrt(dx * dx + dy * dy)
+            
+            if distancia <= radio:
+                # Aplicar daño
                 enemigo.recibir_daño(daño)
                 
-                # Knockback fuerte desde el centro
-                direccion = self.dueño.direccion_hacia(enemigo)
-                enemigo.recibir_knockback(direccion, fuerza=200)
-        """
-        pass
-    
+                # Aplicar knockback fuerte
+                if distancia > 0:
+                    direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
+                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_AZADA)
+        
+        # Crear efecto visual
+        efecto = EfectoAzada(self.dueño.x, self.dueño.y, radio)
+        self.efectos.append(efecto)
     
     def buff_terere(self):
-        """
-        Buff de regeneración de vida
+        """Aplicar buff de regeneración al jugador"""
+        config_nivel = self.config["niveles"][self.nivel - 1]
+        self.vida_por_seg = config_nivel["vida_por_seg"]
+        self.duracion_buff = config_nivel["duracion"]
         
-        PSEUDOCÓDIGO:
-        vida_por_seg = self.stats["vida_por_seg"]
-        duracion = self.stats["duracion"]
-        
-        # Aplicar buff al jugador
-        self.dueño.aplicar_buff_regeneracion(vida_por_seg, duracion)
-        
-        # Efecto visual (aura verde alrededor del jugador)
-        """
-        pass
+        self.buff_activo = True
+        self.timer_buff = 0
     
+    def aplicar_buff(self, dt):
+        """
+        Aplicar efectos del buff si está activo
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        if self.buff_activo and self.tipo == "TERERE":
+            self.dueño.curar(self.vida_por_seg * dt)
+    
+    def subir_nivel(self):
+        """Subir nivel del arma"""
+        if self.nivel < len(self.config["niveles"]):
+            self.nivel += 1
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar proyectiles y efectos del arma
         
-        PSEUDOCÓDIGO:
-        # Dibujar proyectiles activos
-        PARA CADA proyectil EN self.proyectiles:
-            proyectil.dibujar(pantalla, camara)
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
         """
-        pass
+        # Dibujar proyectiles
+        for proyectil in self.proyectiles:
+            proyectil.dibujar(pantalla, camara)
+        
+        # Dibujar efectos
+        for efecto in self.efectos:
+            efecto.dibujar(pantalla, camara)
 
 
 class ProyectilHacha:
-    """
-    Proyectil de hacha giratoria
+    """Proyectil de hacha que rota"""
     
-    PSEUDOCÓDIGO:
-    
-    __init__(self, x, y, direccion, daño):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y, direccion, velocidad, daño):
+        """
+        Inicializar proyectil
+        
+        Args:
+            x: Posición X inicial
+            y: Posición Y inicial
+            direccion: Vector2 de dirección
+            velocidad: Velocidad en píxeles/segundo
+            daño: Daño que inflige
+        """
+        self.x = float(x)
+        self.y = float(y)
         self.direccion = direccion
+        self.velocidad = velocidad
         self.daño = daño
         
-        # Stats del proyectil
-        self.velocidad = 400  # píxeles por segundo
-        self.alcance_maximo = 500  # distancia máxima
-        self.distancia_recorrida = 0
-        
-        # Sprite y rotación
-        self.image = pygame.Surface((30, 30))
-        self.image.fill((192, 192, 192))  # Gris metálico
+        # Crear sprite
+        self.image = pygame.Surface((20, 20))
+        self.image.fill((192, 192, 192))  # Gris plateado
         self.rect = self.image.get_rect()
-        self.rotacion = 0
-        self.velocidad_rotacion = 720  # grados por segundo
+        self.rect.center = (int(self.x), int(self.y))
         
-        # Enemigos ya golpeados (para no golpear múltiples veces)
+        # Distancia recorrida
+        self.distancia_recorrida = 0
+        self.alcance_maximo = PROYECTIL_HACHA_ALCANCE
+        
+        # Rotación
+        self.angulo = 0
+        
+        # Enemigos ya golpeados
         self.enemigos_golpeados = []
         
-        # Control
+        # Flag de eliminación
         self.debe_eliminarse = False
-    
     
     def actualizar(self, dt):
         """
-        Mover y rotar el proyectil
+        Actualizar posición y rotación
         
-        PSEUDOCÓDIGO:
-        # Mover en dirección
+        Args:
+            dt: Delta time en segundos
+        """
+        # Mover
         desplazamiento = self.velocidad * dt
         self.x += self.direccion.x * desplazamiento
         self.y += self.direccion.y * desplazamiento
-        self.distancia_recorrida += desplazamiento
-        
-        # Actualizar rect
         self.rect.center = (int(self.x), int(self.y))
         
+        # Actualizar distancia
+        self.distancia_recorrida += desplazamiento
+        
         # Rotar
-        self.rotacion += self.velocidad_rotacion * dt
-        self.rotacion %= 360
+        self.angulo += PROYECTIL_HACHA_ROTACION * dt
         
         # Verificar si debe eliminarse
-        SI self.distancia_recorrida >= self.alcance_maximo:
+        if self.distancia_recorrida >= self.alcance_maximo:
             self.debe_eliminarse = True
-        """
-        pass
-    
     
     def verificar_colision_enemigos(self, enemigos):
         """
         Verificar colisión con enemigos
         
-        PSEUDOCÓDIGO:
-        PARA CADA enemigo EN enemigos:
-            SI enemigo NO está en self.enemigos_golpeados:
-                SI self.rect.colliderect(enemigo.rect):
-                    # Aplicar daño
-                    enemigo.recibir_daño(self.daño)
-                    
-                    # Knockback
-                    enemigo.recibir_knockback(self.direccion, fuerza=50)
-                    
-                    # Marcar como golpeado
-                    self.enemigos_golpeados.append(enemigo)
+        Args:
+            enemigos: Lista de enemigos
         """
-        pass
-    
+        for enemigo in enemigos:
+            if not enemigo.esta_vivo:
+                continue
+            
+            if enemigo in self.enemigos_golpeados:
+                continue
+            
+            # Verificar colisión
+            if self.rect.colliderect(enemigo.rect):
+                enemigo.recibir_daño(self.daño)
+                self.enemigos_golpeados.append(enemigo)
+                
+                # Aplicar knockback
+                dx = enemigo.x - self.x
+                dy = enemigo.y - self.y
+                distancia = math.sqrt(dx * dx + dy * dy)
+                if distancia > 0:
+                    direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
+                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_HACHA)
     
     def dibujar(self, pantalla, camara):
         """
-        Dibujar hacha rotada
+        Dibujar proyectil
         
-        PSEUDOCÓDIGO:
-        pantalla_x = int(self.x - camara.offset_x)
-        pantalla_y = int(self.y - camara.offset_y)
-        
-        # Rotar imagen
-        imagen_rotada = pygame.transform.rotate(self.image, self.rotacion)
-        rect_rotado = imagen_rotada.get_rect(center=(pantalla_x, pantalla_y))
-        
-        pantalla.blit(imagen_rotada, rect_rotado)
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
         """
-        pass
+        pantalla_x = self.rect.x - camara.offset_x
+        pantalla_y = self.rect.y - camara.offset_y
+        
+        # Solo dibujar si está en pantalla
+        if -50 < pantalla_x < pantalla.get_width() + 50 and -50 < pantalla_y < pantalla.get_height() + 50:
+            # Rotar imagen
+            imagen_rotada = pygame.transform.rotate(self.image, self.angulo)
+            rect_rotado = imagen_rotada.get_rect(center=(pantalla_x + 10, pantalla_y + 10))
+            pantalla.blit(imagen_rotada, rect_rotado)
 
 
 class EfectoAzada:
-    """
-    Efecto visual para ataque de azada
+    """Efecto visual del ataque de azada (círculo expandiéndose)"""
     
-    PSEUDOCÓDIGO:
-    
-    __init__(self, x, y, radio_final):
+    def __init__(self, x, y, radio_final):
+        """
+        Inicializar efecto
+        
+        Args:
+            x: Posición X del centro
+            y: Posición Y del centro
+            radio_final: Radio final del círculo
+        """
         self.x = x
         self.y = y
         self.radio_actual = 0
         self.radio_final = radio_final
         self.velocidad_expansion = 500  # píxeles por segundo
+        
+        self.alpha = 255
         self.completado = False
-        self.alpha = 255  # Transparencia
-    
     
     def actualizar(self, dt):
         """
-        Expandir el círculo
+        Actualizar expansión y fade
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
+        # Expandir
         self.radio_actual += self.velocidad_expansion * dt
         
-        # Desvanecer
-        self.alpha -= 500 * dt
+        # Fade out
+        self.alpha -= 850 * dt
         
-        SI self.radio_actual >= self.radio_final O self.alpha <= 0:
+        # Marcar como completado
+        if self.radio_actual >= self.radio_final or self.alpha <= 0:
             self.completado = True
-        """
-        pass
-    
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar círculo expandiéndose
         
-        PSEUDOCÓDIGO:
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        if self.completado:
+            return
+        
         pantalla_x = int(self.x - camara.offset_x)
         pantalla_y = int(self.y - camara.offset_y)
         
-        # Dibujar círculo con transparencia
-        superficie = pygame.Surface((radio_actual*2, radio_actual*2))
-        superficie.set_alpha(self.alpha)
-        pygame.draw.circle(superficie, (139, 69, 19), 
-                          (radio_actual, radio_actual), 
-                          radio_actual, 3)
-        
-        pantalla.blit(superficie, (pantalla_x, pantalla_y))
-        """
-        pass
-        
-        '''
+        # Crear superficie con transparencia
+        radio_int = int(self.radio_actual)
+        if radio_int > 0:
+            superficie = pygame.Surface((radio_int * 2, radio_int * 2), pygame.SRCALPHA)
+            color = (255, 200, 100, max(0, int(self.alpha)))
+            pygame.draw.circle(superficie, color, (radio_int, radio_int), radio_int, 3)
+            pantalla.blit(superficie, (pantalla_x - radio_int, pantalla_y - radio_int))
