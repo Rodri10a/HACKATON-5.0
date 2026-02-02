@@ -75,7 +75,7 @@ class Map:
         # Crear superficie del tamaño total del mapa
         superficie = pygame.Surface((
             self.ancho_tiles * TILE_SIZE,
-            self.alto_tiles * TILE_SIZE
+            self.alto_tiles * TILE_SIZE 
         ))
         
         # Dibujar cada tile

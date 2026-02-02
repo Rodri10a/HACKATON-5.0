@@ -224,6 +224,19 @@ class Player(BaseEntity):
         for arma in self.armas_equipadas:
             arma.actualizar(dt, enemigos)
     
+    def usar_machete_manual(self, enemigos):
+        """
+        Usar machete manualmente cuando se presiona ESPACIO
+        
+        Args:
+            enemigos: Lista de enemigos
+        """
+        for arma in self.armas_equipadas:
+            if arma.tipo == "MACHETE":
+                if arma.puede_usar:
+                    arma.usar(enemigos)
+                    break
+    
     def recolectar_xp_cercana(self, orbes_xp):
         """
         Atraer y recolectar orbes de XP cercanas

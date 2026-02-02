@@ -177,6 +177,14 @@ class GameEngine:
             if tecla == pygame.K_ESCAPE:
                 self.pausar_juego()
             
+            # Atacar con machete al presionar ESPACIO
+            if tecla == pygame.K_SPACE:
+                # Buscar el machete y usarlo
+                for arma in self.jugador.armas_equipadas:
+                    if arma.tipo == "MACHETE" and arma.puede_usar:
+                        arma.usar(self.spawn_manager.enemigos)
+                        break
+            
             # Debug: teclas especiales
             if DEBUG_MODE:
                 if tecla == pygame.K_F1:
@@ -338,7 +346,7 @@ class GameEngine:
         fuente_grande = pygame.font.Font(None, 48)
         fuente_media = pygame.font.Font(None, 32)
         fuente_pequeña = pygame.font.Font(None, 24)
-        self.assets.reproducir_musica("menu_theme")
+        
         # Título del juego
         titulo = fuente_grande.render("KARAI SURVIVAL", True, COLOR_XP)
         rect = titulo.get_rect()
@@ -348,7 +356,7 @@ class GameEngine:
         # Instrucciones
         instrucciones = [
             "Usa WASD o Flechas para moverte",
-            "Las armas atacan automáticamente",
+            "Presiona ESPACIO para atacar con el machete",
             "Recolecta XP para subir de nivel",
             "¡Sobrevive el mayor tiempo posible!",
             "",
@@ -362,8 +370,7 @@ class GameEngine:
             rect.center = (ANCHO_VENTANA // 2, y_offset)
             self.pantalla.blit(texto, rect)
             y_offset += 35
-       
-        self.assets.reproducir_musica("menu_theme")
+    
     def dibujar_juego(self):
         """Dibujar todo el juego"""
         # Limpiar pantalla
@@ -428,8 +435,8 @@ class GameEngine:
         # Detener música de gameplay
         self.assets.detener_musica()
         
-        # Reproducir música/sonido de game over
-        self.assets.reproducir_sonido("game_over")
+        # Reproducir música/sonido de game over 
+        self.assets.reproducir_sonido("game_over") 
         
         print(f"GAME OVER - Nivel: {self.jugador.nivel}, Tiempo: {int(self.jugador.tiempo_supervivencia)}s")
     
@@ -458,13 +465,13 @@ class GameEngine:
         self.jugador = None
         self.camara = None
         self.spawn_manager = None
-        self.combat_manager = None
+        self.combat_manager = None 
     
     def limpiar(self):
         """Limpiar recursos antes de salir"""
         # Detener todos los sonidos
         self.assets.detener_musica()
-        pygame.mixer.stop()
+        pygame.mixer.stop() 
         
         # Limpiar assets
         self.assets.limpiar()
