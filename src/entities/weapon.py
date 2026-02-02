@@ -86,16 +86,7 @@ class Weapon:
             if self.timer_buff >= self.duracion_buff:
                 self.buff_activo = False
                 self.timer_buff = 0
-    def usar_manual(self, enemigos):
-        """
-        Usar el arma manualmente (para machete con ESPACIO)
-        
-        Args:
-            enemigos: Lista de enemigos
-        """
-        if self.puede_usar:
-            self.usar(enemigos)
-            
+    
     def usar(self, enemigos):
         """
         Usar el arma según su tipo
@@ -160,7 +151,7 @@ class Weapon:
                 if distancia > 0:
                     direccion_kb = pygame.math.Vector2(dx / distancia, dy / distancia)
                     enemigo.recibir_knockback(direccion_kb, KNOCKBACK_FUERZA_MACHETE)
-                    
+    
     def ataque_hacha(self, enemigos):
         """
         Lanzar proyectiles de hacha hacia enemigos cercanos
@@ -447,8 +438,8 @@ class EfectoAzada:
             color = (255, 200, 100, max(0, int(self.alpha)))
             pygame.draw.circle(superficie, color, (radio_int, radio_int), radio_int, 3)
             pantalla.blit(superficie, (pantalla_x - radio_int, pantalla_y - radio_int))
-            
-            
+
+
 class EfectoSlashMachete:
     """Efecto visual de slash del machete (arco que se expande)"""
     
@@ -472,9 +463,9 @@ class EfectoSlashMachete:
         self.velocidad_animacion = 5.0  # Muy rápido
         self.completado = False
         
-        # Ángulo del slash
-        self.angulo_inicio = -90  # Comienza desde arriba-izquierda
-        self.angulo_fin = 90      # Termina en arriba-derecha
+        # Ángulo del slash (más amplio)
+        self.angulo_inicio = -90  # Comienza más arriba
+        self.angulo_fin = 90      # Termina más abajo
         
         # Calcular ángulo base según dirección
         if abs(direccion.x) > abs(direccion.y):
@@ -537,11 +528,11 @@ class EfectoSlashMachete:
         # Crear superficie temporal con transparencia
         temp_surface = pygame.Surface((self.alcance * 2, self.alcance * 2), pygame.SRCALPHA)
         
-        # Dibujar línea del slash
-        grosor = int(8 * (1.0 - self.progreso * 0.5))  # Se adelgaza al final 
+        # Dibujar línea del slash (más gruesa)
+        grosor = int(8 * (1.0 - self.progreso * 0.5))  # Más grueso
         
         # Calcular posiciones relativas a la superficie temporal
-        centro = (self.alcance, self.alcance) 
+        centro = (self.alcance, self.alcance)
         punto_final = (
             int(centro[0] + math.cos(angulo_rad) * self.alcance),
             int(centro[1] + math.sin(angulo_rad) * self.alcance)
@@ -551,4 +542,4 @@ class EfectoSlashMachete:
         
         # Dibujar en pantalla
         pos_blit = (pantalla_x - self.alcance, pantalla_y - self.alcance)
-        pantalla.blit(temp_surface, pos_blit)  
+        pantalla.blit(temp_surface, pos_blit)
