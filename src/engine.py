@@ -338,7 +338,7 @@ class GameEngine:
         fuente_grande = pygame.font.Font(None, 48)
         fuente_media = pygame.font.Font(None, 32)
         fuente_pequeña = pygame.font.Font(None, 24)
-        
+        self.assets.reproducir_musica("menu_theme")
         # Título del juego
         titulo = fuente_grande.render("KARAI SURVIVAL", True, COLOR_XP)
         rect = titulo.get_rect()
@@ -362,7 +362,8 @@ class GameEngine:
             rect.center = (ANCHO_VENTANA // 2, y_offset)
             self.pantalla.blit(texto, rect)
             y_offset += 35
-    
+       
+        self.assets.reproducir_musica("menu_theme")
     def dibujar_juego(self):
         """Dibujar todo el juego"""
         # Limpiar pantalla

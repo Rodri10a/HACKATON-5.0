@@ -75,7 +75,7 @@ class BaseEntity:
             self.vida_actual = 0
             self.esta_vivo = False
             self.al_morir()
-    
+        
     def curar(self, cantidad):
         """
         Recuperar vida sin exceder máximo
