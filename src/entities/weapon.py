@@ -60,8 +60,8 @@ class Weapon:
                 self.puede_usar = True
                 self.timer_cooldown = 0
         
-        # Si puede usar, atacar
-        if self.puede_usar and len(enemigos) > 0:
+        # Solo atacar automáticamente si NO es machete
+        if self.puede_usar and len(enemigos) > 0 and self.tipo != "MACHETE":
             self.usar(enemigos)
         
         # Actualizar proyectiles
@@ -109,7 +109,7 @@ class Weapon:
     
     def ataque_machete(self, enemigos):
         """
-        Ataque melee circular alrededor del jugador
+        Ataque melee circular alrededor del jugador con efecto visual
         
         Args:
             enemigos: Lista de enemigos
@@ -118,6 +118,22 @@ class Weapon:
         daño = config_nivel["daño"]
         alcance = config_nivel["alcance"]
         
+        # Determinar dirección del slash basado en el último movimiento
+        direccion = self.dueño.direccion
+        if direccion.length() == 0:
+            # Si está quieto, slash hacia la derecha por defecto
+            direccion = pygame.math.Vector2(1, 0)
+        
+        # Crear efecto visual del slash
+        efecto_slash = EfectoSlashMachete(
+            self.dueño.x,
+            self.dueño.y,
+            direccion,
+            alcance
+        )
+        self.efectos.append(efecto_slash)
+        
+        # Aplicar daño a enemigos en alcance
         for enemigo in enemigos:
             if not enemigo.esta_vivo:
                 continue
@@ -133,8 +149,8 @@ class Weapon:
                 
                 # Aplicar knockback
                 if distancia > 0:
-                    direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
-                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_MACHETE)
+                    direccion_kb = pygame.math.Vector2(dx / distancia, dy / distancia)
+                    enemigo.recibir_knockback(direccion_kb, KNOCKBACK_FUERZA_MACHETE)
     
     def ataque_hacha(self, enemigos):
         """
@@ -422,3 +438,108 @@ class EfectoAzada:
             color = (255, 200, 100, max(0, int(self.alpha)))
             pygame.draw.circle(superficie, color, (radio_int, radio_int), radio_int, 3)
             pantalla.blit(superficie, (pantalla_x - radio_int, pantalla_y - radio_int))
+
+
+class EfectoSlashMachete:
+    """Efecto visual de slash del machete (arco que se expande)"""
+    
+    def __init__(self, x, y, direccion, alcance):
+        """
+        Inicializar efecto de slash
+        
+        Args:
+            x: Posición X del jugador
+            y: Posición Y del jugador
+            direccion: Dirección hacia donde mira el jugador
+            alcance: Alcance del machete
+        """
+        self.x = x
+        self.y = y
+        self.direccion = direccion
+        self.alcance = alcance
+        
+        # Animación
+        self.progreso = 0  # 0.0 a 1.0
+        self.velocidad_animacion = 5.0  # Muy rápido
+        self.completado = False
+        
+        # Ángulo del slash (más amplio)
+        self.angulo_inicio = -90  # Comienza más arriba
+        self.angulo_fin = 90      # Termina más abajo
+        
+        # Calcular ángulo base según dirección
+        if abs(direccion.x) > abs(direccion.y):
+            # Horizontal
+            if direccion.x > 0:
+                self.angulo_base = 0  # Derecha
+            else:
+                self.angulo_base = 180  # Izquierda
+        else:
+            # Vertical
+            if direccion.y > 0:
+                self.angulo_base = 90  # Abajo
+            else:
+                self.angulo_base = -90  # Arriba
+    
+    def actualizar(self, dt):
+        """
+        Actualizar animación del slash
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        self.progreso += self.velocidad_animacion * dt
+        
+        if self.progreso >= 1.0:
+            self.completado = True
+    
+    def dibujar(self, pantalla, camara):
+        """
+        Dibujar el slash animado
+        
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        if self.completado:
+            return
+        
+        # Posición en pantalla
+        pantalla_x = int(self.x - camara.offset_x)
+        pantalla_y = int(self.y - camara.offset_y)
+        
+        # Calcular ángulo actual del slash según progreso
+        angulo_actual = self.angulo_inicio + (self.angulo_fin - self.angulo_inicio) * self.progreso
+        angulo_total = self.angulo_base + angulo_actual
+        
+        # Convertir a radianes
+        angulo_rad = math.radians(angulo_total)
+        
+        # Calcular punto final del slash
+        end_x = pantalla_x + math.cos(angulo_rad) * self.alcance
+        end_y = pantalla_y + math.sin(angulo_rad) * self.alcance
+        
+        # Calcular alpha (más transparente al final)
+        alpha = int(255 * (1.0 - self.progreso))
+        
+        # Dibujar arco
+        color = (220, 220, 255, alpha)  # Blanco-azulado
+        
+        # Crear superficie temporal con transparencia
+        temp_surface = pygame.Surface((self.alcance * 2, self.alcance * 2), pygame.SRCALPHA)
+        
+        # Dibujar línea del slash (más gruesa)
+        grosor = int(8 * (1.0 - self.progreso * 0.5))  # Más grueso
+        
+        # Calcular posiciones relativas a la superficie temporal
+        centro = (self.alcance, self.alcance)
+        punto_final = (
+            int(centro[0] + math.cos(angulo_rad) * self.alcance),
+            int(centro[1] + math.sin(angulo_rad) * self.alcance)
+        )
+        
+        pygame.draw.line(temp_surface, color, centro, punto_final, grosor)
+        
+        # Dibujar en pantalla
+        pos_blit = (pantalla_x - self.alcance, pantalla_y - self.alcance)
+        pantalla.blit(temp_surface, pos_blit)
