@@ -75,39 +75,52 @@ class Map:
         # Crear superficie del tamaño total del mapa
         superficie = pygame.Surface((
             self.ancho_tiles * TILE_SIZE,
-            self.alto_tiles * TILE_SIZE 
+            self.alto_tiles * TILE_SIZE
         ))
         
-        # Dibujar cada tile
-        for fila in range(self.alto_tiles):
-            for columna in range(self.ancho_tiles):
-                tipo_tile = self.tiles[fila][columna]
-                color = self.obtener_color_tile(tipo_tile)
-                
-                # Calcular posición del tile
-                x = columna * TILE_SIZE
-                y = fila * TILE_SIZE
-                
-                # Dibujar rectángulo del tile
-                pygame.draw.rect(
-                    superficie,
-                    color,
-                    (x, y, TILE_SIZE, TILE_SIZE)
-                )
-                
-                # Agregar variación visual (líneas de pasto)
-                if tipo_tile == "PASTO_CLARO":
-                    # Dibujar algunas "briznas" de pasto
-                    for _ in range(3):
-                        brizna_x = x + random.randint(5, TILE_SIZE - 5)
-                        brizna_y = y + random.randint(5, TILE_SIZE - 5)
-                        pygame.draw.line(
-                            superficie,
-                            (40, 195, 40),
-                            (brizna_x, brizna_y),
-                            (brizna_x, brizna_y + 3),
-                            1
-                        )
+        # Intentar cargar imagen de fondo
+        try:
+            fondo = pygame.image.load("assets/sprites/mapa.png")
+            # Escalar al tamaño del mapa completo
+            fondo = pygame.transform.scale(
+                fondo, 
+                (self.ancho_tiles * TILE_SIZE, self.alto_tiles * TILE_SIZE)
+            )
+            superficie.blit(fondo, (0, 0))
+            print("✓ Fondo del mapa cargado exitosamente")
+        except Exception as e:
+            print(f"✗ No se pudo cargar pasto_juego.png: {e}")
+            print("  Usando tiles de colores por defecto")
+            
+            # Si no encuentra la imagen, usar tiles como antes
+            for fila in range(self.alto_tiles):
+                for columna in range(self.ancho_tiles):
+                    tipo_tile = self.tiles[fila][columna]
+                    color = self.obtener_color_tile(tipo_tile)
+                    
+                    # Calcular posición del tile
+                    x = columna * TILE_SIZE
+                    y = fila * TILE_SIZE
+                    
+                    # Dibujar rectángulo del tile
+                    pygame.draw.rect(
+                        superficie,
+                        color,
+                        (x, y, TILE_SIZE, TILE_SIZE)
+                    )
+                    
+                    # Agregar variación visual (líneas de pasto)
+                    if tipo_tile == "PASTO_CLARO":
+                        for _ in range(3):
+                            brizna_x = x + random.randint(5, TILE_SIZE - 5)
+                            brizna_y = y + random.randint(5, TILE_SIZE - 5)
+                            pygame.draw.line(
+                                superficie,
+                                (40, 195, 40),
+                                (brizna_x, brizna_y),
+                                (brizna_x, brizna_y + 3),
+                                1
+                            )
         
         return superficie
     
@@ -170,7 +183,7 @@ class Map:
             tuple: (x, y) posición en el mundo
         """
         x = random.randint(0, MAPA_ANCHO_PIXELES)
-        y = random.randint(0, MAPA_ALTO_PIXELES)
+        y = random.randint(0, MAPA_ALTO_PIXELES) 
         
         return (x, y)
     

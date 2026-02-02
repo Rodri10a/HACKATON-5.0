@@ -30,11 +30,27 @@ class Enemy(BaseEntity):
             "CARPINCHO": (139, 69, 19),     # Marrón
             "YACARE": (0, 100, 0),          # Verde oscuro
             "TATU": (169, 169, 169),        # Gris
-            "AGUARA_GUAZU": (255, 69, 0)    # Naranja-rojo
+            "AGUARA_GUAZU": (255, 69, 0),   # Naranja-rojo
+            "LUISON": (80, 0, 0),           # Rojo oscuro
+            "MOSQUITO": (100, 100, 100),    # Gris
+            "POMBERO": (139, 90, 43),       # Marrón
+            "SERPIENTE": (0, 128, 0)        # Verde
         }
         
-        # Llamar constructor padre
-        super().__init__(x, y, 40, 40, colores[tipo])
+        # Mapeo de sprites
+        sprites = {
+            "CARPINCHO": "assets/sprites/carpincho.png",
+            "YACARE": "assets/sprites/yacare.png",
+            "TATU": "assets/sprites/tatu.png",
+            "AGUARA_GUAZU": "assets/sprites/aguara_guazu.png",
+            "LUISON": "assets/sprites/luison.png",
+            "MOSQUITO": "assets/sprites/mosquito.png",
+            "POMBERO": "assets/sprites/pora.png",
+            "SERPIENTE": "assets/sprites/serpiente.png"
+        }
+        
+        # Llamar constructor padre con sprite
+        super().__init__(x, y, 40, 40, colores[tipo], sprite_path=sprites.get(tipo))
         
         # Configurar stats desde config
         self.tipo = tipo
@@ -149,9 +165,14 @@ class OrbXP:
         self.y = float(y)
         self.cantidad = cantidad  # Valor de XP
         
-        # Crear sprite pequeño dorado
-        self.image = pygame.Surface((10, 10))
-        self.image.fill(COLOR_XP)
+        # Crear sprite
+        try:
+            self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
+            self.image = pygame.transform.scale(self.image, (15, 15))
+        except:
+            self.image = pygame.Surface((10, 10))
+            self.image.fill(COLOR_XP)
+        
         self.rect = self.image.get_rect()
         self.rect.center = (int(x), int(y))
         
