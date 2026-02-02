@@ -3,16 +3,24 @@ COMBAT_MANAGER.PY - GESTIÓN DE COMBATE Y COLISIONES
 ====================================================
 Maneja interacciones entre jugador, enemigos, armas y orbes XP
 """
-"""
+import random
 import pygame
-from enemy import OrbXP
+import math
+from entities.enemy import OrbXP
 from settings import *
 
+
 class CombatManager:
-    """
-    #PSEUDOCÓDIGO:
-'''
-    __init__(self, jugador, spawn_manager):
+    """Gestor de combate y colisiones del juego"""
+    
+    def __init__(self, jugador, spawn_manager):
+        """
+        Inicializar combat manager
+        
+        Args:
+            jugador: Objeto Player
+            spawn_manager: Objeto SpawnManager
+        """
         self.jugador = jugador
         self.spawn_manager = spawn_manager
         
@@ -28,14 +36,14 @@ class CombatManager:
             "daño_total_recibido": 0,
             "xp_total_recolectada": 0
         }
-    '''
     
-    #def actualizar(self, dt):
-'''
+    def actualizar(self, dt):
         """
         Actualizar sistema de combate
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
         # Verificar colisiones enemigos-jugador
         self.verificar_colisiones_enemigos_jugador()
         
@@ -50,238 +58,160 @@ class CombatManager:
         
         # Actualizar efectos visuales
         self.actualizar_efectos(dt)
-        """
-        pass
-    
     
     def verificar_colisiones_enemigos_jugador(self):
-        """
-        Verificar si enemigos tocan al jugador
-        
-        PSEUDOCÓDIGO:
-        PARA enemigo EN self.spawn_manager.enemigos:
-            SI NO enemigo.esta_vivo:
-                CONTINUAR
+        """Verificar si enemigos tocan al jugador"""
+        for enemigo in self.spawn_manager.enemigos:
+            if not enemigo.esta_vivo:
+                continue
             
-            SI self.jugador.colisiona_con(enemigo):
-                # El enemigo ataca en su propia lógica
-                # Solo verificamos la colisión aquí
-                pass
-        """
-        pass
-    
+            # El enemigo ya maneja su propio ataque
+            # Solo necesitamos que esté cerca
+            pass
     
     def actualizar_armas_jugador(self, dt):
         """
         Actualizar todas las armas y verificar impactos
         
-        PSEUDOCÓDIGO:
-        PARA arma EN self.jugador.armas_equipadas:
+        Args:
+            dt: Delta time en segundos
+        """
+        for arma in self.jugador.armas_equipadas:
             # Actualizar arma
             arma.actualizar(dt, self.spawn_manager.enemigos)
             
-            # SI es arma de proyectiles, verificar colisiones
-            SI len(arma.proyectiles) > 0:
+            # Aplicar buff si está activo
+            arma.aplicar_buff(dt)
+            
+            # Si es arma de proyectiles, verificar colisiones
+            if len(arma.proyectiles) > 0:
                 self.verificar_proyectiles(arma)
-        """
-        pass
-    
     
     def verificar_proyectiles(self, arma):
         """
         Verificar colisiones de proyectiles con enemigos
         
-        PSEUDOCÓDIGO:
-        PARA proyectil EN arma.proyectiles:
-            SI proyectil.debe_eliminarse:
-                CONTINUAR
+        Args:
+            arma: Objeto Weapon
+        """
+        for proyectil in arma.proyectiles:
+            if proyectil.debe_eliminarse:
+                continue
             
             proyectil.verificar_colision_enemigos(self.spawn_manager.enemigos)
-        """
-        pass
-    
     
     def crear_orbe_xp(self, x, y, cantidad):
         """
         Crear orbe de XP en una posición
         
-        PSEUDOCÓDIGO:
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+            cantidad: Valor de XP del orbe
+        """
         orbe = OrbXP(x, y, cantidad)
         self.orbes_xp.append(orbe)
-        """
-        pass
-    
+        
+        # Limitar cantidad de orbes para no saturar
+        if len(self.orbes_xp) > MAX_ORBES_XP:
+            self.orbes_xp.pop(0)  # Eliminar el más viejo
     
     def actualizar_orbes_xp(self, dt):
         """
         Actualizar animación de orbes
         
-        PSEUDOCÓDIGO:
-        PARA orbe EN self.orbes_xp:
+        Args:
+            dt: Delta time en segundos
+        """
+        for orbe in self.orbes_xp:
             orbe.actualizar(dt)
-        """
-        pass
-    
-    
-    def recolectar_orbe(self, orbe):
-        """
-        Recolectar un orbe de XP
-        
-        PSEUDOCÓDIGO:
-        self.jugador.ganar_xp(orbe.cantidad)
-        self.stats["xp_total_recolectada"] += orbe.cantidad
-        self.orbes_xp.remove(orbe)
-        
-        # Efecto visual de recolección
-        self.crear_efecto_recoleccion(orbe.x, orbe.y)
-        """
-        pass
-    
-    
-    def crear_efecto_recoleccion(self, x, y):
-        """
-        Crear efecto visual al recolectar XP
-        
-        PSEUDOCÓDIGO:
-        efecto = EfectoParticulas(
-            x, y,
-            color=COLOR_XP,
-            cantidad=5,
-            velocidad=100
-        )
-        self.efectos.append(efecto)
-        """
-        pass
-    
     
     def crear_efecto_impacto(self, x, y):
         """
         Crear efecto visual de impacto
         
-        PSEUDOCÓDIGO:
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+        """
         efecto = EfectoImpacto(x, y)
         self.efectos.append(efecto)
-        """
-        pass
-    
     
     def actualizar_efectos(self, dt):
         """
         Actualizar y limpiar efectos visuales
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
         efectos_activos = []
         
-        PARA efecto EN self.efectos:
+        for efecto in self.efectos:
             efecto.actualizar(dt)
             
-            SI NO efecto.completado:
+            if not efecto.completado:
                 efectos_activos.append(efecto)
         
         self.efectos = efectos_activos
-        """
-        pass
-    
-    
-    def aplicar_daño_area(self, x, y, radio, daño):
-        """
-        Aplicar daño en área (para armas AoE)
-        
-        PSEUDOCÓDIGO:
-        enemigos_dañados = 0
-        
-        PARA enemigo EN self.spawn_manager.enemigos:
-            SI NO enemigo.esta_vivo:
-                CONTINUAR
-            
-            # Calcular distancia
-            dx = enemigo.x - x
-            dy = enemigo.y - y
-            distancia = sqrt(dx*dx + dy*dy)
-            
-            SI distancia <= radio:
-                enemigo.recibir_daño(daño)
-                self.stats["daño_total_infligido"] += daño
-                enemigos_dañados += 1
-                
-                # Crear efecto visual
-                self.crear_efecto_impacto(enemigo.x, enemigo.y)
-        
-        RETORNAR enemigos_dañados
-        """
-        pass
-    
     
     def verificar_muerte_enemigo(self, enemigo):
         """
         Callback cuando un enemigo muere
         
-        PSEUDOCÓDIGO:
-        SI NO enemigo.esta_vivo:
+        Args:
+            enemigo: Objeto Enemy que murió
+        """
+        if not enemigo.esta_vivo:
             # Crear orbe de XP
             self.crear_orbe_xp(enemigo.x, enemigo.y, enemigo.xp_drop)
-            
-            # Posibilidad de drop de vida
-            SI random.random() < CHANCE_DROP_VIDA:
-                self.crear_drop_vida(enemigo.x, enemigo.y)
-        """
-        pass
-    
-    
-    def crear_drop_vida(self, x, y):
-        """
-        Crear drop de vida
-        
-        PSEUDOCÓDIGO:
-        drop = DropVida(x, y, VIDA_RECUPERADA_DROP)
-        # Agregar a lista de drops (similar a orbes XP)
-        """
-        pass
-    
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar elementos de combate
         
-        PSEUDOCÓDIGO:
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
         # Dibujar orbes de XP
-        PARA orbe EN self.orbes_xp:
-            SI camara.esta_visible(orbe):
+        for orbe in self.orbes_xp:
+            if camara.esta_visible(orbe):
                 orbe.dibujar(pantalla, camara)
         
         # Dibujar armas del jugador (proyectiles, efectos)
-        PARA arma EN self.jugador.armas_equipadas:
+        for arma in self.jugador.armas_equipadas:
             arma.dibujar(pantalla, camara)
         
         # Dibujar efectos visuales
-        PARA efecto EN self.efectos:
+        for efecto in self.efectos:
             efecto.dibujar(pantalla, camara)
-        """
-        pass
-    
     
     def obtener_estadisticas(self):
         """
         Obtener estadísticas de combate
         
-        PSEUDOCÓDIGO:
-        RETORNAR {
+        Returns:
+            dict: Diccionario con estadísticas
+        """
+        return {
             "daño_infligido": self.stats["daño_total_infligido"],
             "daño_recibido": self.stats["daño_total_recibido"],
             "xp_recolectada": self.stats["xp_total_recolectada"],
             "orbes_activas": len(self.orbes_xp)
         }
-        """
-        pass
 
 
 class EfectoImpacto:
-    """
-    Efecto visual de impacto
+    """Efecto visual de impacto (círculo expandiéndose)"""
     
-    PSEUDOCÓDIGO:
-    
-    __init__(self, x, y):
+    def __init__(self, x, y):
+        """
+        Inicializar efecto
+        
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+        """
         self.x = x
         self.y = y
         self.tiempo_vida = 0
@@ -291,52 +221,76 @@ class EfectoImpacto:
         self.alpha = 255
     
     def actualizar(self, dt):
+        """
+        Actualizar expansión y fade
+        
+        Args:
+            dt: Delta time en segundos
+        """
         self.tiempo_vida += dt
         
         # Expandir y desvanecer
         self.tamaño += 50 * dt
         self.alpha -= 850 * dt
         
-        SI self.tiempo_vida >= self.duracion:
+        if self.tiempo_vida >= self.duracion:
             self.completado = True
     
     def dibujar(self, pantalla, camara):
+        """
+        Dibujar círculo expandiéndose
+        
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        if self.completado:
+            return
+        
         pantalla_x = int(self.x - camara.offset_x)
         pantalla_y = int(self.y - camara.offset_y)
         
-        # Dibujar círculo expandiéndose
-        superficie = pygame.Surface((self.tamaño*2, self.tamaño*2))
-        superficie.set_alpha(max(0, int(self.alpha)))
-        pygame.draw.circle(
-            superficie,
-            (255, 200, 0),  # Naranja
-            (self.tamaño, self.tamaño),
-            int(self.tamaño),
-            2
-        )
-        pantalla.blit(superficie, (pantalla_x, pantalla_y))
-    """
-    pass
+        # Crear superficie con transparencia
+        tamaño_int = int(self.tamaño)
+        if tamaño_int > 0:
+            superficie = pygame.Surface((tamaño_int * 2, tamaño_int * 2), pygame.SRCALPHA)
+            color = (255, 200, 0, max(0, int(self.alpha)))
+            pygame.draw.circle(
+                superficie,
+                color,
+                (tamaño_int, tamaño_int),
+                tamaño_int,
+                2
+            )
+            pantalla.blit(superficie, (pantalla_x - tamaño_int, pantalla_y - tamaño_int))
 
 
 class EfectoParticulas:
-    """
-    Sistema simple de partículas
+    """Sistema simple de partículas"""
     
-    PSEUDOCÓDIGO:
-    
-    __init__(self, x, y, color, cantidad, velocidad):
+    def __init__(self, x, y, color, cantidad, velocidad):
+        """
+        Inicializar sistema de partículas
+        
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+            color: Color de las partículas (RGB)
+            cantidad: Número de partículas
+            velocidad: Velocidad de las partículas
+        """
         self.particulas = []
         
-        PARA _ EN range(cantidad):
+        for _ in range(cantidad):
             angulo = random.uniform(0, 360)
-            vel = random.uniform(velocidad*0.5, velocidad)
+            angulo_rad = math.radians(angulo)
+            vel = random.uniform(velocidad * 0.5, velocidad)
             
             particula = {
                 "x": x,
                 "y": y,
-                "vx": cos(angulo) * vel,
-                "vy": sin(angulo) * vel,
+                "vx": math.cos(angulo_rad) * vel,
+                "vy": math.sin(angulo_rad) * vel,
                 "vida": 1.0  # 0.0 a 1.0
             }
             self.particulas.append(particula)
@@ -345,7 +299,13 @@ class EfectoParticulas:
         self.completado = False
     
     def actualizar(self, dt):
-        PARA particula EN self.particulas:
+        """
+        Actualizar partículas
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        for particula in self.particulas:
             # Mover
             particula["x"] += particula["vx"] * dt
             particula["y"] += particula["vy"] * dt
@@ -356,15 +316,21 @@ class EfectoParticulas:
         # Eliminar partículas muertas
         self.particulas = [p for p in self.particulas if p["vida"] > 0]
         
-        SI len(self.particulas) == 0:
+        if len(self.particulas) == 0:
             self.completado = True
     
     def dibujar(self, pantalla, camara):
-        PARA particula EN self.particulas:
+        """
+        Dibujar partículas
+        
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        for particula in self.particulas:
             pantalla_x = int(particula["x"] - camara.offset_x)
             pantalla_y = int(particula["y"] - camara.offset_y)
             
-            alpha = int(particula["vida"] * 255)
             tamaño = max(1, int(particula["vida"] * 5))
             
             pygame.draw.circle(
@@ -373,6 +339,3 @@ class EfectoParticulas:
                 (pantalla_x, pantalla_y),
                 tamaño
             )
-    """
-    pass
-    '''

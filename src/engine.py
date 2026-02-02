@@ -3,24 +3,26 @@ ENGINE.PY - MOTOR PRINCIPAL DEL JUEGO
 ======================================
 Clase principal que orquesta todos los sistemas del juego
 """
-'''
+
 import pygame
 import sys
 from constants import GameState
 from settings import *
-from player import Player
-from map import Map
-from camera import Camera
-from spawn_manager import SpawnManager
-from combat_manager import CombatManager
-from ui_manager import UIManager
+from entities.player import Player
+from entities.weapon import Weapon
+from World.map import Map
+from World.camera import Camera
+from managers.spawn_manager import SpawnManager
+from managers.combat_manager import CombatManager
+from managers.ui_manager import UIManager
 from asset_.asset_loader import AssetLoader
 
+
 class GameEngine:
-    """
-    PSEUDOCÓDIGO:
+    """Motor principal del juego - Orquesta todos los sistemas"""
     
-    __init__(self):
+    def __init__(self):
+        """Inicializar motor del juego"""
         # Inicializar Pygame
         pygame.init()
         pygame.mixer.init()
@@ -40,6 +42,7 @@ class GameEngine:
         self.juego_pausado = False
         
         # Cargar assets
+        print("Cargando assets...")
         self.assets = AssetLoader()
         
         # Sistemas del juego (se inicializan después)
@@ -53,13 +56,14 @@ class GameEngine:
         # Estadísticas de sesión
         self.tiempo_total_juego = 0
         self.partidas_jugadas = 0
-    
+        
+        # Nivel anterior para detectar subida
+        self.nivel_anterior = 1
     
     def inicializar_juego_nuevo(self):
-        """
-        Inicializar una nueva partida
+        """Inicializar una nueva partida"""
+        print("Iniciando nueva partida...")
         
-        PSEUDOCÓDIGO:
         # Crear mapa
         self.mapa = Map()
         
@@ -67,6 +71,10 @@ class GameEngine:
         pos_inicial_x = MAPA_ANCHO_PIXELES // 2
         pos_inicial_y = MAPA_ALTO_PIXELES // 2
         self.jugador = Player(pos_inicial_x, pos_inicial_y)
+        
+        # Equipar machete inicial
+        machete = Weapon("MACHETE", self.jugador)
+        self.jugador.armas_equipadas.append(machete)
         
         # Crear cámara
         self.camara = Camera(ANCHO_VENTANA, ALTO_VENTANA)
@@ -88,20 +96,17 @@ class GameEngine:
         # Incrementar contador de partidas
         self.partidas_jugadas += 1
         
-        print("Nueva partida iniciada")
-        """
-        pass
-    
+        # Resetear nivel anterior
+        self.nivel_anterior = 1
+        
+        print("Partida iniciada correctamente")
     
     def reiniciar_juego(self):
-        """
-        Reiniciar el juego (después de Game Over)
-        
-        PSEUDOCÓDIGO:
+        """Reiniciar el juego (después de Game Over)"""
         # Limpiar sistemas existentes
-        SI self.spawn_manager:
+        if self.spawn_manager:
             self.spawn_manager.enemigos.clear()
-        SI self.combat_manager:
+        if self.combat_manager:
             self.combat_manager.orbes_xp.clear()
             self.combat_manager.efectos.clear()
         
@@ -110,16 +115,10 @@ class GameEngine:
         
         # Cambiar estado
         self.estado = GameState.JUGANDO
-        """
-        pass
-    
     
     def run(self):
-        """
-        Loop principal del juego
-        
-        PSEUDOCÓDIGO:
-        MIENTRAS self.corriendo:
+        """Loop principal del juego"""
+        while self.corriendo:
             # Calcular delta time
             self.dt = self.clock.tick(FPS) / 1000.0  # Convertir ms a segundos
             self.fps_actual = self.clock.get_fps()
@@ -143,176 +142,142 @@ class GameEngine:
         self.limpiar()
         pygame.quit()
         sys.exit()
-        """
-        pass
-    
     
     def manejar_eventos(self):
-        """
-        Procesar eventos de Pygame
-        
-        PSEUDOCÓDIGO:
-        PARA evento EN pygame.event.get():
-            SI evento.type == pygame.QUIT:
+        """Procesar eventos de Pygame"""
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
                 self.corriendo = False
             
             # Eventos de teclado
-            SI evento.type == pygame.KEYDOWN:
+            if evento.type == pygame.KEYDOWN:
                 self.manejar_tecla_presionada(evento.key)
             
             # Eventos de mouse
-            SI evento.type == pygame.MOUSEBUTTONDOWN:
+            if evento.type == pygame.MOUSEBUTTONDOWN:
                 self.manejar_click_mouse(evento.pos, evento.button)
-            
-            # Eventos de ventana
-            SI evento.type == pygame.VIDEORESIZE:
-                self.manejar_resize(evento.w, evento.h)
-        """
-        pass
-    
     
     def manejar_tecla_presionada(self, tecla):
         """
         Manejar teclas presionadas según estado del juego
         
-        PSEUDOCÓDIGO:
+        Args:
+            tecla: Código de la tecla presionada
+        """
         # MENÚ
-        SI self.estado == GameState.MENU:
-            SI tecla == pygame.K_SPACE O tecla == pygame.K_RETURN:
+        if self.estado == GameState.MENU:
+            if tecla == pygame.K_SPACE or tecla == pygame.K_RETURN:
                 self.inicializar_juego_nuevo()
                 self.estado = GameState.JUGANDO
-            SI tecla == pygame.K_ESCAPE:
+            if tecla == pygame.K_ESCAPE:
                 self.corriendo = False
         
         # JUGANDO
-        SI self.estado == GameState.JUGANDO:
-            SI tecla == pygame.K_ESCAPE:
+        elif self.estado == GameState.JUGANDO:
+            if tecla == pygame.K_ESCAPE:
                 self.pausar_juego()
             
             # Debug: teclas especiales
-            SI DEBUG_MODE:
-                SI tecla == pygame.K_F1:
+            if DEBUG_MODE:
+                if tecla == pygame.K_F1:
                     self.jugador.ganar_xp(100)  # XP instantánea
-                SI tecla == pygame.K_F2:
-                    self.spawn_manager.spawnear_oleada_boss()
-                SI tecla == pygame.K_F3:
+                if tecla == pygame.K_F3:
                     self.jugador.vida_actual = self.jugador.vida_maxima
         
         # PAUSA
-        SI self.estado == GameState.PAUSA:
-            SI tecla == pygame.K_ESCAPE:
+        elif self.estado == GameState.PAUSA:
+            if tecla == pygame.K_ESCAPE:
                 self.reanudar_juego()
-            SI tecla == pygame.K_q:
+            if tecla == pygame.K_q:
                 self.volver_al_menu()
         
         # MEJORA
-        SI self.estado == GameState.MEJORA:
+        elif self.estado == GameState.MEJORA:
             # Las mejoras se manejan con clicks de mouse
             pass
         
         # GAME OVER
-        SI self.estado == GameState.GAME_OVER:
-            SI tecla == pygame.K_SPACE:
+        elif self.estado == GameState.GAME_OVER:
+            if tecla == pygame.K_SPACE:
                 self.reiniciar_juego()
-            SI tecla == pygame.K_ESCAPE:
+            if tecla == pygame.K_ESCAPE:
                 self.volver_al_menu()
-        """
-        pass
-    
     
     def manejar_click_mouse(self, pos, boton):
         """
         Manejar clicks del mouse
         
-        PSEUDOCÓDIGO:
+        Args:
+            pos: Tupla (x, y) con posición del click
+            boton: Botón del mouse (1=izquierdo, 2=medio, 3=derecho)
+        """
         # Solo procesar click izquierdo
-        SI boton != 1:
-            RETORNAR
+        if boton != 1:
+            return
         
         # MEJORA - Seleccionar mejora
-        SI self.estado == GameState.MEJORA:
-            SI self.ui_manager.mostrar_pantalla_mejora:
+        if self.estado == GameState.MEJORA:
+            if self.ui_manager.mostrar_pantalla_mejora:
                 indice = self.ui_manager.manejar_click_mejora(
                     pos, 
                     self.ui_manager.opciones_mejora
                 )
                 
-                SI indice NO es None:
+                if indice is not None:
                     # Aplicar mejora seleccionada
                     opcion = self.ui_manager.opciones_mejora[indice]
-                    self.jugador.aplicar_mejora(opcion["tipo"], opcion["valor"])
-                    
-                    # Reproducir sonido
-                    self.assets.reproducir_sonido("subir_nivel")
+                    self.aplicar_mejora_seleccionada(opcion)
                     
                     # Cerrar pantalla de mejora y reanudar juego
                     self.ui_manager.mostrar_pantalla_mejora = False
+                    self.jugador.subio_nivel = False
                     self.estado = GameState.JUGANDO
-        """
-        pass
     
-    
-    def manejar_resize(self, ancho, alto):
+    def aplicar_mejora_seleccionada(self, opcion):
         """
-        Manejar cambio de tamaño de ventana
+        Aplicar la mejora que el jugador seleccionó
         
-        PSEUDOCÓDIGO:
-        # Actualizar tamaño de pantalla
-        self.pantalla = pygame.display.set_mode((ancho, alto), pygame.RESIZABLE)
-        
-        # Actualizar cámara si existe
-        SI self.camara:
-            self.camara.ancho = ancho
-            self.camara.alto = alto
-        
-        print(f"Ventana redimensionada a {ancho}x{alto}")
+        Args:
+            opcion: Diccionario con la opción de mejora
         """
-        pass
-    
+        tipo = opcion["tipo"]
+        valor = opcion["valor"]
+        
+        # Aplicar mejora al jugador
+        self.jugador.aplicar_mejora(tipo, valor)
+        
+        # Si es nueva arma, equiparla
+        if tipo == "nueva_arma":
+            nueva_arma = Weapon(valor, self.jugador)
+            self.jugador.armas_equipadas.append(nueva_arma)
     
     def actualizar(self):
-        """
-        Actualizar lógica según estado del juego
-        
-        PSEUDOCÓDIGO:
-        SI self.estado == GameState.MENU:
+        """Actualizar lógica según estado del juego"""
+        if self.estado == GameState.MENU:
             self.actualizar_menu()
         
-        SINO SI self.estado == GameState.JUGANDO:
+        elif self.estado == GameState.JUGANDO:
             self.actualizar_juego()
         
-        SINO SI self.estado == GameState.PAUSA:
+        elif self.estado == GameState.PAUSA:
             # No actualizar nada en pausa
             pass
         
-        SINO SI self.estado == GameState.MEJORA:
+        elif self.estado == GameState.MEJORA:
             # No actualizar juego, solo esperar selección
             pass
         
-        SINO SI self.estado == GameState.GAME_OVER:
+        elif self.estado == GameState.GAME_OVER:
             # No actualizar juego
             pass
-        """
-        pass
-    
     
     def actualizar_menu(self):
-        """
-        Actualizar lógica del menú
-        
-        PSEUDOCÓDIGO:
+        """Actualizar lógica del menú"""
         # Animaciones del menú (opcional)
-        # Por ahora, solo espera input
         pass
-        """
-        pass
-    
     
     def actualizar_juego(self):
-        """
-        Actualizar toda la lógica del juego
-        
-        PSEUDOCÓDIGO:
+        """Actualizar toda la lógica del juego"""
         # Actualizar jugador
         self.jugador.actualizar(self.dt)
         
@@ -325,6 +290,11 @@ class GameEngine:
         # Actualizar spawn de enemigos
         self.spawn_manager.actualizar(self.dt)
         
+        # Verificar enemigos muertos y crear orbes XP
+        for enemigo in self.spawn_manager.enemigos:
+            if not enemigo.esta_vivo and enemigo not in self.combat_manager.orbes_xp:
+                self.combat_manager.verificar_muerte_enemigo(enemigo)
+        
         # Actualizar sistema de combate
         self.combat_manager.actualizar(self.dt)
         
@@ -332,58 +302,69 @@ class GameEngine:
         self.ui_manager.actualizar(self.dt)
         
         # Verificar si el jugador murió
-        SI NO self.jugador.esta_vivo:
+        if not self.jugador.esta_vivo:
             self.game_over()
         
         # Verificar si debe mostrar pantalla de mejora
-        SI self.jugador.nivel > self.nivel_anterior:
+        if self.jugador.subio_nivel:
             self.mostrar_pantalla_mejora()
-            self.nivel_anterior = self.jugador.nivel
-        """
-        pass
-    
     
     def dibujar(self):
-        """
-        Dibujar según estado del juego
-        
-        PSEUDOCÓDIGO:
-        SI self.estado == GameState.MENU:
+        """Dibujar según estado del juego"""
+        if self.estado == GameState.MENU:
             self.dibujar_menu()
         
-        SINO SI self.estado == GameState.JUGANDO:
+        elif self.estado == GameState.JUGANDO:
             self.dibujar_juego()
         
-        SINO SI self.estado == GameState.PAUSA:
+        elif self.estado == GameState.PAUSA:
             self.dibujar_juego()  # Dibujar juego congelado
             self.ui_manager.dibujar_menu_pausa()
         
-        SINO SI self.estado == GameState.MEJORA:
+        elif self.estado == GameState.MEJORA:
             self.dibujar_juego()  # Dibujar juego de fondo
             self.ui_manager.dibujar_pantalla_mejora(self.ui_manager.opciones_mejora)
         
-        SINO SI self.estado == GameState.GAME_OVER:
+        elif self.estado == GameState.GAME_OVER:
             self.dibujar_juego()  # Mostrar último frame
             self.ui_manager.dibujar_game_over()
-        """
-        pass
-    
     
     def dibujar_menu(self):
-        """
-        Dibujar pantalla de menú
+        """Dibujar pantalla de menú"""
+        # Fondo negro
+        self.pantalla.fill((0, 0, 0))
         
-        PSEUDOCÓDIGO:
-        self.ui_manager.dibujar_pantalla_inicio()
-        """
-        pass
-    
+        # Crear fuentes temporales para el menú
+        fuente_grande = pygame.font.Font(None, 48)
+        fuente_media = pygame.font.Font(None, 32)
+        fuente_pequeña = pygame.font.Font(None, 24)
+        
+        # Título del juego
+        titulo = fuente_grande.render("KARAI SURVIVAL", True, COLOR_XP)
+        rect = titulo.get_rect()
+        rect.center = (ANCHO_VENTANA // 2, 150)
+        self.pantalla.blit(titulo, rect)
+        
+        # Instrucciones
+        instrucciones = [
+            "Usa WASD o Flechas para moverte",
+            "Las armas atacan automáticamente",
+            "Recolecta XP para subir de nivel",
+            "¡Sobrevive el mayor tiempo posible!",
+            "",
+            "Presiona ESPACIO para comenzar"
+        ]
+        
+        y_offset = 300
+        for linea in instrucciones:
+            texto = fuente_pequeña.render(linea, True, COLOR_TEXTO)
+            rect = texto.get_rect()
+            rect.center = (ANCHO_VENTANA // 2, y_offset)
+            self.pantalla.blit(texto, rect)
+            y_offset += 35
     
     def dibujar_juego(self):
-        """
-        Dibujar todo el juego
-        
-        PSEUDOCÓDIGO:
+        """Dibujar todo el juego"""
         # Limpiar pantalla
         self.pantalla.fill(COLOR_FONDO)
         
@@ -403,77 +384,43 @@ class GameEngine:
         self.ui_manager.dibujar_hud()
         
         # Dibujar FPS si está activado
-        SI MOSTRAR_FPS:
+        if MOSTRAR_FPS:
             self.dibujar_fps()
-        """
-        pass
-    
     
     def dibujar_fps(self):
-        """
-        Dibujar contador de FPS
-        
-        PSEUDOCÓDIGO:
+        """Dibujar contador de FPS"""
         fuente = pygame.font.Font(None, 24)
         fps_texto = f"FPS: {int(self.fps_actual)}"
         superficie = fuente.render(fps_texto, True, (0, 255, 0))
         self.pantalla.blit(superficie, (10, ALTO_VENTANA - 30))
-        """
-        pass
-    
     
     def pausar_juego(self):
-        """
-        Pausar el juego
-        
-        PSEUDOCÓDIGO:
+        """Pausar el juego"""
         self.estado = GameState.PAUSA
         self.juego_pausado = True
         self.assets.pausar_musica()
-        print("Juego pausado")
-        """
-        pass
-    
     
     def reanudar_juego(self):
-        """
-        Reanudar el juego
-        
-        PSEUDOCÓDIGO:
+        """Reanudar el juego"""
         self.estado = GameState.JUGANDO
         self.juego_pausado = False
         self.assets.reanudar_musica()
-        print("Juego reanudado")
-        """
-        pass
-    
     
     def mostrar_pantalla_mejora(self):
-        """
-        Mostrar pantalla de selección de mejoras
-        
-        PSEUDOCÓDIGO:
+        """Mostrar pantalla de selección de mejoras"""
         # Cambiar estado
         self.estado = GameState.MEJORA
         
         # Generar opciones de mejora
-        opciones = self.jugador.mostrar_pantalla_mejoras()
+        opciones = self.jugador.generar_opciones_mejora()
         self.ui_manager.opciones_mejora = opciones
         self.ui_manager.mostrar_pantalla_mejora = True
         
-        # Pausar música o reducir volumen
+        # Reducir volumen de música
         pygame.mixer.music.set_volume(0.1)
-        
-        print(f"¡Nivel {self.jugador.nivel} alcanzado!")
-        """
-        pass
-    
     
     def game_over(self):
-        """
-        Manejar Game Over
-        
-        PSEUDOCÓDIGO:
+        """Manejar Game Over"""
         # Cambiar estado
         self.estado = GameState.GAME_OVER
         
@@ -482,47 +429,26 @@ class GameEngine:
         
         # Reproducir música/sonido de game over
         self.assets.reproducir_sonido("game_over")
-        self.assets.reproducir_musica("game_over", loop=0, volumen=0.3)
-        
-        # Guardar estadísticas
-        self.guardar_estadisticas()
         
         print(f"GAME OVER - Nivel: {self.jugador.nivel}, Tiempo: {int(self.jugador.tiempo_supervivencia)}s")
-        """
-        pass
-    
     
     def volver_al_menu(self):
-        """
-        Volver al menú principal
-        
-        PSEUDOCÓDIGO:
+        """Volver al menú principal"""
         # Cambiar estado
         self.estado = GameState.MENU
         
         # Detener música actual
         self.assets.detener_musica()
         
-        # Reproducir música de menú
-        self.assets.reproducir_musica("menu", volumen=0.3)
-        
         # Limpiar sistemas de juego
         self.limpiar_partida()
-        
-        print("Volviendo al menú principal")
-        """
-        pass
-    
     
     def limpiar_partida(self):
-        """
-        Limpiar datos de la partida actual
-        
-        PSEUDOCÓDIGO:
-        SI self.spawn_manager:
+        """Limpiar datos de la partida actual"""
+        if self.spawn_manager:
             self.spawn_manager.enemigos.clear()
         
-        SI self.combat_manager:
+        if self.combat_manager:
             self.combat_manager.orbes_xp.clear()
             self.combat_manager.efectos.clear()
         
@@ -532,75 +458,9 @@ class GameEngine:
         self.camara = None
         self.spawn_manager = None
         self.combat_manager = None
-        """
-        pass
-    
-    
-    def guardar_estadisticas(self):
-        """
-        Guardar estadísticas de la partida
-        
-        PSEUDOCÓDIGO:
-        stats = {
-            "nivel": self.jugador.nivel,
-            "tiempo_supervivencia": self.jugador.tiempo_supervivencia,
-            "enemigos_matados": self.jugador.enemigos_matados,
-            "xp_total": self.combat_manager.stats["xp_total_recolectada"],
-            "daño_infligido": self.combat_manager.stats["daño_total_infligido"]
-        }
-        
-        # TODO: Guardar en archivo JSON
-        # import json
-        # with open("data/stats.json", "w") as f:
-        #     json.dump(stats, f)
-        
-        print(f"Estadísticas guardadas: {stats}")
-        """
-        pass
-    
-    
-    def cargar_configuracion(self):
-        """
-        Cargar configuración del juego
-        
-        PSEUDOCÓDIGO:
-        # TODO: Cargar desde archivo JSON
-        # import json
-        # try:
-        #     with open("data/config.json", "r") as f:
-        #         config = json.load(f)
-        #         # Aplicar configuración
-        # except:
-        #     print("No se encontró archivo de configuración")
-        """
-        pass
-    
-    
-    def guardar_configuracion(self):
-        """
-        Guardar configuración del juego
-        
-        PSEUDOCÓDIGO:
-        config = {
-            "volumen_musica": pygame.mixer.music.get_volume(),
-            "volumen_sfx": 0.7,  # TODO: Obtener de settings
-            "pantalla_completa": False,
-            "mostrar_fps": MOSTRAR_FPS
-        }
-        
-        # TODO: Guardar en archivo JSON
-        """
-        pass
-    
     
     def limpiar(self):
-        """
-        Limpiar recursos antes de salir
-        
-        PSEUDOCÓDIGO:
-        # Guardar configuración
-        self.guardar_configuracion()
-        
+        """Limpiar recursos antes de salir"""
         # Detener todos los sonidos
         self.assets.detener_musica()
         pygame.mixer.stop()
@@ -609,20 +469,3 @@ class GameEngine:
         self.assets.limpiar()
         
         print("Recursos limpiados. Saliendo...")
-        """
-        pass
-    
-    
-    def obtener_estadisticas_sesion(self):
-        """
-        Obtener estadísticas de la sesión actual
-        
-        PSEUDOCÓDIGO:
-        RETORNAR {
-            "tiempo_total_juego": self.tiempo_total_juego,
-            "partidas_jugadas": self.partidas_jugadas,
-            "fps_promedio": int(self.fps_actual)
-        }
-        """
-        pass
-    '''

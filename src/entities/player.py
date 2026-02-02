@@ -5,17 +5,23 @@ Control del jugador, stats, nivel y armas
 """
 
 import pygame
-from base_entity import BaseEntity
-from src.settings import *
+import random
+from entities.base_entity import BaseEntity
+from settings import *
 
 class Player(BaseEntity):
-    '''
-    """
-    PSEUDOCÓDIGO:
+    """Clase del jugador - Campesino Paraguayo"""
     
-    __init__(self, x, y):
-        # Llamar constructor padre
-        super().__init__(x, y, 50, 50, (255, 200, 0))  # Amarillo campesino
+    def __init__(self, x, y):
+        """
+        Inicializar jugador
+        
+        Args:
+            x: Posición X inicial
+            y: Posición Y inicial
+        """
+        # Llamar constructor padre (cuadrado amarillo)
+        super().__init__(x, y, 50, 50, (255, 200, 0))
         
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
@@ -28,7 +34,7 @@ class Player(BaseEntity):
         self.xp_necesaria = XP_POR_NIVEL[0]
         
         # Inventario de armas
-        self.armas_equipadas = []  # Lista de instancias de Weapon
+        self.armas_equipadas = []
         self.armas_disponibles = ["MACHETE"]  # Empieza con machete
         
         # Radio de recolección de XP
@@ -37,18 +43,17 @@ class Player(BaseEntity):
         # Cooldown de invulnerabilidad al recibir daño
         self.invulnerable = False
         self.tiempo_invulnerabilidad = 0
-        self.duracion_invulnerabilidad = 0.5  # segundos
+        self.duracion_invulnerabilidad = INVULNERABILIDAD_DURACION
         
         # Stats de juego
         self.enemigos_matados = 0
         self.tiempo_supervivencia = 0
-    
+        
+        # Flag para subida de nivel
+        self.subio_nivel = False
     
     def manejar_input(self):
-        """
-        Procesar input del teclado para movimiento
-        
-        PSEUDOCÓDIGO:
+        """Procesar input del teclado para movimiento"""
         teclas = pygame.key.get_pressed()
         
         # Resetear dirección
@@ -56,233 +61,239 @@ class Player(BaseEntity):
         self.direccion.y = 0
         
         # Movimiento WASD o flechas
-        SI teclas[K_w] O teclas[K_UP]:
+        if teclas[pygame.K_w] or teclas[pygame.K_UP]:
             self.direccion.y = -1
-        SI teclas[K_s] O teclas[K_DOWN]:
+        if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
             self.direccion.y = 1
-        SI teclas[K_a] O teclas[K_LEFT]:
+        if teclas[pygame.K_a] or teclas[pygame.K_LEFT]:
             self.direccion.x = -1
-        SI teclas[K_d] O teclas[K_RIGHT]:
+        if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
             self.direccion.x = 1
-        """
-        pass
-    
     
     def ganar_xp(self, cantidad):
         """
         Sumar XP y verificar subida de nivel
         
-        PSEUDOCÓDIGO:
+        Args:
+            cantidad: Cantidad de XP a ganar
+        """
         self.xp_actual += cantidad
         
         # Verificar subida de nivel
-        MIENTRAS self.xp_actual >= self.xp_necesaria:
+        while self.xp_actual >= self.xp_necesaria:
             self.subir_nivel()
-        """
-        pass
-    
     
     def subir_nivel(self):
-        """
-        Aumentar nivel y ofrecer mejora
-        
-        PSEUDOCÓDIGO:
+        """Aumentar nivel y ofrecer mejora"""
         # Restar XP usada
         self.xp_actual -= self.xp_necesaria
         self.nivel += 1
         
         # Calcular nueva XP necesaria
-        SI self.nivel <= len(XP_POR_NIVEL):
+        if self.nivel <= len(XP_POR_NIVEL):
             self.xp_necesaria = XP_POR_NIVEL[self.nivel - 1]
-        SINO:
+        else:
             # Fórmula exponencial para niveles altos
             self.xp_necesaria = int(XP_POR_NIVEL[-1] * (1.5 ** (self.nivel - 10)))
         
         # Curación completa al subir nivel
         self.vida_actual = self.vida_maxima
         
-        # PAUSAR JUEGO y mostrar pantalla de mejoras
-        self.mostrar_pantalla_mejoras()
-        """
-        pass
+        # Marcar que subió nivel (para que el engine pause)
+        self.subio_nivel = True
     
-    
-    def mostrar_pantalla_mejoras(self):
+    def generar_opciones_mejora(self):
         """
-        Mostrar 3 opciones aleatorias de mejora
+        Generar 3 opciones aleatorias de mejora
         
-        PSEUDOCÓDIGO:
+        Returns:
+            list: Lista de diccionarios con opciones de mejora
+        """
         opciones_disponibles = []
         
         # Opción 1: Nueva arma (si hay disponibles)
-        PARA CADA arma EN ARMAS_CONFIG:
-            SI arma NO está en self.armas_equipadas:
-                opciones_disponibles.agregar(("nueva_arma", arma))
+        armas_disponibles_para_obtener = []
+        for arma in ARMAS_CONFIG.keys():
+            if arma not in self.armas_disponibles:
+                armas_disponibles_para_obtener.append(arma)
         
-        # Opción 2: Mejorar arma existente
-        PARA CADA arma EN self.armas_equipadas:
-            SI arma.nivel < arma.nivel_maximo:
-                opciones_disponibles.agregar(("mejorar_arma", arma))
+        for arma in armas_disponibles_para_obtener:
+            opciones_disponibles.append({
+                "tipo": "nueva_arma",
+                "valor": arma,
+                "descripcion": f"Desbloquear {arma}"
+            })
         
-        # Opción 3: Mejoras pasivas (vida, velocidad, etc)
-        opciones_disponibles.agregar(("aumentar_vida_max", 20))
-        opciones_disponibles.agregar(("aumentar_velocidad", 20))
-        opciones_disponibles.agregar(("aumentar_radio_recoleccion", 20))
+        # Opción 2: Mejorar arma existente (placeholder - implementar con sistema de armas)
+        # Por ahora agregamos mejoras pasivas
+        
+        # Opción 3: Mejoras pasivas
+        opciones_disponibles.append({
+            "tipo": "aumentar_vida_max",
+            "valor": MEJORAS_VALORES["vida_max"],
+            "descripcion": f"+{MEJORAS_VALORES['vida_max']} Vida Máxima"
+        })
+        
+        opciones_disponibles.append({
+            "tipo": "aumentar_velocidad",
+            "valor": MEJORAS_VALORES["velocidad"],
+            "descripcion": f"+{MEJORAS_VALORES['velocidad']} Velocidad"
+        })
+        
+        opciones_disponibles.append({
+            "tipo": "aumentar_radio_recoleccion",
+            "valor": MEJORAS_VALORES["radio_recoleccion"],
+            "descripcion": f"+{MEJORAS_VALORES['radio_recoleccion']} Radio Recolección"
+        })
+        
+        # Si hay menos de 3 opciones, duplicar algunas
+        while len(opciones_disponibles) < 3:
+            opciones_disponibles.append({
+                "tipo": "aumentar_vida_max",
+                "valor": MEJORAS_VALORES["vida_max"],
+                "descripcion": f"+{MEJORAS_VALORES['vida_max']} Vida Máxima"
+            })
         
         # Elegir 3 opciones aleatorias
-        opciones_mostrar = random.sample(opciones_disponibles, 3)
+        if len(opciones_disponibles) > 3:
+            opciones_mostrar = random.sample(opciones_disponibles, 3)
+        else:
+            opciones_mostrar = opciones_disponibles[:3]
         
-        # Esperar elección del jugador (UI_Manager se encarga)
-        # Cuando elige, aplicar mejora correspondiente
-        """
-        pass
-    
+        return opciones_mostrar
     
     def aplicar_mejora(self, tipo_mejora, valor):
         """
         Aplicar la mejora elegida
         
-        PSEUDOCÓDIGO:
-        SI tipo_mejora == "nueva_arma":
-            nueva_arma = Weapon(valor, self)  # valor es el nombre del arma
-            self.armas_equipadas.agregar(nueva_arma)
+        Args:
+            tipo_mejora: Tipo de mejora (string)
+            valor: Valor de la mejora
+        """
+        if tipo_mejora == "nueva_arma":
+            # Agregar arma a disponibles
+            if valor not in self.armas_disponibles:
+                self.armas_disponibles.append(valor)
         
-        SI tipo_mejora == "mejorar_arma":
-            valor.subir_nivel()  # valor es la instancia del arma
-        
-        SI tipo_mejora == "aumentar_vida_max":
+        elif tipo_mejora == "aumentar_vida_max":
             self.vida_maxima += valor
             self.vida_actual += valor  # También cura
         
-        SI tipo_mejora == "aumentar_velocidad":
+        elif tipo_mejora == "aumentar_velocidad":
             self.velocidad += valor
         
-        SI tipo_mejora == "aumentar_radio_recoleccion":
+        elif tipo_mejora == "aumentar_radio_recoleccion":
             self.radio_recoleccion += valor
-        """
-        pass
-    
     
     def recibir_daño(self, cantidad):
         """
         Sobrescribir para incluir invulnerabilidad
         
-        PSEUDOCÓDIGO:
-        SI NO self.invulnerable:
+        Args:
+            cantidad: Cantidad de daño a recibir
+        """
+        if not self.invulnerable:
             super().recibir_daño(cantidad)
             
             # Activar invulnerabilidad temporal
             self.invulnerable = True
             self.tiempo_invulnerabilidad = 0
-            
-            # Efecto visual (parpadeo)
-            # Se maneja en el método dibujar
-        """
-        pass
-    
     
     def actualizar_invulnerabilidad(self, dt):
         """
         Actualizar timer de invulnerabilidad
         
-        PSEUDOCÓDIGO:
-        SI self.invulnerable:
+        Args:
+            dt: Delta time en segundos
+        """
+        if self.invulnerable:
             self.tiempo_invulnerabilidad += dt
             
-            SI self.tiempo_invulnerabilidad >= self.duracion_invulnerabilidad:
+            if self.tiempo_invulnerabilidad >= self.duracion_invulnerabilidad:
                 self.invulnerable = False
                 self.tiempo_invulnerabilidad = 0
-        """
-        pass
-    
     
     def actualizar_armas(self, dt, enemigos):
         """
         Actualizar todas las armas equipadas
         
-        PSEUDOCÓDIGO:
-        PARA CADA arma EN self.armas_equipadas:
-            arma.actualizar(dt, enemigos)
+        Args:
+            dt: Delta time en segundos
+            enemigos: Lista de enemigos
         """
-        pass
-    
+        for arma in self.armas_equipadas:
+            arma.actualizar(dt, enemigos)
     
     def recolectar_xp_cercana(self, orbes_xp):
         """
         Atraer y recolectar orbes de XP cercanas
         
-        PSEUDOCÓDIGO:
-        PARA CADA orbe EN orbes_xp:
+        Args:
+            orbes_xp: Lista de orbes de XP
+        """
+        orbes_a_eliminar = []
+        
+        for orbe in orbes_xp:
             distancia = self.distancia_a(orbe)
             
-            SI distancia <= self.radio_recoleccion:
+            if distancia <= self.radio_recoleccion:
                 # Atraer orbe hacia jugador
                 direccion = orbe.direccion_hacia(self)
-                orbe.x += direccion.x * 300 * dt  # Velocidad de atracción
-                orbe.y += direccion.y * 300 * dt
+                orbe.x += direccion.x * 300 * 0.016  # Aproximación de dt
+                orbe.y += direccion.y * 300 * 0.016
+                orbe.rect.center = (int(orbe.x), int(orbe.y))
                 
-                # SI toca al jugador, recolectar
-                SI self.colisiona_con(orbe):
+                # Si toca al jugador, recolectar
+                if self.colisiona_con(orbe):
                     self.ganar_xp(orbe.cantidad)
-                    orbes_xp.remove(orbe)
-        """
-        pass
-    
+                    orbes_a_eliminar.append(orbe)
+        
+        # Eliminar orbes recolectadas
+        for orbe in orbes_a_eliminar:
+            if orbe in orbes_xp:
+                orbes_xp.remove(orbe)
     
     def limitar_al_mapa(self):
-        """
-        No permitir que salga del mapa
-        
-        PSEUDOCÓDIGO:
-        SI self.x < 0:
+        """No permitir que salga del mapa"""
+        if self.x < 0:
             self.x = 0
-        SI self.x > MAPA_ANCHO_PIXELES:
+        if self.x > MAPA_ANCHO_PIXELES:
             self.x = MAPA_ANCHO_PIXELES
-        SI self.y < 0:
+        if self.y < 0:
             self.y = 0
-        SI self.y > MAPA_ALTO_PIXELES:
+        if self.y > MAPA_ALTO_PIXELES:
             self.y = MAPA_ALTO_PIXELES
         
         # Actualizar rect
         self.rect.center = (int(self.x), int(self.y))
-        """
-        pass
-    
     
     def al_morir(self):
-        """
-        Callback cuando muere el jugador
-        
-        PSEUDOCÓDIGO:
-        # Cambiar estado del juego a GAME_OVER
-        # Mostrar pantalla de estadísticas finales
-        # - Tiempo supervivido
-        # - Nivel alcanzado
-        # - Enemigos matados
-        """
+        """Callback cuando muere el jugador"""
+        # El engine manejará el game over
         pass
-    
     
     def dibujar(self, pantalla, camara):
         """
         Dibujar con efecto de parpadeo si es invulnerable
         
-        PSEUDOCÓDIGO:
-        SI self.invulnerable:
-            # Parpadear cada 0.1 segundos
-            SI int(self.tiempo_invulnerabilidad * 10) % 2 == 0:
-                super().dibujar(pantalla, camara)
-        SINO:
-            super().dibujar(pantalla, camara)
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
         """
-        pass
-    
+        if self.invulnerable:
+            # Parpadear cada 0.1 segundos
+            if int(self.tiempo_invulnerabilidad * 10) % 2 == 0:
+                super().dibujar(pantalla, camara)
+        else:
+            super().dibujar(pantalla, camara)
     
     def actualizar(self, dt):
         """
         Actualización principal del jugador
         
-        PSEUDOCÓDIGO:
+        Args:
+            dt: Delta time en segundos
+        """
         # Manejar input
         self.manejar_input()
         
@@ -297,6 +308,3 @@ class Player(BaseEntity):
         
         # Actualizar tiempo de supervivencia
         self.tiempo_supervivencia += dt
-        """
-        pass
-        '''
