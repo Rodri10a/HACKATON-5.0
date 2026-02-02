@@ -144,8 +144,8 @@ class AssetLoader:
             "subir_nivel",
             "game_over",
             "ataque_machete",
-            "ataque_hacha",
-            "ataque_azada"
+            "ataque_rifle",
+            "ataque_fuego"
         ]
         
         for nombre in sonidos_lista:
@@ -172,9 +172,9 @@ class AssetLoader:
     def cargar_musica(self):
         """Cargar archivos de música de fondo"""
         musicas = {
-            "menu": "menu_theme.ogg",
-            "gameplay": "gameplay_theme.ogg",
-            "game_over": "game_over_theme.ogg"
+            "menu": "menu_theme.mp3",
+            "gameplay": "gameplay_theme.mp3",
+            "game_over": "game_over_theme.mp3"
         }
         
         for clave, archivo in musicas.items():

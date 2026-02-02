@@ -20,8 +20,8 @@ class Player(BaseEntity):
             x: Posición X inicial
             y: Posición Y inicial
         """
-        # Llamar constructor padre (cuadrado amarillo)
-        super().__init__(x, y, 50, 50, (255, 200, 0))
+        # Llamar constructor padre con sprite
+        super().__init__(x, y, 50, 50, (255, 200, 0), sprite_path="assets/sprites/player.png")
         
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
@@ -223,6 +223,19 @@ class Player(BaseEntity):
         """
         for arma in self.armas_equipadas:
             arma.actualizar(dt, enemigos)
+    
+    def usar_machete_manual(self, enemigos):
+        """
+        Usar machete manualmente cuando se presiona ESPACIO
+        
+        Args:
+            enemigos: Lista de enemigos
+        """
+        for arma in self.armas_equipadas:
+            if arma.tipo == "MACHETE":
+                if arma.puede_usar:
+                    arma.usar(enemigos)
+                    break
     
     def recolectar_xp_cercana(self, orbes_xp):
         """
