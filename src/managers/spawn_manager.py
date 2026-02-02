@@ -3,12 +3,19 @@ SPAWN_MANAGER.PY - GESTIÓN DE APARICIÓN DE ENEMIGOS
 ====================================================
 Controla cuándo y dónde aparecen enemigos, escalando dificultad
 """
-
+import logging
 import pygame
 import random
 import math
 from entities.enemy import Enemy
 from settings import *
+
+logging.basicConfig(level=logging.INFO,
+format='%(asctime)s - %(levelname)s - %(message)s', datefmt="%H:%M:%S",
+handlers=[
+    logging.FileHandler("game.log") ,
+    logging.StreamHandler()
+])
 
 
 class SpawnManager:
@@ -59,6 +66,8 @@ class SpawnManager:
             "DESCANSO": 1.6
         }
 
+        logging.info("SpawnManager inicializado .Estado inicial: NORMAL")
+
     def actualizar(self, dt):
         """
         Actualizar spawns y enemigos
@@ -79,6 +88,7 @@ class SpawnManager:
         if int(self.tiempo_juego) > self.ultimo_escalado and int(self.tiempo_juego) % 60 == 0:
             self.escalar_dificultad()
             self.ultimo_escalado = int(self.tiempo_juego)
+            logging.info(f"Dificultad escalada: tiempo entre spawns {self.tiempo_entre_spawns}, enemigos por spawn {self.enemigos_por_spawn}")
         
         # Verificar si es momento de spawnear
         if self.timer_spawn >= self.tiempo_entre_spawns:
@@ -92,9 +102,11 @@ class SpawnManager:
         # Eliminar enemigos muertos
         self.limpiar_enemigos_muertos()
 
+
     # Methodo para actualizar el estado de la oleada
     def actualizar_oleada(self, dt):
         self.tiempo_estado += dt
+        estado_anterior = self.estado_oleada
 
         if self.estado_oleada == "NORMAL" and self.tiempo_estado >= self.duracion_normal:
             self.estado_oleada = "HORDA"
@@ -109,8 +121,8 @@ class SpawnManager:
         factor = self.factores_spawn[self.estado_oleada]
         self.tiempo_entre_spawns = max(SPAWN_MINIMO, TIEMPO_ENTRE_SPAWNS * factor)
         self.enemigos_por_spawn = max(1, int(self.enemigos_por_spawn_base * factor))
-
-        print(f"[OLEADA] Estado: {self.estado_oleada}, Enemigos por spawn: {self.enemigos_por_spawn}, Tiempo spawn: {self.tiempo_entre_spawns:.2f}")
+        if estado_anterior != self.estado_oleada:
+            logging.info(f"Cambio de estado de oleada: {self.estado_oleada}")
 
 
     def escalar_dificultad(self):
@@ -142,6 +154,7 @@ class SpawnManager:
             enemigo.jugador = self.jugador  # Asignar referencia al jugador
             
             self.enemigos.append(enemigo)
+            logging.info(f"Spawn enemigo: {tipo_enemigo} en ({x:.2f}, {y:.2f})")
     
     def elegir_tipo_enemigo(self):
         """
@@ -191,6 +204,9 @@ class SpawnManager:
     
     def limpiar_enemigos_muertos(self):
         """Eliminar enemigos muertos de la lista"""
+        muertos = [e for e in self.enemigos if not e.esta_vivo]
+        for m in muertos:
+            logging.info(f"Enemigo muerto: {m.tipo} en ({m.x:.2f}, {m.y:.2f})")
         self.enemigos = [e for e in self.enemigos if e.esta_vivo]
     
     def obtener_enemigos_en_rango(self, x, y, rango):
@@ -270,9 +286,11 @@ class SpawnManager:
         Returns:
             dict: Diccionario con estadísticas
         """
-        return {
+        stats = {
             "enemigos_activos": len(self.enemigos),
             "enemigos_por_spawn": self.enemigos_por_spawn,
             "tiempo_entre_spawns": self.tiempo_entre_spawns,
             "tiempo_juego": int(self.tiempo_juego)
         }
+        logging.info(f"Estadísticas de Spawn: {stats}")
+        return stats
