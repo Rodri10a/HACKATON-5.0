@@ -435,8 +435,8 @@ class GameEngine:
         # Detener música de gameplay
         self.assets.detener_musica()
         
-        # Reproducir música/sonido de game over
-        self.assets.reproducir_sonido("game_over")
+        # Reproducir música/sonido de game over 
+        self.assets.reproducir_sonido("game_over") 
         
         print(f"GAME OVER - Nivel: {self.jugador.nivel}, Tiempo: {int(self.jugador.tiempo_supervivencia)}s")
     
