@@ -202,6 +202,15 @@ class GameEngine:
                 self.reiniciar_juego()
             if tecla == pygame.K_ESCAPE:
                 self.volver_al_menu()
+                
+        # JUGANDO
+        elif self.estado == GameState.JUGANDO:
+            if tecla == pygame.K_ESCAPE:
+                self.pausar_juego()
+            
+            # Atacar con machete al presionar ESPACIO
+            if tecla == pygame.K_SPACE:
+                self.jugador.usar_machete_manual(self.spawn_manager.enemigos)
     
     def manejar_click_mouse(self, pos, boton):
         """
@@ -232,6 +241,7 @@ class GameEngine:
                     self.ui_manager.mostrar_pantalla_mejora = False
                     self.jugador.subio_nivel = False
                     self.estado = GameState.JUGANDO
+            
     
     def aplicar_mejora_seleccionada(self, opcion):
         """
