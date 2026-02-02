@@ -471,7 +471,7 @@ class GameEngine:
         """Limpiar recursos antes de salir"""
         # Detener todos los sonidos
         self.assets.detener_musica()
-        pygame.mixer.stop()
+        pygame.mixer.stop() 
         
         # Limpiar assets
         self.assets.limpiar()
