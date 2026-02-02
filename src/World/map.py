@@ -80,7 +80,7 @@ class Map:
         
         # Intentar cargar imagen de fondo
         try:
-            fondo = pygame.image.load("assets/sprites/mapa.png")
+            fondo = pygame.image.load("assets/sprites/mapa.jpeg")
             # Escalar al tamaño del mapa completo
             fondo = pygame.transform.scale(
                 fondo, 

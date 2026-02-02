@@ -25,7 +25,7 @@ CAMPESINO_RADIO_RECOLECCION = 80  # Más grande para recoger XP más fácil
 
 # ========== SISTEMA DE EXPERIENCIA (MÁS FÁCIL) ==========
 # Cada nivel se completa en aprox 30-45 segundos
-XP_POR_NIVEL = [50, 70, 100, 140, 190, 260, 350, 470, 630, 850]
+XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650] 
 
 # ========== CONFIGURACIÓN DE ENEMIGOS ==========
 ENEMIGO_CONFIGS = {
@@ -88,25 +88,25 @@ ENEMIGO_CONFIGS = {
 }
 
 # ========== SISTEMA DE OLEADAS (ESCALAMIENTO RÁPIDO) ==========
-TIEMPO_ENTRE_SPAWNS = 0.8        # Más rápido desde el inicio
-SPAWN_REDUCCION_POR_MINUTO = 0.1 # Escala más rápido
-SPAWN_MINIMO = 0.15              # Mínimo más bajo
-ENEMIGOS_POR_SPAWN = 2           # Empieza con 2 enemigos
-AUMENTO_ENEMIGOS_CADA = 60       # Cada 1 minuto +1 enemigo
+# --- En la sección SISTEMA DE OLEADAS ---
+TIEMPO_ENTRE_SPAWNS = 1.2        # Antes 0.8 (Tardan más en aparecer)
+ENEMIGOS_POR_SPAWN = 1           # Antes 2 (Sale solo 1 a la vez al inicio)
+AUMENTO_ENEMIGOS_CADA = 120      # Antes 60 (La dificultad sube cada 2 minutos, no cada 1)
 
 # ========== CONFIGURACIÓN DE ARMAS ==========
 ARMAS_CONFIG = {
     "MACHETE": {
         "daño_base": 20,
-        "alcance": 80,          # Más alcance
+        "alcance": 180,          # Más alcance
         "cooldown": 0.4,        # Más rápido
         "tipo": "melee",
+        # Modifica la lista de "niveles" dentro de "MACHETE":
         "niveles": [
-            {"daño": 20, "alcance": 80},
-            {"daño": 30, "alcance": 90},
-            {"daño": 45, "alcance": 100},
-            {"daño": 65, "alcance": 120}
-        ]
+        {"daño": 20, "alcance": 120}, # Antes 80
+        {"daño": 30, "alcance": 150}, # Antes 90
+        {"daño": 45, "alcance": 200}, # Antes 100
+        {"daño": 65, "alcance": 250}  # Antes 120 (Casi media pantalla)  
+]
     },
     "HACHA": {
         "daño_base": 30,
@@ -125,7 +125,7 @@ ARMAS_CONFIG = {
         "alcance": 100,
         "cooldown": 0.7,        # Más rápido
         "tipo": "aoe",
-        "niveles": [
+        "niveles": [ 
             {"daño": 25, "radio": 70},
             {"daño": 38, "radio": 90},
             {"daño": 55, "radio": 120},
@@ -188,7 +188,7 @@ VELOCIDAD_BONUS_POR_NIVEL = 15
 RADIO_RECOLECCION_BONUS = 25
 
 # ========== LÍMITES ==========
-MAX_ENEMIGOS_PANTALLA = 300
+MAX_ENEMIGOS_PANTALLA = 100
 MAX_PROYECTILES = 200
 MAX_ORBES_XP = 500
 MAX_ARMAS_EQUIPADAS = 6
