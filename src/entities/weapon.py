@@ -139,20 +139,21 @@ class Weapon:
     def ataque_machete(self, enemigos):
         """
         Ataque melee circular alrededor del jugador con efecto visual
-        
+        Usa colisión de hitbox para detectar enemigos
+
         Args:
             enemigos: Lista de enemigos
         """
         config_nivel = self.config["niveles"][self.nivel - 1]
         daño = config_nivel["daño"]
         alcance = config_nivel["alcance"]
-        
+
         # Determinar dirección del slash basado en el último movimiento
         direccion = self.dueño.direccion
         if direccion.length() == 0:
             # Si está quieto, slash hacia la derecha por defecto
             direccion = pygame.math.Vector2(1, 0)
-        
+
         # Crear efecto visual del slash
         efecto_slash = EfectoSlashMachete(
             self.dueño.x,
@@ -161,21 +162,30 @@ class Weapon:
             alcance
         )
         self.efectos.append(efecto_slash)
-        
-        # Aplicar daño a enemigos en alcance
+
+        # Crear área de ataque (rectángulo centrado en el jugador)
+        area_ataque = pygame.Rect(
+            self.dueño.x - alcance,
+            self.dueño.y - alcance,
+            alcance * 2,
+            alcance * 2
+        )
+
+        # Aplicar daño a enemigos cuyo hitbox colisiona con el área de ataque
         for enemigo in enemigos:
             if not enemigo.esta_vivo:
                 continue
-            
-            # Calcular distancia
-            dx = enemigo.x - self.dueño.x
-            dy = enemigo.y - self.dueño.y
-            distancia = math.sqrt(dx * dx + dy * dy)
-            
-            if distancia <= alcance:
+
+            # Verificar colisión de hitbox
+            if area_ataque.colliderect(enemigo.rect):
                 # Aplicar daño
                 enemigo.recibir_daño(daño)
-                
+
+                # Calcular dirección para knockback (desde centro del jugador al enemigo)
+                dx = enemigo.x - self.dueño.x
+                dy = enemigo.y - self.dueño.y
+                distancia = math.sqrt(dx * dx + dy * dy)
+
                 # Aplicar knockback
                 if distancia > 0:
                     direccion_kb = pygame.math.Vector2(dx / distancia, dy / distancia)
