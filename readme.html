@@ -1,338 +1,607 @@
-<div align="center">
-
-# 👨‍🌾 KARAI SURVIVAL
-
-### 🇵🇾 Sobreviví a las Leyendas del Paraguay 🇵🇾
-
-<img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-<img src="https://img.shields.io/badge/Pygame-2.6-green?style=for-the-badge&logo=python&logoColor=white" alt="Pygame">
-<img src="https://img.shields.io/badge/Genre-Roguelike-red?style=for-the-badge" alt="Genre">
-<img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Status">
-
-**Un roguelike de acción y supervivencia en 2D inspirado en el folklore paraguayo**
-
-[🎮 Jugar Ahora](#instalación) • [📖 Documentación](#características) • [👥 Equipo](#equipo-de-desarrollo) • [🚀 Roadmap](#roadmap)
-
----
-
-</div>
-
-## 🌟 Sobre el Juego
-
-**KARAI SURVIVAL** te sumerge en las tierras paraguayas donde deberás encarnar a un valiente **Campesino** enfrentando oleadas interminables de criaturas del folklore local. A medida que el tiempo avanza, la fauna hostil se vuelve cada vez más implacable y despiadada.
-
-### 🎯 Objetivo Principal
-Sobreviví el mayor tiempo posible mientras recolectás **experiencia** para transformar tus humildes herramientas de trabajo en **armas de destrucción masiva**. Cada segundo cuenta, cada decisión importa.
-
-### ✨ Lo que hace único a KARAI SURVIVAL
-- 🏞️ **Ambientación 100% Paraguaya**: Enemigos basados en leyendas y mitos locales
-- ⚔️ **Sistema de Progresión Dinámico**: Las armas evolucionan con vos
-- 🎵 **Soundtrack Paraguayo Auténtico**: Música que te conecta con la tierra
-- 🎨 **Arte Pixel Art 2D**: Estética retro con identidad regional
-- 💀 **Dificultad Creciente**: Cada minuto que sobrevivís, el desafío aumenta
-
----
-
-## 👥 Equipo de Desarrollo
-
-<table align="center">
-<tr>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/rodrigo.png" width="100px" style="border-radius:50%"/><br>
-<b>Rodrigo Argüello</b><br>
-<i>Team Lead</i><br>
-<sub>🎮 Lógica del Juego</sub><br>
-<sub>🏗️ Arquitectura</sub><br> 
-<sub>🔀 Git/GitHub</sub><br>
-<sub>👨‍💼 Gestión de Tareas</sub>
-</td>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/eduardo.png" width="100px" style="border-radius:50%"/><br>
-<b>Eduardo Lugo</b><br>
-<i>Visual & Audio Designer</i><br>
-<sub>🎨 Diseño de Armas</sub><br>
-<sub>🔊 Efectos de Sonido</sub><br>
-<sub>🎵 Música</sub>
-</td>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/edgar.png" width="100px" style="border-radius:50%"/><br>
-<b>Edgar Ojeda</b><br>
-<i>Character Artist</i><br>
-<sub>👨‍🌾 Diseño de Personajes</sub><br>
-<sub>👹 Diseño de Enemigos</sub><br>
-<sub>🎨 Sprites & Animaciones</sub>
-</td>
-</tr>
-<tr>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/marcos.png" width="100px" style="border-radius:50%"/><br>
-<b>Marcos Cáceres</b><br>
-<i>Game Systems Developer</i><br>
-<sub>⚙️ Configuración del Juego</sub><br>
-<sub>👤 Sistema de Personajes</sub><br>
-<sub>🎮 Player Controller</sub>
-</td>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/oscar.png" width="100px" style="border-radius:50%"/><br>
-<b>Óscar López</b><br>
-<i>Level Designer</i><br>
-<sub>🗺️ Sistema de Mapas</sub><br>
-<sub>🌍 Diseño de Niveles</sub><br>
-<sub>🏞️ Ambientación</sub>
-</td>
-<td align="center" width="200px">
-<img src="https://github.com/identicons/alexis.png" width="100px" style="border-radius:50%"/><br>
-<b>Alexis Samudio</b><br>
-<i>UI/UX Designer</i><br>
-<sub>🖥️ Interfaz Gráfica</sub><br>
-<sub>📊 HUD & Menús</sub><br>
-<sub>✨ Experiencia de Usuario</sub>
-</td>
-</tr>
-</table>
-
----
-
-## 💻 Stack Tecnológico
-
-<div align="center">
-
-| Categoría | Tecnología | Versión | Propósito |
-|-----------|-----------|---------|-----------|
-| **Lenguaje** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) | 3.12 | Desarrollo principal |
-| **Game Engine** | ![Pygame](https://img.shields.io/badge/Pygame-2.6-green?style=flat) | 2.6 | Motor de juego 2D |
-| **Version Control** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) | Latest | Control de versiones |
-| **Hosting** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github) | - | Repositorio del proyecto |
-| **Arte** | Pixel Art 2D | - | Estilo visual retro |
-| **Audio** | WAV/MP3 | - | Efectos y música |
-
-</div>
-
----
-
-## 🎮 Características del Juego
-
-### 👹 Enemigos del Folklore Paraguayo
-
-<table>
-<tr>
-<td width="50%">
-
-**Criaturas Terrestres**
-- 🐺 **Lobo** - Rápido y agresivo
-- 🦎 **Yacaré** - Lento pero resistente
-- 🐍 **Serpiente** - Movimientos impredecibles
-- 👻 **Luison** - El séptimo hijo, criatura de la noche
-- 🐕 **Aoao** - Espíritu protector convertido en amenaza
-
-</td>
-<td width="50%">
-
-**Criaturas Voladoras**
-- 🦟 **Mosquito** - Pequeño pero molesto
-- 🦇 **[Próximamente]** - Más enemigos en desarrollo
-
-**💀 Escalada de Dificultad**
-- Enemigos más rápidos con el tiempo
-- Mayor cantidad de spawns
-- Combinaciones letales de enemigos
-
-</td>
-</tr>
-</table>
-
-### ⚔️ Arsenal del Campesino
-
-| Arma | Tipo | Evolución |
-|------|------|-----------|
-| 🔪 **Machete** | Cuerpo a cuerpo | ⭐ → ⭐⭐ → ⭐⭐⭐ |
-| 🔫 **Rifle** | Distancia | ⭐ → ⭐⭐ → ⭐⭐⭐ |
-
-> **Sistema de Mejora**: Las armas suben de nivel automáticamente al ganar experiencia
-
-### 🎁 Power-Ups
-
-- 🫚 **Jengibre** - Restaura vida instantáneamente
-- ⚡ **Boost de Velocidad** - Aumenta la velocidad de movimiento temporalmente
-- 🧉 **Tereré** *(Próximamente)* - Regeneración de vida
-
----
-
-## 🎯 Gameplay y Controles
-
-<div align="center">
-
-### 🕹️ Controles
-```
-┌─────────────────────────────────────┐
-│  ⬆️ W         → Mover Arriba       │
-│  ⬇️ S         → Mover Abajo        │
-│  ⬅️ A         → Mover Izquierda    │
-│  ➡️ D         → Mover Derecha      │
-│  SPACE BAR    → Atacar              │
-│  MOUSE        → Apuntar             │
-└─────────────────────────────────────┘
-```
-
-### 🎮 Mecánicas Principales
-
-| Mecánica | Descripción |
-|----------|-------------|
-| 💀 **Sobrevivir** | Resiste oleadas infinitas de enemigos |
-| ⭐ **Recolectar XP** | Derrota enemigos y recoge orbs de experiencia |
-| 📈 **Subir de Nivel** | Desbloquea mejoras para tus armas |
-| 🎯 **Estrategia** | Los enemigos dropean buffs ocasionales |
-| ⏱️ **Contra Reloj** | Cada minuto que pasa, aumenta la dificultad |
-
-</div>
-
----
-
-## 🚀 Instalación y Ejecución
-
-### Requisitos Previos
-```bash
-# Python 3.12 o superior
-python --version
-
-# Pip actualizado
-pip --version
-```
-
-### Instalación
-
-1️⃣ **Clonar el repositorio**
-```bash
-git clone https://github.com/Rodri10a/HACKATON-5.0.git
-cd HACKATON-5.0
-```
-
-2️⃣ **Instalar dependencias**
-```bash
-pip install -r requirements.txt
-```
-
-3️⃣ **Ejecutar el juego**
-```bash
-python main.py
-```
-
-### Estructura del Proyecto
-```
-KARAI-SURVIVAL/
-├── assets/
-│   ├── sprites/      # Personajes, enemigos, armas
-│   ├── audio/        # Música y efectos de sonido
-│   └── ui/           # Elementos de interfaz
-├── src/
-│   ├── game/         # Lógica principal del juego
-│   ├── entities/     # Clases de personajes y enemigos
-│   ├── systems/      # Sistemas de juego (colisiones, spawn, etc.)
-│   └── ui/           # Interfaces y menús
-├── config/           # Archivos de configuración
-├── main.py           # Punto de entrada
-└── requirements.txt  # Dependencias
-```
-
----
-
-## 🎨 Capturas de Pantalla
-
-<div align="center">
-
-### 🏠 Menú Principal
-![Menu](docs/screenshots/menu.png)
-*Interfaz principal con diseño paraguayo*
-
-### 🎮 Gameplay
-![Gameplay](docs/screenshots/gameplay.png)
-*Acción intensa contra criaturas del folklore*
-
-### 💀 Game Over
-![GameOver](docs/screenshots/gameover.png)
-*Estadísticas finales y puntuación*
-
-</div>
-
----
-
-## 🏆 Logros y Desafíos
-
-### 💪 Desafíos Superados
-- ✅ Implementación completa de **Pygame** desde cero
-- ✅ Sistema de **lógica de juego** roguelike funcional
-- ✅ **Sistema de colisiones** optimizado y preciso
-- ✅ Integración de **arte, sonido y código** en tiempo récord
-- ✅ Trabajo colaborativo mediante **Git flow** profesional
-
-### 🎯 Aprendizajes Clave
-- Gestión de proyectos con Git y GitHub
-- Desarrollo de juegos con Pygame
-- Diseño de sistemas roguelike
-- Trabajo en equipo bajo presión
-- Optimización de rendimiento en Python
-
----
-
-## 🗺️ Roadmap
-
-### 🔜 Próximas Actualizaciones
-
-#### Versión 1.1 - Expansión de Contenido
-- [ ] 5+ Nuevos enemigos del folklore paraguayo
-- [ ] 3+ Nuevas armas tradicionales
-- [ ] Sistema de personajes jugables
-- [ ] Jefes finales épicos
-
-#### Versión 1.2 - Nuevos Mundos
-- [ ] Mapas adicionales (Selva, Pueblo, Río)
-- [ ] Biomas con mecánicas únicas
-- [ ] Sistema de clima dinámico
-
-#### Versión 2.0 - Multiplataforma
-- [ ] 📱 Versión móvil (Android/iOS)
-- [ ] 💾 Sistema de guardado en la nube
-- [ ] 🏆 Tablas de clasificación globales
-- [ ] 🎮 Soporte para gamepad
-
-#### Futuro
-- [ ] Modo multijugador cooperativo
-- [ ] Editor de niveles
-- [ ] Mod support
-- [ ] Steam release
-
----
-
-## 📜 Licencia
-
-Este proyecto fue desarrollado durante la **Hackathon 5.0** como proyecto educativo.
-
----
-
-## 🙏 Agradecimientos
-
-- 🎓 A los organizadores de la Hackathon 5.0
-- 🇵🇾 A la rica cultura y folklore paraguayo que inspiró este juego
-- 👥 A cada miembro del equipo por su dedicación y talento
-- 🎮 A la comunidad de Pygame por sus recursos
-
----
-
-## 📞 Contacto y Contribuciones
-
-<div align="center">
-
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Rodri10a/HACKATON-5.0)
-
-**¿Encontraste un bug? ¿Tenés una idea?**
-
-[Reportar Bug](https://github.com/Rodri10a/HACKATON-5.0/issues) • [Sugerir Feature](https://github.com/Rodri10a/HACKATON-5.0/issues) • [Contribuir](https://github.com/Rodri10a/HACKATON-5.0/pulls)
-
----
-
-<sub>Desarrollado con ❤️ y 🧉 en Paraguay</sub>
-
-**© 2025 KARAI SURVIVAL Team - Hackathon 5.0**
-
-</div>
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARAI SURVIVAL - README</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .pixel-avatar {
+            width: 120px;
+            height: 120px;
+            image-rendering: pixelated;
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pixel-avatar-alt {
+            background: linear-gradient(135deg, #60a5fa 0%, #22d3ee 100%);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(59 130 246 / 0.3), 0 8px 10px -6px rgb(6 182 212 / 0.3);
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #06b6d4, transparent);
+            margin: 3rem 0;
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-slate-900 to-blue-950 text-gray-100 min-h-screen">
+    
+    <div class="container mx-auto px-4 py-12 max-w-6xl">
+        
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <span class="text-6xl"></span>
+                <h1 class="text-6xl font-black gradient-text">KARAI SURVIVAL</h1>
+            </div>
+            
+            <h2 class="text-3xl font-bold text-cyan-400 mb-6">
+                🇵🇾 Sobreviví a las Leyendas del Paraguay 🇵🇾
+            </h2>
+            
+            <!-- Badges -->
+            <div class="flex flex-wrap gap-3 justify-center mb-6">
+                <span class="badge bg-blue-600 text-white">
+                    <i class="fab fa-python"></i> PYTHON 3.12
+                </span>
+                <span class="badge bg-green-600 text-white">
+                    <i class="fas fa-gamepad"></i> PYGAME 2.6
+                </span>
+                <span class="badge bg-gray-700 text-white">
+                    GENRE: ROGUELIKE
+                </span>
+                <span class="badge bg-cyan-600 text-white">
+                    STATUS: ACTIVE
+                </span>
+            </div>
+            
+            <p class="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                <strong>Un roguelike de acción y supervivencia en 2D inspirado en el folklore paraguayo</strong>
+            </p>
+            
+            <!-- Quick Links -->
+            <div class="flex flex-wrap gap-4 justify-center mt-8">
+                <a href="#instalacion" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition glow-effect">
+                    🎮 Jugar Ahora
+                </a>
+                <a href="#documentacion" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold transition">
+                    📖 Documentación
+                </a>
+                <a href="#equipo" class="px-6 py-3 bg-cyan-600 hover:bg-cyan-700 rounded-lg font-semibold transition glow-effect">
+                    👥 Equipo
+                </a>
+                <a href="#roadmap" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-semibold transition">
+                    🚀 Roadmap
+                </a>
+            </div>
+        </header>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Sobre el Juego -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🌟</span>
+                <h2 class="text-4xl font-bold">Sobre el Juego</h2>
+            </div>
+            
+            <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-blue-500/30">
+                <p class="text-lg text-gray-300 mb-6 leading-relaxed">
+                    <strong class="text-white">KARAI SURVIVAL</strong> te sumerge en las tierras paraguayas donde deberás encarnar a un valiente <strong class="text-cyan-400">Campesino</strong> enfrentando oleadas interminables de criaturas del folklore local. A medida que el tiempo avanza, la fauna hostil se vuelve cada vez más implacable y despiadada.
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gray-900/50 rounded-xl p-6 border border-blue-500/30">
+                        <h3 class="text-xl font-bold text-blue-400 mb-3">🎯 Objetivo Principal</h3>
+                        <p class="text-gray-300">
+                            Sobreviví el mayor tiempo posible mientras recolectás <strong>experiencia</strong> para transformar tus humildes herramientas de trabajo en <strong class="text-cyan-400">armas de destrucción masiva</strong>. Cada segundo cuenta, cada decisión importa.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gray-900/50 rounded-xl p-6 border border-cyan-500/30">
+                        <h3 class="text-xl font-bold text-cyan-400 mb-3">✨ Lo que nos hace únicos</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>🏞️ <strong>Ambientación 100% Paraguaya</strong></li>
+                            <li>⚔️ <strong>Sistema de Progresión Dinámico</strong></li>
+                            <li>🎵 <strong>Soundtrack Paraguayo Auténtico</strong></li>
+                            <li>🎨 <strong>Arte Pixel Art 2D</strong></li>
+                            <li>💀 <strong>Dificultad Creciente</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Equipo de Desarrollo -->
+        <section id="equipo" class="mb-16">
+            <div class="flex items-center gap-3 mb-8">
+                <span class="text-4xl">👥</span>
+                <h2 class="text-4xl font-bold">Equipo de Desarrollo</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Rodrigo Argüello -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-blue-500/30 card-hover text-center">
+                    <div class="pixel-avatar mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">🎮</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Rodrigo Argüello</h3>
+                    <p class="text-blue-400 italic mb-4">Team Lead</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>🎮 Lógica del Juego</li>
+                        <li>🏗️ Arquitectura</li>
+                        <li>🔀 Git/GitHub</li>
+                        <li>👨‍💼 Gestión de Tareas</li>
+                    </ul>
+                </div>
+                
+                <!-- Eduardo Lugo -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-cyan-500/30 card-hover text-center">
+                    <div class="pixel-avatar pixel-avatar-alt mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">🎨</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Eduardo Lugo</h3>
+                    <p class="text-cyan-400 italic mb-4">Visual & Audio Designer</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>🎨 Diseño de Armas</li>
+                        <li>🔊 Efectos de Sonido</li>
+                        <li>🎵 Música</li>
+                    </ul>
+                </div>
+                
+                <!-- Edgar Ojeda -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-blue-500/30 card-hover text-center">
+                    <div class="pixel-avatar mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">👨‍🎨</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Edgar Ojeda</h3>
+                    <p class="text-blue-400 italic mb-4">Character Artist</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>👨‍🌾 Diseño de Personajes</li>
+                        <li>👹 Diseño de Enemigos</li>
+                        <li>🎨 Sprites & Animaciones</li>
+                    </ul>
+                </div>
+                
+                <!-- Marcos Cáceres -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-cyan-500/30 card-hover text-center">
+                    <div class="pixel-avatar pixel-avatar-alt mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">⚙️</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Marcos Cáceres</h3>
+                    <p class="text-cyan-400 italic mb-4">Game Systems Developer</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>⚙️ Configuración del Juego</li>
+                        <li>👤 Sistema de Personajes</li>
+                        <li>🎮 Player Controller</li>
+                    </ul>
+                </div>
+                
+                <!-- Óscar López -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-blue-500/30 card-hover text-center">
+                    <div class="pixel-avatar mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">🗺️</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Óscar López</h3>
+                    <p class="text-blue-400 italic mb-4">Level Designer</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>🗺️ Sistema de Mapas</li>
+                        <li>🌍 Diseño de Niveles</li>
+                        <li>🏞️ Ambientación</li>
+                    </ul>
+                </div>
+                
+                <!-- Alexis Samudio -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-6 border border-cyan-500/30 card-hover text-center">
+                    <div class="pixel-avatar pixel-avatar-alt mx-auto mb-4">
+                        <div class="w-full h-full flex items-center justify-center text-6xl">🖥️</div>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-1">Alexis Samudio</h3>
+                    <p class="text-cyan-400 italic mb-4">UI/UX Designer</p>
+                    <ul class="space-y-2 text-sm text-left text-gray-300">
+                        <li>🖥️ Interfaz Gráfica</li>
+                        <li>📊 HUD & Menús</li>
+                        <li>✨ Experiencia de Usuario</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Stack Tecnológico -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">💻</span>
+                <h2 class="text-4xl font-bold">Stack Tecnológico</h2>
+            </div>
+            
+            <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-blue-500/30">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b border-blue-500/30">
+                                <th class="pb-4 text-blue-400 font-bold">Categoría</th>
+                                <th class="pb-4 text-blue-400 font-bold">Tecnología</th>
+                                <th class="pb-4 text-blue-400 font-bold">Versión</th>
+                                <th class="pb-4 text-blue-400 font-bold">Propósito</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 font-semibold">Lenguaje</td>
+                                <td class="py-4">
+                                    <span class="badge bg-blue-600 text-white text-xs">
+                                        <i class="fab fa-python"></i> Python
+                                    </span>
+                                </td>
+                                <td class="py-4">3.12</td>
+                                <td class="py-4">Desarrollo principal</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 font-semibold">Game Engine</td>
+                                <td class="py-4">
+                                    <span class="badge bg-green-600 text-white text-xs">
+                                        <i class="fas fa-gamepad"></i> Pygame
+                                    </span>
+                                </td>
+                                <td class="py-4">2.6</td>
+                                <td class="py-4">Motor de juego 2D</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 font-semibold">Version Control</td>
+                                <td class="py-4">
+                                    <span class="badge bg-orange-600 text-white text-xs">
+                                        <i class="fab fa-git-alt"></i> Git
+                                    </span>
+                                </td>
+                                <td class="py-4">Latest</td>
+                                <td class="py-4">Control de versiones</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 font-semibold">Hosting</td>
+                                <td class="py-4">
+                                    <span class="badge bg-gray-900 text-white text-xs">
+                                        <i class="fab fa-github"></i> GitHub
+                                    </span>
+                                </td>
+                                <td class="py-4">-</td>
+                                <td class="py-4">Repositorio del proyecto</td>
+                            </tr>
+                            <tr class="border-b border-gray-800">
+                                <td class="py-4 font-semibold">Arte</td>
+                                <td class="py-4">Pixel Art 2D</td>
+                                <td class="py-4">-</td>
+                                <td class="py-4">Estilo visual retro</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 font-semibold">Audio</td>
+                                <td class="py-4">WAV/MP3</td>
+                                <td class="py-4">-</td>
+                                <td class="py-4">Efectos y música</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Características del Juego -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🎮</span>
+                <h2 class="text-4xl font-bold">Características del Juego</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Enemigos -->
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-red-500/30">
+                    <h3 class="text-2xl font-bold text-red-400 mb-6 flex items-center gap-2">
+                        <span>👹</span> Enemigos del Folklore Paraguayo
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Criaturas Terrestres</h4>
+                            <ul class="space-y-2 text-gray-300">
+                                <li>🐺 <strong>Lobo</strong> - Rápido y agresivo</li>
+                                <li>🦎 <strong>Yacaré</strong> - Lento pero resistente</li>
+                                <li>🐍 <strong>Serpiente</strong> - Movimientos impredecibles</li>
+                                <li>👻 <strong>Luison</strong> - El séptimo hijo, criatura de la noche</li>
+                                <li>🐕 <strong>Aoao</strong> - Espíritu protector convertido en amenaza</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Criaturas Voladoras</h4>
+                            <ul class="space-y-2 text-gray-300">
+                                <li>🦟 <strong>Mosquito</strong> - Pequeño pero molesto</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-red-900/20 rounded-lg p-4 border border-red-500/30">
+                            <p class="text-sm text-gray-300">
+                                <strong class="text-red-400">💀 Escalada de Dificultad:</strong><br>
+                                Enemigos más rápidos con el tiempo • Mayor cantidad de spawns • Combinaciones letales
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Arsenal y Power-ups -->
+                <div class="space-y-8">
+                    <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-yellow-500/30">
+                        <h3 class="text-2xl font-bold text-yellow-400 mb-6 flex items-center gap-2">
+                            <span>⚔️</span> Arsenal del Campesino
+                        </h3>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between bg-gray-900/50 rounded-lg p-4">
+                                <div>
+                                    <p class="font-bold text-white">🔪 Machete</p>
+                                    <p class="text-sm text-gray-400">Cuerpo a cuerpo</p>
+                                </div>
+                                <div class="text-yellow-400">⭐ → ⭐⭐ → ⭐⭐⭐</div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between bg-gray-900/50 rounded-lg p-4">
+                                <div>
+                                    <p class="font-bold text-white">🔫 Rifle</p>
+                                    <p class="text-sm text-gray-400">Distancia</p>
+                                </div>
+                                <div class="text-yellow-400">⭐ → ⭐⭐ → ⭐⭐⭐</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 bg-yellow-900/20 rounded-lg p-3 border border-yellow-500/30">
+                            <p class="text-sm text-gray-300">
+                                <strong class="text-yellow-400">Sistema de Mejora:</strong> Las armas suben de nivel automáticamente al ganar experiencia
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-green-500/30">
+                        <h3 class="text-2xl font-bold text-green-400 mb-6 flex items-center gap-2">
+                            <span>🎁</span> Power-Ups
+                        </h3>
+                        
+                        <ul class="space-y-3 text-gray-300">
+                            <li class="bg-gray-900/50 rounded-lg p-4">
+                                🫚 <strong class="text-white">Jengibre</strong> - Restaura vida instantáneamente
+                            </li>
+                            <li class="bg-gray-900/50 rounded-lg p-4">
+                                ⚡ <strong class="text-white">Boost de Velocidad</strong> - Aumenta la velocidad temporalmente
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Gameplay y Controles -->
+        <section class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🎯</span>
+                <h2 class="text-4xl font-bold">Gameplay y Controles</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-blue-500/30">
+                    <h3 class="text-2xl font-bold text-blue-400 mb-6">🕹️ Controles</h3>
+                    
+                    <div class="bg-gray-900/70 rounded-xl p-6 font-mono text-sm space-y-3">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">⬆️ W</span>
+                            <span class="text-white">Mover Arriba</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">⬇️ S</span>
+                            <span class="text-white">Mover Abajo</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">⬅️ A</span>
+                            <span class="text-white">Mover Izquierda</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">➡️ D</span>
+                            <span class="text-white">Mover Derecha</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-400">SPACE BAR</span>
+                            <span class="text-white">Atacar</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-400">MOUSE</span>
+                            <span class="text-white">Apuntar</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-cyan-500/30">
+                    <h3 class="text-2xl font-bold text-cyan-400 mb-6">🎮 Mecánicas Principales</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-900/50 rounded-lg p-4 border-l-4 border-blue-500">
+                            <p class="text-white font-semibold mb-1">💀 Sobrevivir</p>
+                            <p class="text-sm text-gray-400">Resiste oleadas infinitas de enemigos</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border-l-4 border-yellow-500">
+                            <p class="text-white font-semibold mb-1">⭐ Recolectar XP</p>
+                            <p class="text-sm text-gray-400">Derrota enemigos y recoge orbs de experiencia</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border-l-4 border-green-500">
+                            <p class="text-white font-semibold mb-1">📈 Subir de Nivel</p>
+                            <p class="text-sm text-gray-400">Desbloquea mejoras para tus armas</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border-l-4 border-cyan-500">
+                            <p class="text-white font-semibold mb-1">🎯 Estrategia</p>
+                            <p class="text-sm text-gray-400">Los enemigos dropean buffs ocasionales</p>
+                        </div>
+                        <div class="bg-gray-900/50 rounded-lg p-4 border-l-4 border-red-500">
+                            <p class="text-white font-semibold mb-1">⏱️ Contra Reloj</p>
+                            <p class="text-sm text-gray-400">Cada minuto aumenta la dificultad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Instalación -->
+        <section id="instalacion" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🚀</span>
+                <h2 class="text-4xl font-bold">Instalación y Ejecución</h2>
+            </div>
+            
+            <div class="bg-gray-800/50 backdrop-blur rounded-2xl p-8 border border-blue-500/30">
+                <h3 class="text-xl font-bold text-cyan-400 mb-4">Instalación Rápida</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-300 mb-2 font-semibold">1️⃣ Clonar el repositorio</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-cyan-400">
+                            git clone https://github.com/Rodri10a/HACKATON-5.0.git<br>
+                            cd HACKATON-5.0
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-gray-300 mb-2 font-semibold">2️⃣ Instalar dependencias</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-cyan-400">
+                            pip install -r requirements.txt
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <p class="text-gray-300 mb-2 font-semibold">3️⃣ Ejecutar el juego</p>
+                        <div class="bg-gray-900 rounded-lg p-4 font-mono text-sm text-cyan-400">
+                            python main.py
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Roadmap -->
+        <section id="roadmap" class="mb-16">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="text-4xl">🗺️</span>
+                <h2 class="text-4xl font-bold">Roadmap</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="bg-gradient-to-r from-blue-900/30 to-cyan-900/30 backdrop-blur rounded-2xl p-8 border border-blue-500/30">
+                    <h3 class="text-2xl font-bold text-cyan-400 mb-4">🔜 Próximas Actualizaciones</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Versión 1.1 - Expansión de Contenido</h4>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li>☐ 5+ Nuevos enemigos del folklore paraguayo</li>
+                                <li>☐ 3+ Nuevas armas tradicionales</li>
+                                <li>☐ Sistema de personajes jugables</li>
+                                <li>☐ Jefes finales épicos</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Versión 1.2 - Nuevos Mundos</h4>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li>☐ Mapas adicionales (Selva, Pueblo, Río)</li>
+                                <li>☐ Biomas con mecánicas únicas</li>
+                                <li>☐ Sistema de clima dinámico</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Versión 2.0 - Multiplataforma</h4>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li>☐ 📱 Versión móvil (Android/iOS)</li>
+                                <li>☐ 💾 Sistema de guardado en la nube</li>
+                                <li>☐ 🏆 Tablas de clasificación globales</li>
+                                <li>☐ 🎮 Soporte para gamepad</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-white mb-3">Futuro</h4>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li>☐ Modo multijugador cooperativo</li>
+                                <li>☐ Editor de niveles</li>
+                                <li>☐ Mod support</li>
+                                <li>☐ Steam release</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="text-center py-12 border-t border-blue-500/30">
+            <div class="flex justify-center gap-4 mb-6">
+                <a href="https://github.com/Rodri10a/HACKATON-5.0" class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-semibold transition flex items-center gap-2">
+                    <i class="fab fa-github"></i> GitHub Repository
+                </a>
+            </div>
+            
+            <p class="text-gray-400 mb-2">Desarrollado con ❤️ y 🧉 en Paraguay</p>
+            <p class="text-gray-500 text-sm">© 2025 KARAI SURVIVAL Team - Hackathon 5.0</p>
+        </footer>
+        
+    </div>
+    
+</body>
+</html>
