@@ -99,15 +99,15 @@ SPAWN_REDUCCION_POR_MINUTO = 0.1 # Cuánto se reduce el tiempo entre spawns cada
 ARMAS_CONFIG = {
     "MACHETE": {
         "daño_base": 20,
-        "alcance": 120,          # Más alcance
+        "alcance": 90,          # Más alcance
         "cooldown": 0.4,        # Más rápido
         "tipo": "melee",
         # Modifica la lista de "niveles" dentro de "MACHETE":
         "niveles": [
-        {"daño": 30, "alcance": 125},
-        {"daño": 35, "alcance": 130},
-        {"daño": 40, "alcance": 135}, 
-        {"daño": 50, "alcance": 140}    
+        {"daño": 30, "alcance": 95},
+        {"daño": 35, "alcance": 100},
+        {"daño": 40, "alcance": 110}, 
+        {"daño": 50, "alcance": 120}    
 ]
     },
     "RIFLE": {
