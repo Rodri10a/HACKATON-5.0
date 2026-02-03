@@ -27,10 +27,9 @@ class Enemy(BaseEntity):
         
         # Definir color según tipo
         colores = {
-            "CARPINCHO": (139, 69, 19),     # Marrón
+            "AOAO": (0, 0, 255),          # Azul      
+            "PORA": (255, 255, 0),        # Amarillo
             "YACARE": (0, 100, 0),          # Verde oscuro
-            "TATU": (169, 169, 169),        # Gris
-            "AGUARA_GUAZU": (255, 69, 0),   # Naranja-rojo
             "LUISON": (80, 0, 0),           # Rojo oscuro
             "MOSQUITO": (100, 100, 100),    # Gris
             "POMBERO": (139, 90, 43),       # Marrón
@@ -39,10 +38,9 @@ class Enemy(BaseEntity):
         
         # Mapeo de sprites
         sprites = {
-            "CARPINCHO": "assets/sprites/carpincho.png",
+            "AOAO": "assets/sprites/aoao.png",
+            "PORA": "assets/sprites/pora.png",
             "YACARE": "assets/sprites/yacare.png",
-            "TATU": "assets/sprites/tatu.png",
-            "AGUARA_GUAZU": "assets/sprites/aguara_guazu.png",
             "LUISON": "assets/sprites/luison.png",
             "MOSQUITO": "assets/sprites/mosquito.png",
             "POMBERO": "assets/sprites/pora.png",
@@ -50,7 +48,7 @@ class Enemy(BaseEntity):
         }
         
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 40, 40, colores[tipo], sprite_path=sprites.get(tipo))
+        super().__init__(x, y, config["ancho"], config["alto"], colores[tipo], sprite_path=sprites.get(tipo))
         
         # Configurar stats desde config
         self.tipo = tipo
@@ -167,7 +165,7 @@ class OrbXP:
         
         # Crear sprite
         try:
-            self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
+            self.image = pygame.image.load("assets/sprites/orbe_xp.png").convert_alpha()
             self.image = pygame.transform.scale(self.image, (30, 30))
         except:
             self.image = pygame.Surface((20, 20))
@@ -177,7 +175,7 @@ class OrbXP:
         self.rect.center = (int(x), int(y))
         
         # Animación
-        self.tiempo_vida = 0
+        self.tiempo_vida = 3
         self.flotando = True
     
     def actualizar(self, dt):

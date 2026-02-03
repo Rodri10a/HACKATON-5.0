@@ -41,6 +41,9 @@ class SpawnManager:
         
         # Límite de enemigos en pantalla
         self.max_enemigos = MAX_ENEMIGOS_PANTALLA
+        
+        # Referencia al combat_manager (se asigna desde engine)
+        self.combat_manager = None
     
     def actualizar(self, dt):
         """
@@ -105,7 +108,7 @@ class SpawnManager:
             
             # Ajustar peso según tiempo de juego
             # Enemigos más fuertes aparecen más seguido con el tiempo
-            if tipo == "AGUARA_GUAZU":  # Boss
+            if tipo == "LUISON":  # Boss
                 # Solo aparece después de 5 minutos
                 if self.tiempo_juego < 300:
                     peso = 0
@@ -120,7 +123,7 @@ class SpawnManager:
         if opciones:
             return random.choice(opciones)
         else:
-            return "CARPINCHO"  # Fallback
+            return "MOSQUITO"  # Fallback
     
     def escalar_dificultad(self):
         """Aumentar dificultad progresivamente"""
@@ -146,6 +149,15 @@ class SpawnManager:
     
     def limpiar_enemigos_muertos(self):
         """Eliminar enemigos muertos de la lista"""
+        """Eliminar enemigos muertos de la lista y crear orbes de XP"""
+        # Primero crear orbes de XP para los enemigos muertos
+        if self.combat_manager:
+            for enemigo in self.enemigos:
+                if not enemigo.esta_vivo:
+                    # Crear orbe de XP en la posición del enemigo
+                    self.combat_manager.crear_orbe_xp(enemigo.x, enemigo.y, enemigo.xp_drop)
+
+        # Luego eliminar los enemigos muertos
         self.enemigos = [e for e in self.enemigos if e.esta_vivo]
     
     def obtener_enemigos_en_rango(self, x, y, rango):
