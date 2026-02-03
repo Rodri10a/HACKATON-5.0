@@ -464,8 +464,8 @@ class EfectoSlashMachete:
         self.completado = False
         
         # Ángulo del slash (más amplio)
-        self.angulo_inicio = -90  # Comienza más arriba
-        self.angulo_fin = 90      # Termina más abajo
+        self.angulo_inicio = -120  # Comienza más arriba
+        self.angulo_fin = 120      # Termina más abajo
         
         # Calcular ángulo base según dirección
         if abs(direccion.x) > abs(direccion.y):
@@ -502,7 +502,7 @@ class EfectoSlashMachete:
             camara: Objeto Camera
         """
         if self.completado:
-            return
+            return 
         
         # Posición en pantalla
         pantalla_x = int(self.x - camara.offset_x)
@@ -529,7 +529,7 @@ class EfectoSlashMachete:
         temp_surface = pygame.Surface((self.alcance * 2, self.alcance * 2), pygame.SRCALPHA)
         
         # Dibujar línea del slash (más gruesa)
-        grosor = int(8 * (1.0 - self.progreso * 0.5))  # Más grueso
+        grosor = int(18 * (1.0 - self.progreso * 0.5))  # Más grueso
         
         # Calcular posiciones relativas a la superficie temporal
         centro = (self.alcance, self.alcance)
@@ -542,4 +542,4 @@ class EfectoSlashMachete:
         
         # Dibujar en pantalla
         pos_blit = (pantalla_x - self.alcance, pantalla_y - self.alcance)
-        pantalla.blit(temp_surface, pos_blit)
+        pantalla.blit(temp_surface, pos_blit)   

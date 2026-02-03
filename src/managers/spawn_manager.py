@@ -11,11 +11,9 @@ from entities.enemy import Enemy
 from settings import *
 
 logging.basicConfig(level=logging.INFO,
-format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S',
-handlers=[
-    logging.FileHandler("game.log") ,
-    
-])
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S',
+                    handlers=[logging.FileHandler("game.log")])
 
 
 class SpawnManager:
@@ -49,6 +47,10 @@ class SpawnManager:
         
         # Límite de enemigos en pantalla
         self.max_enemigos = MAX_ENEMIGOS_PANTALLA
+        
+        # Referencia al combat_manager (se asigna desde engine)
+        self.combat_manager = None
+    
 
         # sistema de spawn basado en oleadas
         self.estado_oleada = "NORMAL"
@@ -61,11 +63,16 @@ class SpawnManager:
 
         # spawns por estado
         self.factores_spawn = {
-            "NORMAL": 1.0 ,
+            "NORMAL": 1.0,
             "HORDA": 0.4,
             "DESCANSO": 1.6
         }
 
+        # presion por quietud
+        self.ultimo_pos_jugador = (jugador.x, jugador.y)
+        self.tiempo_quieto = 0
+
+        #un pequeño log de inicialización    
         logging.info("SpawnManager inicializado .Estado inicial: NORMAL")
 
     def actualizar(self, dt):
@@ -82,6 +89,21 @@ class SpawnManager:
         self.timer_spawn += dt
 
         # Actualizar estado de oleada
+        self.actualizar_oleada(dt)
+
+        # Verificar movimiento del jugador
+        dx = self.jugador.x - self.ultimo_pos_jugador[0]
+        dy = self.jugador.y - self.ultimo_pos_jugador[1]
+        if math.sqrt(dx*dx + dy*dy) < 5:
+            self.tiempo_quieto += dt
+        else:
+            self.tiempo_quieto = 0
+        self.ultimo_pos_jugador = (self.jugador.x, self.jugador.y)
+
+        if self.tiempo_quieto >= 5:
+            self.spawnear_enemigos()
+            self.tiempo_quieto = 0
+
         self.actualizar_oleada(dt)
         
         # Escalar dificultad cada minuto
@@ -103,7 +125,7 @@ class SpawnManager:
         self.limpiar_enemigos_muertos()
 
 
-    # Methodo para actualizar el estado de la oleada
+    # Método para actualizar el estado de la oleada
     def actualizar_oleada(self, dt):
         self.tiempo_estado += dt
         estado_anterior = self.estado_oleada
@@ -142,12 +164,12 @@ class SpawnManager:
         for i in range(self.enemigos_por_spawn):
             # Elegir tipo de enemigo según probabilidades
             tipo_enemigo = self.elegir_tipo_enemigo()
+            angulo = random.uniform(0, 2 * math.pi)
+            distancia = random.uniform( 100, 300)
+
+            x = self.jugador.x + math.cos(angulo) * distancia
+            y = self.jugador.y + math.sin(angulo) * distancia
             
-            # Obtener posición de spawn (fuera de pantalla)
-            x, y = self.mapa.posicion_spawn_fuera_pantalla(
-                self.camara, 
-                margen=SPAWN_MARGEN_PANTALLA
-            )
             
             # Crear enemigo
             enemigo = Enemy(x, y, tipo_enemigo)
@@ -171,7 +193,7 @@ class SpawnManager:
             
             # Ajustar peso según tiempo de juego
             # Enemigos más fuertes aparecen más seguido con el tiempo
-            if tipo == "AGUARA_GUAZU":  # Boss
+            if tipo == "LUISON":  # Boss
                 # Solo aparece después de 5 minutos
                 if self.tiempo_juego < 300:
                     peso = 0
@@ -180,7 +202,7 @@ class SpawnManager:
 
             # En hordas aparecen más enemigos fuertes
             if self.estado_oleada == "HORDA":
-                peso = max(1 ,int(peso *1.5))
+                peso = max(1, int(peso * 1.5))
 
             
             # Agregar tipo 'peso' veces a la lista
@@ -203,7 +225,15 @@ class SpawnManager:
                 enemigo.actualizar(dt)
     
     def limpiar_enemigos_muertos(self):
-        """Eliminar enemigos muertos de la lista"""
+        """Eliminar enemigos muertos de la lista y crear orbes de XP"""
+        # Primero crear orbes de XP para los enemigos muertos
+        if self.combat_manager:
+            for enemigo in self.enemigos:
+                if not enemigo.esta_vivo:
+                    # Crear orbe de XP en la posición del enemigo
+                    self.combat_manager.crear_orbe_xp(enemigo.x, enemigo.y, enemigo.xp_drop)
+
+        # Luego eliminar los enemigos muertos
         muertos = [e for e in self.enemigos if not e.esta_vivo]
         for m in muertos:
             logging.info(f"Enemigo muerto: {m.tipo} en ({m.x:.2f}, {m.y:.2f})")

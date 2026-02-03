@@ -21,8 +21,7 @@ class Player(BaseEntity):
             y: Posición Y inicial
         """
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 50, 50, (255, 200, 0), sprite_path="assets/sprites/player.png")
-        
+        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png") 
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
         self.vida_actual = CAMPESINO_VIDA_MAX
@@ -39,6 +38,7 @@ class Player(BaseEntity):
         
         # Radio de recolección de XP
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
+        self.direccion = pygame.math.Vector2(0, 0)
         
         # Cooldown de invulnerabilidad al recibir daño
         self.invulnerable = False

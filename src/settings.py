@@ -25,88 +25,97 @@ CAMPESINO_RADIO_RECOLECCION = 80  # Más grande para recoger XP más fácil
 
 # ========== SISTEMA DE EXPERIENCIA (MÁS FÁCIL) ==========
 # Cada nivel se completa en aprox 30-45 segundos
-XP_POR_NIVEL = [50, 70, 100, 140, 190, 260, 350, 470, 630, 850]
+XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650] 
 
 # ========== CONFIGURACIÓN DE ENEMIGOS ==========
 ENEMIGO_CONFIGS = {
-    "CARPINCHO": {
-        "vida": 20,
-        "velocidad": 70,
+    "MOSQUITO": {
+        "vida": 10,
+        "velocidad": 110,
+        "daño": 2,
+        "xp": 12,
+        "spawn_peso": 12,
+        "ancho": 35,          # Pequeño, ligeramente horizontal
+        "alto": 28,
+    },
+    "AOAO": {
+        "vida": 50,
+        "velocidad": 50,
+        "daño": 8,
+        "xp": 25,
+        "spawn_peso": 10,
+        "ancho": 50,          # Criatura vertical grande
+        "alto": 65,
+    },
+    "PORA": {
+        "vida": 25,
+        "velocidad": 40,
         "daño": 4,
-        "xp": 15,           # Más XP
-        "spawn_peso": 10
+        "xp": 15,
+        "spawn_peso": 8,
+        "ancho": 55,          # Fantasma vertical con brazos
+        "alto": 75,
     },
     "YACARE": {
         "vida": 35,
         "velocidad": 55,
         "daño": 6,
         "xp": 22,
-        "spawn_peso": 7
-    },
-    "TATU": {
-        "vida": 55,
-        "velocidad": 35,
-        "daño": 8,
-        "xp": 35,
-        "spawn_peso": 4
-    },
-    "AGUARA_GUAZU": {
-        "vida": 100,
-        "velocidad": 85,
-        "daño": 14,
-        "xp": 60,
-        "spawn_peso": 2
+        "spawn_peso": 7,
+        "ancho": 95,          # Cocodrilo muy horizontal
+        "alto": 45,
     },
     "LUISON": {
-        "vida": 130,
-        "velocidad": 80,
-        "daño": 18,
+        "vida": 300,
+        "velocidad": 40,
+        "daño":25,
         "xp": 75,
-        "spawn_peso": 1     # Raro
-    },
-    "MOSQUITO": {
-        "vida": 10,
-        "velocidad": 110,
-        "daño": 2,
-        "xp": 12,
-        "spawn_peso": 12
+        "spawn_peso": 1,      # Raro - Boss
+        "ancho": 140,          # Boss grande, casi cuadrado
+        "alto": 140,
     },
     "POMBERO": {
         "vida": 70,
         "velocidad": 60,
         "daño": 10,
         "xp": 40,
-        "spawn_peso": 5
+        "spawn_peso": 5,
+        "ancho": 55,          # Usa sprite de PORA
+        "alto": 75,
     },
     "SERPIENTE": {
         "vida": 28,
         "velocidad": 75,
         "daño": 7,
         "xp": 18,
-        "spawn_peso": 8
+        "spawn_peso": 8,
+        "ancho": 100,         # Serpiente muy horizontal
+        "alto": 38,
     }
 }
 
 # ========== SISTEMA DE OLEADAS (ESCALAMIENTO RÁPIDO) ==========
-TIEMPO_ENTRE_SPAWNS = 0.8        # Más rápido desde el inicio
-SPAWN_REDUCCION_POR_MINUTO = 0.1 # Escala más rápido
-SPAWN_MINIMO = 0.15              # Mínimo más bajo
-ENEMIGOS_POR_SPAWN = 2           # Empieza con 2 enemigos
-AUMENTO_ENEMIGOS_CADA = 60       # Cada 1 minuto +1 enemigo
+# --- En la sección SISTEMA DE OLEADAS ---
+TIEMPO_ENTRE_SPAWNS = 1.2        # Antes 0.8 (Tardan más en aparecer)
+ENEMIGOS_POR_SPAWN = 1           # Antes 2 (Sale solo 1 a la vez al inicio)
+AUMENTO_ENEMIGOS_CADA = 120      # Antes 60 (La dificultad sube cada 2 minutos, no cada 1)
 
+SPAWN_MINIMO = 0.3               # Tiempo mínimo entre spawns (no puede bajar de esto)
+SPAWN_REDUCCION_POR_MINUTO = 0.1 # Cuánto se reduce el tiempo entre spawns cada minuto
 # ========== CONFIGURACIÓN DE ARMAS ==========
 ARMAS_CONFIG = {
     "MACHETE": {
         "daño_base": 20,
-        "alcance": 80,          # Más alcance
+        "alcance": 180,          # Más alcance
         "cooldown": 0.4,        # Más rápido
         "tipo": "melee",
+        # Modifica la lista de "niveles" dentro de "MACHETE":
         "niveles": [
-            {"daño": 20, "alcance": 80},
-            {"daño": 30, "alcance": 90},
-            {"daño": 45, "alcance": 100},
-            {"daño": 65, "alcance": 120}
-        ]
+        {"daño": 20, "alcance": 120}, # Antes 80
+        {"daño": 30, "alcance": 150}, # Antes 90
+        {"daño": 45, "alcance": 200}, # Antes 100
+        {"daño": 65, "alcance": 250}  # Antes 120 (Casi media pantalla)  
+]
     },
     "HACHA": {
         "daño_base": 30,
@@ -125,7 +134,7 @@ ARMAS_CONFIG = {
         "alcance": 100,
         "cooldown": 0.7,        # Más rápido
         "tipo": "aoe",
-        "niveles": [
+        "niveles": [ 
             {"daño": 25, "radio": 70},
             {"daño": 38, "radio": 90},
             {"daño": 55, "radio": 120},
@@ -147,8 +156,8 @@ ARMAS_CONFIG = {
 
 # ========== CONFIGURACIÓN DE MAPA ==========
 TILE_SIZE = 64
-MAPA_ANCHO_TILES = 100
-MAPA_ALTO_TILES = 100
+MAPA_ANCHO_TILES = 20
+MAPA_ALTO_TILES = 20
 MAPA_ANCHO_PIXELES = MAPA_ANCHO_TILES * TILE_SIZE
 MAPA_ALTO_PIXELES = MAPA_ALTO_TILES * TILE_SIZE
 
@@ -188,7 +197,7 @@ VELOCIDAD_BONUS_POR_NIVEL = 15
 RADIO_RECOLECCION_BONUS = 25
 
 # ========== LÍMITES ==========
-MAX_ENEMIGOS_PANTALLA = 300
+MAX_ENEMIGOS_PANTALLA = 100
 MAX_PROYECTILES = 200
 MAX_ORBES_XP = 500
 MAX_ARMAS_EQUIPADAS = 6

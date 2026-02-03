@@ -83,9 +83,12 @@ class GameEngine:
         
         # Crear spawn manager
         self.spawn_manager = SpawnManager(self.mapa, self.camara, self.jugador)
-        
+
         # Crear combat manager
         self.combat_manager = CombatManager(self.jugador, self.spawn_manager)
+
+        # Asignar combat_manager al spawn_manager para que pueda crear orbes
+        self.spawn_manager.combat_manager = self.combat_manager
         
         # Crear UI manager
         self.ui_manager = UIManager(self.pantalla, self.jugador)
@@ -215,7 +218,7 @@ class GameEngine:
             pos: Tupla (x, y) con posición del click
             boton: Botón del mouse
         """
-        if boton != 1:
+        if boton != 1: 
             return
         
         # MEJORA - Seleccionar mejora
@@ -235,12 +238,12 @@ class GameEngine:
                     self.estado = GameState.JUGANDO
         
         
-        # MENÚ - Click en el botón INICIAR JUEGO
+        # MENÚ - Click en el botón INICIAR JUEGO 
         if self.estado == GameState.MENU:
             boton_ancho = 300
             boton_alto = 65
             boton_x = ANCHO_VENTANA // 2 - boton_ancho // 2
-            boton_y = ALTO_VENTANA - 110
+            boton_y = ALTO_VENTANA - 220 
             
             if boton_x <= pos[0] <= boton_x + boton_ancho and boton_y <= pos[1] <= boton_y + boton_alto:
                 self.inicializar_juego_nuevo()
@@ -289,12 +292,7 @@ class GameEngine:
         self.jugador.actualizar_armas(self.dt, self.spawn_manager.enemigos)
         self.camara.actualizar(self.dt)
         self.spawn_manager.actualizar(self.dt)
-        
-        # Verificar enemigos muertos y crear orbes XP
-        for enemigo in self.spawn_manager.enemigos:
-            if not enemigo.esta_vivo and enemigo not in self.combat_manager.orbes_xp:
-                self.combat_manager.verificar_muerte_enemigo(enemigo)
-        
+
         self.combat_manager.actualizar(self.dt)
         self.ui_manager.actualizar(self.dt)
         
@@ -340,7 +338,7 @@ class GameEngine:
         boton_ancho = 300
         boton_alto = 65
         boton_x = ANCHO_VENTANA // 2 - boton_ancho // 2
-        boton_y = ALTO_VENTANA - 110  # Más abajo
+        boton_y = ALTO_VENTANA - 220  # Más abajo
         
         # Detectar hover
         pos_mouse = pygame.mouse.get_pos()
