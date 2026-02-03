@@ -40,6 +40,12 @@ class Player(BaseEntity):
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
         self.direccion = pygame.math.Vector2(0, 0)
         
+        #Rotacion y flip del sprite segun direccion
+        self.imagen_original = self.image.copy()
+        self.voltear_horizontalmente = False
+        self.ultima_direccion_x = 1  # 1: derecha, -1: izquierda
+
+
         # Cooldown de invulnerabilidad al recibir daño
         self.invulnerable = False
         self.tiempo_invulnerabilidad = 0
@@ -70,6 +76,10 @@ class Player(BaseEntity):
         if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
             self.direccion.x = 1
     
+    #actualizar direccion visual segun movimiento horizontal
+        if self.direccion.x != 0:
+            self.ultima_direccion_x = self.direccion.x
+            self.voltear_horizontalmente = (self.direccion.x < 0)
     def ganar_xp(self, cantidad):
         """
         Sumar XP y verificar subida de nivel
@@ -320,6 +330,10 @@ class Player(BaseEntity):
             pantalla: Surface de pygame
             camara: Objeto Camera
         """
+        #Aplicar flip horizontal si se voltea
+        imagen_actual = pygame.transform.flip(self.imagen_original, self.voltear_horizontalmente, False)
+        #Actualizar la imagen del jugador para dibujar
+        self.image = imagen_actual
         if self.invulnerable:
             # Parpadear cada 0.1 segundos
             if int(self.tiempo_invulnerabilidad * 10) % 2 == 0:
