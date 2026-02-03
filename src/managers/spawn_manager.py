@@ -11,10 +11,10 @@ from entities.enemy import Enemy
 from settings import *
 
 logging.basicConfig(level=logging.INFO,
-format='%(asctime)s - %(levelname)s - %(message)s', datefmt="%H:%M:%S",
+format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S',
 handlers=[
     logging.FileHandler("game.log") ,
-    logging.StreamHandler()
+    
 ])
 
 
