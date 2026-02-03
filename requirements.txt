@@ -1,1 +1,4 @@
-''' DEPENDENCIAS (PYGAME, ETC ) 
+''' DEPENDENCIAS (PYGAME, ETC ) '''
+pip install pygame
+pip install numpy
+pip install requests
