@@ -62,8 +62,8 @@ ENEMIGO_CONFIGS = {
         "daño": 15,
         "xp": 20,
         "spawn_peso": 10,
-        "ancho": 50,          # Criatura vertical grande
-        "alto": 65,
+        "ancho": 90,          # Criatura vertical grande
+        "alto": 100,
     },
     "PORA": {
         "vida": 70,
@@ -71,8 +71,8 @@ ENEMIGO_CONFIGS = {
         "daño": 20,
         "xp": 15,
         "spawn_peso": 8,
-        "ancho": 55,          # Fantasma vertical con brazos
-        "alto": 75,
+        "ancho": 80,          # Fantasma vertical con brazos
+        "alto": 100,
     },
     
     "LUISON": {
@@ -113,7 +113,7 @@ ARMAS_CONFIG = {
     "RIFLE": {
         "daño_base": 30,
         "alcance": 80,
-        "cooldown": 5.0,        # Cooldown base (se sobrescribe por nivel)
+        "cooldown": 5.5,        # Cooldown base (se sobrescribe por nivel)
         "tipo": "proyectil",
         "niveles": [
             {"daño": 40, "cantidad": 1, "velocidad": 450, "cooldown": 5.0},   # Nv.1

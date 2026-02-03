@@ -49,7 +49,7 @@ class Enemy(BaseEntity):
         
         # Llamar constructor padre con sprite
         super().__init__(x, y, config["ancho"], config["alto"], colores[tipo], sprite_path=sprites.get(tipo))
-        
+
         # Configurar stats desde config
         self.tipo = tipo
         self.vida_maxima = config["vida"]
@@ -57,29 +57,39 @@ class Enemy(BaseEntity):
         self.velocidad = config["velocidad"]
         self.daño = config["daño"]
         self.xp_drop = config["xp"]
-        
+
+        # Flip del sprite según dirección
+        self.imagen_original = self.image.copy() if self.image else None
+        self.voltear_horizontalmente = False
+
         # Referencias
         self.jugador = None  # Se asigna desde spawn_manager
-        
+
         # Timers de ataque
         self.cooldown_ataque = 1.0  # segundos
         self.timer_ataque = 0
         self.puede_atacar = True
-        
+
         # Estado
         self.esta_atacando = False
     
     def perseguir_jugador(self, dt):
         """
         IA básica: moverse hacia el jugador
-        
+
         Args:
             dt: Delta time en segundos
         """
         if self.jugador and self.jugador.esta_vivo:
             # Obtener dirección hacia jugador
             self.direccion = self.direccion_hacia(self.jugador)
-            
+
+            # Actualizar flip según dirección horizontal
+            if self.direccion.x < 0:
+                self.voltear_horizontalmente = True  # Mirando a la izquierda
+            elif self.direccion.x > 0:
+                self.voltear_horizontalmente = False  # Mirando a la derecha
+
             # Mover hacia el jugador
             self.mover(dt)
     
@@ -118,7 +128,7 @@ class Enemy(BaseEntity):
     def recibir_knockback(self, direccion, fuerza):
         """
         Retroceso al recibir daño
-        
+
         Args:
             direccion: Vector de dirección del knockback
             fuerza: Fuerza del knockback en píxeles
@@ -126,7 +136,24 @@ class Enemy(BaseEntity):
         self.x += direccion.x * fuerza
         self.y += direccion.y * fuerza
         self.rect.center = (int(self.x), int(self.y))
-    
+
+    def dibujar(self, pantalla, camara):
+        """
+        Dibujar enemigo con flip según dirección
+
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        if self.imagen_original:
+            # Aplicar flip horizontal si es necesario
+            imagen_actual = pygame.transform.flip(self.imagen_original, self.voltear_horizontalmente, False)
+            # Actualizar la imagen del enemigo
+            self.image = imagen_actual
+
+        # Llamar al método dibujar del padre
+        super().dibujar(pantalla, camara)
+
     def actualizar(self, dt):
         """
         Actualización principal del enemigo
