@@ -124,9 +124,33 @@ class Player(BaseEntity):
                 "descripcion": f"Desbloquear {arma}"
             })
         
-        # Opción 2: Mejorar arma existente (placeholder - implementar con sistema de armas)
-        # Por ahora agregamos mejoras pasivas
-        
+                # Opción 2: Mejorar arma existente (si puede mejorar)
+        for arma in self.armas_equipadas:
+            if arma.puede_mejorar():
+                nivel_actual = arma.nivel
+                nivel_siguiente = nivel_actual + 1
+
+                # Obtener descripción según tipo de arma
+                if arma.tipo_ataque == "melee":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "proyectil":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "aoe":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "buff":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                else:
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+
+                opciones_disponibles.append({
+                    "tipo": "mejorar_arma",
+                    "valor": arma,  # Referencia al objeto arma
+                    "descripcion": descripcion
+                })
         # Opción 3: Mejoras pasivas
         opciones_disponibles.append({
             "tipo": "aumentar_vida_max",
@@ -174,7 +198,10 @@ class Player(BaseEntity):
             # Agregar arma a disponibles
             if valor not in self.armas_disponibles:
                 self.armas_disponibles.append(valor)
-        
+        elif tipo_mejora == "mejorar_arma":
+            # Mejorar el arma referenciado en 'valor'
+            arma = valor
+            arma.subir_nivel()        
         elif tipo_mejora == "aumentar_vida_max":
             self.vida_maxima += valor
             self.vida_actual += valor  # También cura
