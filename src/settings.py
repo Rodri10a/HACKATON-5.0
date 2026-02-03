@@ -66,13 +66,13 @@ ENEMIGO_CONFIGS = {
         "alto": 45,
     },
     "LUISON": {
-        "vida": 130,
-        "velocidad": 80,
-        "daño": 18,
+        "vida": 300,
+        "velocidad": 40,
+        "daño":25,
         "xp": 75,
         "spawn_peso": 1,      # Raro - Boss
-        "ancho": 70,          # Boss grande, casi cuadrado
-        "alto": 70,
+        "ancho": 140,          # Boss grande, casi cuadrado
+        "alto": 140,
     },
     "POMBERO": {
         "vida": 70,

@@ -108,7 +108,7 @@ class SpawnManager:
             
             # Ajustar peso según tiempo de juego
             # Enemigos más fuertes aparecen más seguido con el tiempo
-            if tipo == "AGUARA_GUAZU":  # Boss
+            if tipo == "LUISON":  # Boss
                 # Solo aparece después de 5 minutos
                 if self.tiempo_juego < 300:
                     peso = 0
@@ -123,7 +123,7 @@ class SpawnManager:
         if opciones:
             return random.choice(opciones)
         else:
-            return "CARPINCHO"  # Fallback
+            return "MOSQUITO"  # Fallback
     
     def escalar_dificultad(self):
         """Aumentar dificultad progresivamente"""
