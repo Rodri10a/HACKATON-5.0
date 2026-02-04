@@ -27,10 +27,9 @@ class Enemy(BaseEntity):
         
         # Definir color según tipo
         colores = {
-            "CARPINCHO": (139, 69, 19),     # Marrón
+            "AOAO": (0, 0, 255),          # Azul      
+            "PORA": (255, 255, 0),        # Amarillo
             "YACARE": (0, 100, 0),          # Verde oscuro
-            "TATU": (169, 169, 169),        # Gris
-            "AGUARA_GUAZU": (255, 69, 0),   # Naranja-rojo
             "LUISON": (80, 0, 0),           # Rojo oscuro
             "MOSQUITO": (100, 100, 100),    # Gris
             "POMBERO": (139, 90, 43),       # Marrón
@@ -39,10 +38,9 @@ class Enemy(BaseEntity):
         
         # Mapeo de sprites
         sprites = {
-            "CARPINCHO": "assets/sprites/carpincho.png",
+            "AOAO": "assets/sprites/aoao.png",
+            "PORA": "assets/sprites/pora.png",
             "YACARE": "assets/sprites/yacare.png",
-            "TATU": "assets/sprites/tatu.png",
-            "AGUARA_GUAZU": "assets/sprites/aguara_guazu.png",
             "LUISON": "assets/sprites/luison.png",
             "MOSQUITO": "assets/sprites/mosquito.png",
             "POMBERO": "assets/sprites/pora.png",
@@ -50,8 +48,8 @@ class Enemy(BaseEntity):
         }
         
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 40, 40, colores[tipo], sprite_path=sprites.get(tipo))
-        
+        super().__init__(x, y, config["ancho"], config["alto"], colores[tipo], sprite_path=sprites.get(tipo))
+
         # Configurar stats desde config
         self.tipo = tipo
         self.vida_maxima = config["vida"]
@@ -59,29 +57,39 @@ class Enemy(BaseEntity):
         self.velocidad = config["velocidad"]
         self.daño = config["daño"]
         self.xp_drop = config["xp"]
-        
+
+        # Flip del sprite según dirección
+        self.imagen_original = self.image.copy() if self.image else None
+        self.voltear_horizontalmente = False
+
         # Referencias
         self.jugador = None  # Se asigna desde spawn_manager
-        
+
         # Timers de ataque
         self.cooldown_ataque = 1.0  # segundos
         self.timer_ataque = 0
         self.puede_atacar = True
-        
+
         # Estado
         self.esta_atacando = False
     
     def perseguir_jugador(self, dt):
         """
         IA básica: moverse hacia el jugador
-        
+
         Args:
             dt: Delta time en segundos
         """
         if self.jugador and self.jugador.esta_vivo:
             # Obtener dirección hacia jugador
             self.direccion = self.direccion_hacia(self.jugador)
-            
+
+            # Actualizar flip según dirección horizontal
+            if self.direccion.x < 0:
+                self.voltear_horizontalmente = True  # Mirando a la izquierda
+            elif self.direccion.x > 0:
+                self.voltear_horizontalmente = False  # Mirando a la derecha
+
             # Mover hacia el jugador
             self.mover(dt)
     
@@ -120,7 +128,7 @@ class Enemy(BaseEntity):
     def recibir_knockback(self, direccion, fuerza):
         """
         Retroceso al recibir daño
-        
+
         Args:
             direccion: Vector de dirección del knockback
             fuerza: Fuerza del knockback en píxeles
@@ -128,7 +136,24 @@ class Enemy(BaseEntity):
         self.x += direccion.x * fuerza
         self.y += direccion.y * fuerza
         self.rect.center = (int(self.x), int(self.y))
-    
+
+    def dibujar(self, pantalla, camara):
+        """
+        Dibujar enemigo con flip según dirección
+
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        if self.imagen_original:
+            # Aplicar flip horizontal si es necesario
+            imagen_actual = pygame.transform.flip(self.imagen_original, self.voltear_horizontalmente, False)
+            # Actualizar la imagen del enemigo
+            self.image = imagen_actual
+
+        # Llamar al método dibujar del padre
+        super().dibujar(pantalla, camara)
+
     def actualizar(self, dt):
         """
         Actualización principal del enemigo
@@ -167,7 +192,7 @@ class OrbXP:
         
         # Crear sprite
         try:
-            self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
+            self.image = pygame.image.load("assets/sprites/orbe_xp.png").convert_alpha()
             self.image = pygame.transform.scale(self.image, (30, 30))
         except:
             self.image = pygame.Surface((20, 20))
@@ -177,7 +202,7 @@ class OrbXP:
         self.rect.center = (int(x), int(y))
         
         # Animación
-        self.tiempo_vida = 0
+        self.tiempo_vida = 3
         self.flotando = True
     
     def actualizar(self, dt):
@@ -253,3 +278,64 @@ class OrbXP:
             bool: True si hay colisión
         """
         return self.rect.colliderect(entidad.rect)
+
+
+class TerrereItem:
+    """Item de Terere que regenera vida al jugador"""
+    
+    def __init__(self, x, y):
+        """
+        Inicializar item de terere
+        
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+        """
+        self.x = float(x)
+        self.y = float(y)
+        
+        # Crear sprite
+        try:
+            self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
+            self.image = pygame.transform.scale(self.image, (40, 40))
+        except:
+            # Placeholder - círculo verde
+            self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, (0, 200, 0), (20, 20), 18)
+            pygame.draw.circle(self.image, (100, 255, 100), (20, 20), 15)
+        
+        self.rect = self.image.get_rect()
+        self.rect.center = (int(x), int(y))
+        
+        # Animación de flotación
+        self.tiempo_vida = 0
+        self.duracion_total = float('inf')  # No expira automáticamente
+    
+    def actualizar(self, dt):
+        """
+        Actualizar animación de flotación
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        self.tiempo_vida += dt
+        
+        # Efecto de flotación sutil
+        offset_y = math.sin(self.tiempo_vida * 3) * 3
+        self.rect.centery = int(self.y + offset_y)
+    
+    def dibujar(self, pantalla, camara):
+        """
+        Dibujar item en pantalla
+        
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        pantalla_x = self.rect.x - camara.offset_x
+        pantalla_y = self.rect.y - camara.offset_y
+        
+        # Solo dibujar si está visible
+        if (0 <= pantalla_x <= camara.ancho and 
+            0 <= pantalla_y <= camara.alto):
+            pantalla.blit(self.image, (pantalla_x, pantalla_y))
