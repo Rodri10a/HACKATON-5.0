@@ -1,2 +1,9 @@
 ''' IGNORAR __PYCACHE__  Y ARCHIVOS LOCALES ''' 
-venv/
+__pycache__/        # Ignorar TODAS las carpetas __pycache__
+*.pyc               # Ya está ✓
+*.pyo               # Archivos compilados optimizados
+*.pyd               # Módulos compilados Windows
+*.so                # Módulos compilados Linux
+.env                # Variables de entorno locales
+venv/               # Ya está ✓
+.venv/              # Entorno virtual alternativo
