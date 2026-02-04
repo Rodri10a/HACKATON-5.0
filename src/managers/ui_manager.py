@@ -1,21 +1,23 @@
-
-# from src.settings import *
-
+"""
+UI_MANAGER.PY - GESTOR DE INTERFAZ DE USUARIO
+==============================================
+Todas las pantallas y elementos HUD del juego
+"""
 
 import pygame
 from settings import *
 
 
 class UIManager:
-    """Gestor de interfaz de usuario"""
+    """Gestor de toda la interfaz del juego"""
     
     def __init__(self, pantalla, jugador):
         """
         Inicializar UI manager
         
         Args:
-            pantalla: Surface de pygame
-            jugador: Objeto Player
+            pantalla: Surface principal de pygame
+            jugador: Referencia al jugador
         """
         self.pantalla = pantalla
         self.jugador = jugador
@@ -24,384 +26,389 @@ class UIManager:
         self.fuente_grande = pygame.font.Font(None, 48)
         self.fuente_media = pygame.font.Font(None, 32)
         self.fuente_pequeña = pygame.font.Font(None, 24)
+        self.fuente_tiny = pygame.font.Font(None, 20)
         
-        # Estados de UI
+        # Flags
         self.mostrar_menu_pausa = False
         self.mostrar_pantalla_mejora = False
         self.mostrar_game_over = False
         
-        # Opciones de mejora disponibles
+        # Opciones de mejora (se setean desde engine)
         self.opciones_mejora = []
-        self.mejora_seleccionada = None
     
     def dibujar_hud(self):
-        """Dibujar HUD principal (vida, XP, nivel, tiempo)"""
-        # Barra de vida
+        """Dibujar todo el HUD"""
         self.dibujar_barra_vida()
-        
-        # Barra de XP
         self.dibujar_barra_xp()
-        
-        # Nivel actual
-        self.dibujar_nivel()
-        
-        # Tiempo de supervivencia
-        self.dibujar_tiempo()
-        
-        # Contador de enemigos matados
-        self.dibujar_estadisticas()
+        self.dibujar_info_derecha()
+        self.dibujar_armas_equipadas()
     
     def dibujar_barra_vida(self):
-        """Dibujar barra de vida del jugador"""
-        x, y = POSICION_BARRA_VIDA
-        ancho, alto = TAMAÑO_BARRA_VIDA
+        """Dibujar barra de vida con fondo, borde y texto"""
+        x, y = 20, 20
+        ancho, alto = 250, 28
         
-        # Fondo de la barra (negro)
-        pygame.draw.rect(
-            self.pantalla,
-            (0, 0, 0),
-            (x, y, ancho, alto)
-        )
+        # Fondo oscuro de la barra
+        pygame.draw.rect(self.pantalla, (30, 30, 30), (x - 2, y - 2, ancho + 4, alto + 4), border_radius=6)
         
-        # Calcular ancho de vida actual
-        porcentaje_vida = self.jugador.vida_actual / self.jugador.vida_maxima
-        ancho_vida = int(ancho * porcentaje_vida)
+        # Fondo rojo oscuro (vida perdida)
+        pygame.draw.rect(self.pantalla, (80, 10, 10), (x, y, ancho, alto), border_radius=4)
         
-        # Dibujar vida (rojo)
-        pygame.draw.rect(
-            self.pantalla,
-            COLOR_VIDA,
-            (x, y, ancho_vida, alto)
-        )
+        # Calcular porcentaje de vida
+        porcentaje = self.jugador.vida_actual / self.jugador.vida_maxima
+        ancho_vida = int(ancho * porcentaje)
         
-        # Borde de la barra
-        pygame.draw.rect(
-            self.pantalla,
-            COLOR_TEXTO,
-            (x, y, ancho, alto),
-            2  # grosor del borde
-        )
+        # Color de la barra según vida restante
+        if porcentaje > 0.5:
+            color_vida = (50, 200, 50)      # Verde
+        elif porcentaje > 0.25:
+            color_vida = (230, 180, 0)      # Amarillo
+        else:
+            color_vida = (220, 30, 30)      # Rojo
         
-        # Texto de vida
-        texto = f"{int(self.jugador.vida_actual)} / {self.jugador.vida_maxima}"
-        superficie_texto = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
-        texto_rect = superficie_texto.get_rect()
-        texto_rect.center = (x + ancho // 2, y + alto // 2)
-        self.pantalla.blit(superficie_texto, texto_rect)
+        # Barra de vida
+        if ancho_vida > 0:
+            pygame.draw.rect(self.pantalla, color_vida, (x, y, ancho_vida, alto), border_radius=4)
+        
+        # Borde dorado
+        pygame.draw.rect(self.pantalla, (200, 170, 60), (x - 2, y - 2, ancho + 4, alto + 4), 2, border_radius=6)
+        
+        # Texto de vida centrado
+        texto_vida = f"{int(self.jugador.vida_actual)} / {int(self.jugador.vida_maxima)}"
+        superficie_texto = self.fuente_pequeña.render(texto_vida, True, (255, 255, 255))
+        rect_texto = superficie_texto.get_rect()
+        rect_texto.center = (x + ancho // 2, y + alto // 2)
+        
+        # Sombra del texto
+        sombra = self.fuente_pequeña.render(texto_vida, True, (0, 0, 0))
+        rect_sombra = sombra.get_rect()
+        rect_sombra.center = (x + ancho // 2 + 1, y + alto // 2 + 1)
+        self.pantalla.blit(sombra, rect_sombra)
+        self.pantalla.blit(superficie_texto, rect_texto)
     
     def dibujar_barra_xp(self):
-        """Dibujar barra de experiencia"""
-        x, y = POSICION_BARRA_XP
-        ancho, alto = TAMAÑO_BARRA_XP
+        """Dibujar barra de XP bajo la barra de vida"""
+        x, y = 20, 55
+        ancho, alto = 250, 16
         
-        # Fondo
-        pygame.draw.rect(self.pantalla, (0, 0, 0), (x, y, ancho, alto))
+        # Fondo oscuro
+        pygame.draw.rect(self.pantalla, (30, 30, 30), (x - 2, y - 2, ancho + 4, alto + 4), border_radius=4)
         
-        # Calcular progreso de XP
-        porcentaje_xp = self.jugador.xp_actual / self.jugador.xp_necesaria
+        # Fondo oscuro de la barra
+        pygame.draw.rect(self.pantalla, (40, 30, 10), (x, y, ancho, alto), border_radius=3)
+        
+        # Calcular porcentaje de XP
+        porcentaje_xp = self.jugador.xp_actual / self.jugador.xp_necesaria if self.jugador.xp_necesaria > 0 else 0
         ancho_xp = int(ancho * porcentaje_xp)
         
-        # Dibujar XP (dorado)
-        pygame.draw.rect(
-            self.pantalla,
-            COLOR_XP,
-            (x, y, ancho_xp, alto)
-        )
+        # Barra de XP dorada
+        if ancho_xp > 0:
+            pygame.draw.rect(self.pantalla, COLOR_XP, (x, y, ancho_xp, alto), border_radius=3)
         
         # Borde
-        pygame.draw.rect(self.pantalla, COLOR_TEXTO, (x, y, ancho, alto), 2)
+        pygame.draw.rect(self.pantalla, (180, 150, 40), (x - 2, y - 2, ancho + 4, alto + 4), 2, border_radius=4)
         
-        # Texto
-        texto = f"XP: {int(self.jugador.xp_actual)} / {self.jugador.xp_necesaria}"
-        superficie_texto = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
-        self.pantalla.blit(superficie_texto, (x + 5, y + alto + 5))
-    
-    def dibujar_nivel(self):
-        """Dibujar nivel actual del jugador"""
-        texto = f"NIVEL {self.jugador.nivel}"
-        superficie = self.fuente_grande.render(texto, True, COLOR_XP)
-        rect = superficie.get_rect()
-        rect.topright = (ANCHO_VENTANA - 20, 20)
-        self.pantalla.blit(superficie, rect)
-    
-    def dibujar_tiempo(self):
-        """Dibujar tiempo de supervivencia"""
-        minutos = int(self.jugador.tiempo_supervivencia // 60)
-        segundos = int(self.jugador.tiempo_supervivencia % 60)
+        # Texto de XP
+        texto_xp = f"XP: {int(self.jugador.xp_actual)} / {int(self.jugador.xp_necesaria)}"
+        superficie_xp = self.fuente_tiny.render(texto_xp, True, (255, 255, 255))
+        rect_xp = superficie_xp.get_rect()
+        rect_xp.center = (x + ancho // 2, y + alto // 2)
         
-        texto = f"Tiempo: {minutos:02d}:{segundos:02d}"
-        superficie = self.fuente_media.render(texto, True, COLOR_TEXTO)
-        rect = superficie.get_rect()
-        rect.topright = (ANCHO_VENTANA - 20, 80)
-        self.pantalla.blit(superficie, rect)
+        # Sombra
+        sombra_xp = self.fuente_tiny.render(texto_xp, True, (0, 0, 0))
+        rect_sombra = sombra_xp.get_rect()
+        rect_sombra.center = (x + ancho // 2 + 1, y + alto // 2 + 1)
+        self.pantalla.blit(sombra_xp, rect_sombra)
+        self.pantalla.blit(superficie_xp, rect_xp)
     
-    def dibujar_estadisticas(self):
-        """Dibujar estadísticas de juego"""
-        # Enemigos matados
-        texto = f"Enemigos: {self.jugador.enemigos_matados}"
-        superficie = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
-        rect = superficie.get_rect()
-        rect.topright = (ANCHO_VENTANA - 20, 120)
-        self.pantalla.blit(superficie, rect)
+    def dibujar_info_derecha(self):
+        """Dibujar nivel, tiempo y enemigos en la parte derecha con fondo"""
+        x_derecha = ANCHO_VENTANA - 20
         
-        # Armas equipadas
-        y_offset = 150
-        for arma in self.jugador.armas_equipadas:
-            texto = f"{arma.tipo} Nv.{arma.nivel}"
-            superficie = self.fuente_pequeña.render(texto, True, COLOR_TEXTO)
-            rect = superficie.get_rect()
-            rect.topright = (ANCHO_VENTANA - 20, y_offset)
-            self.pantalla.blit(superficie, rect)
-            y_offset += 25
+        # --- NIVEL ---
+        # Fondo del nivel
+        texto_nivel = f"NIVEL {self.jugador.nivel}"
+        sup_nivel = self.fuente_media.render(texto_nivel, True, COLOR_XP)
+        rect_nivel = sup_nivel.get_rect()
+        rect_nivel.topright = (x_derecha, 15)
+        
+        # Fondo semi-transparente
+        fondo_nivel = pygame.Surface((rect_nivel.width + 20, rect_nivel.height + 10), pygame.SRCALPHA)
+        fondo_nivel.fill((0, 0, 0, 160))
+        self.pantalla.blit(fondo_nivel, (rect_nivel.x - 10, rect_nivel.y - 5))
+        pygame.draw.rect(self.pantalla, (200, 170, 60), (rect_nivel.x - 10, rect_nivel.y - 5, rect_nivel.width + 20, rect_nivel.height + 10), 2, border_radius=6)
+        
+        # Sombra texto
+        sombra = self.fuente_media.render(texto_nivel, True, (0, 0, 0))
+        rect_sombra = sombra.get_rect()
+        rect_sombra.topright = (x_derecha + 1, 16)
+        self.pantalla.blit(sombra, rect_sombra)
+        self.pantalla.blit(sup_nivel, rect_nivel)
+        
+        # --- TIEMPO ---
+        minutos = int(self.jugador.tiempo_supervivencia) // 60
+        segundos = int(self.jugador.tiempo_supervivencia) % 60
+        texto_tiempo = f"Tiempo: {minutos:02d}:{segundos:02d}"
+        sup_tiempo = self.fuente_pequeña.render(texto_tiempo, True, (255, 255, 255))
+        rect_tiempo = sup_tiempo.get_rect()
+        rect_tiempo.topright = (x_derecha, 60)
+        
+        # Fondo
+        fondo_tiempo = pygame.Surface((rect_tiempo.width + 20, rect_tiempo.height + 8), pygame.SRCALPHA)
+        fondo_tiempo.fill((0, 0, 0, 160))
+        self.pantalla.blit(fondo_tiempo, (rect_tiempo.x - 10, rect_tiempo.y - 4))
+        pygame.draw.rect(self.pantalla, (100, 100, 100), (rect_tiempo.x - 10, rect_tiempo.y - 4, rect_tiempo.width + 20, rect_tiempo.height + 8), 1, border_radius=5)
+        
+        # Sombra texto
+        sombra_t = self.fuente_pequeña.render(texto_tiempo, True, (0, 0, 0))
+        rect_sombra_t = sombra_t.get_rect()
+        rect_sombra_t.topright = (x_derecha + 1, 61)
+        self.pantalla.blit(sombra_t, rect_sombra_t)
+        self.pantalla.blit(sup_tiempo, rect_tiempo)
+        
+        # --- ENEMIGOS ---
+        texto_enemigos = f"Enemigos: {self.jugador.enemigos_matados}"
+        sup_enemigos = self.fuente_pequeña.render(texto_enemigos, True, (255, 255, 255))
+        rect_enemigos = sup_enemigos.get_rect()
+        rect_enemigos.topright = (x_derecha, 95)
+        
+        # Fondo
+        fondo_enemigos = pygame.Surface((rect_enemigos.width + 20, rect_enemigos.height + 8), pygame.SRCALPHA)
+        fondo_enemigos.fill((0, 0, 0, 160))
+        self.pantalla.blit(fondo_enemigos, (rect_enemigos.x - 10, rect_enemigos.y - 4))
+        pygame.draw.rect(self.pantalla, (100, 100, 100), (rect_enemigos.x - 10, rect_enemigos.y - 4, rect_enemigos.width + 20, rect_enemigos.height + 8), 1, border_radius=5)
+        
+        # Sombra texto
+        sombra_e = self.fuente_pequeña.render(texto_enemigos, True, (0, 0, 0))
+        rect_sombra_e = sombra_e.get_rect()
+        rect_sombra_e.topright = (x_derecha + 1, 96)
+        self.pantalla.blit(sombra_e, rect_sombra_e)
+        self.pantalla.blit(sup_enemigos, rect_enemigos)
+    
+    def dibujar_armas_equipadas(self):
+        """Dibujar las armas equipadas abajo a la derecha"""
+        x_derecha = ANCHO_VENTANA - 20
+        y_inicio = 130
+        
+        for i, arma in enumerate(self.jugador.armas_equipadas):
+            texto_arma = f"{arma.tipo} Nv.{arma.nivel}"
+            sup_arma = self.fuente_tiny.render(texto_arma, True, (255, 255, 255))
+            rect_arma = sup_arma.get_rect()
+            rect_arma.topright = (x_derecha, y_inicio + i * 25)
+            
+            # Fondo
+            fondo_arma = pygame.Surface((rect_arma.width + 16, rect_arma.height + 6), pygame.SRCALPHA)
+            fondo_arma.fill((0, 0, 0, 160))
+            self.pantalla.blit(fondo_arma, (rect_arma.x - 8, rect_arma.y - 3))
+            pygame.draw.rect(self.pantalla, (100, 100, 100), (rect_arma.x - 8, rect_arma.y - 3, rect_arma.width + 16, rect_arma.height + 6), 1, border_radius=4)
+            
+            # Sombra
+            sombra_a = self.fuente_tiny.render(texto_arma, True, (0, 0, 0))
+            rect_sombra_a = sombra_a.get_rect()
+            rect_sombra_a.topright = (x_derecha + 1, y_inicio + i * 25 + 1)
+            self.pantalla.blit(sombra_a, rect_sombra_a)
+            self.pantalla.blit(sup_arma, rect_arma)
     
     def dibujar_pantalla_mejora(self, opciones):
         """
-        Pantalla de selección de mejora al subir nivel
+        Dibujar pantalla de mejoras al subir de nivel
         
         Args:
-            opciones: Lista de diccionarios con opciones de mejora
+            opciones: Lista de diccionarios con las opciones
         """
+        if not opciones:
+            return
+        
         # Overlay oscuro semi-transparente
-        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
-        overlay.set_alpha(200)
-        overlay.fill((0, 0, 0))
+        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 200))
         self.pantalla.blit(overlay, (0, 0))
         
         # Título
-        titulo = "¡SUBISTE DE NIVEL!"
-        superficie_titulo = self.fuente_grande.render(titulo, True, COLOR_XP)
-        rect_titulo = superficie_titulo.get_rect()
-        rect_titulo.center = (ANCHO_VENTANA // 2, 100)
-        self.pantalla.blit(superficie_titulo, rect_titulo)
+        titulo = self.fuente_grande.render("¡SUBISTE DE NIVEL!", True, COLOR_XP)
+        rect_titulo = titulo.get_rect()
+        rect_titulo.center = (ANCHO_VENTANA // 2, 60)
+        self.pantalla.blit(titulo, rect_titulo)
         
-        # Dibujar 3 opciones de mejora
-        ancho_carta = 300
-        alto_carta = 400
-        espacio = 50
-        x_inicial = (ANCHO_VENTANA - (ancho_carta * 3 + espacio * 2)) // 2
-        y_carta = 200
+        # Subtitulo
+        subtitulo = self.fuente_pequeña.render("Elige una mejora", True, (200, 200, 200))
+        rect_sub = subtitulo.get_rect()
+        rect_sub.center = (ANCHO_VENTANA // 2, 100)
+        self.pantalla.blit(subtitulo, rect_sub)
         
-        for i, opcion in enumerate(opciones):
-            x_carta = x_inicial + (ancho_carta + espacio) * i
+        # Dibujar 3 cartas de mejora
+        carta_ancho = 280
+        carta_alto = 350
+        espaciado = 40
+        total_ancho = carta_ancho * 3 + espaciado * 2
+        inicio_x = (ANCHO_VENTANA - total_ancho) // 2
+        inicio_y = (ALTO_VENTANA - carta_alto) // 2 + 30
+        
+        pos_mouse = pygame.mouse.get_pos()
+        
+        for i, opcion in enumerate(opciones[:3]):
+            carta_x = inicio_x + i * (carta_ancho + espaciado)
+            carta_y = inicio_y
             
-            # Detectar hover del mouse
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            hover = (x_carta < mouse_x < x_carta + ancho_carta and
-                    y_carta < mouse_y < y_carta + alto_carta)
+            # Detectar hover
+            hover = carta_x <= pos_mouse[0] <= carta_x + carta_ancho and carta_y <= pos_mouse[1] <= carta_y + carta_alto
             
-            # Dibujar carta
-            self.dibujar_carta_mejora(
-                x_carta, y_carta, 
-                ancho_carta, alto_carta, 
-                opcion, hover, i
-            )
-        
-        # Instrucciones
-        texto = "Haz clic en una carta para elegir"
-        superficie = self.fuente_media.render(texto, True, COLOR_TEXTO)
-        rect = superficie.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, ALTO_VENTANA - 50)
-        self.pantalla.blit(superficie, rect)
+            self.dibujar_carta_mejora(carta_x, carta_y, carta_ancho, carta_alto, opcion, hover, i)
     
     def dibujar_carta_mejora(self, x, y, ancho, alto, opcion, hover, indice):
         """
-        Dibujar carta individual de mejora
+        Dibujar una carta de mejora
         
         Args:
-            x: Posición X de la carta
-            y: Posición Y de la carta
+            x: Posición X
+            y: Posición Y
             ancho: Ancho de la carta
             alto: Alto de la carta
             opcion: Diccionario con la opción
-            hover: Si el mouse está sobre la carta
-            indice: Índice de la carta (0, 1, 2)
+            hover: Si el mouse está encima
+            indice: Índice de la carta
         """
-        # Color de fondo (más claro si hover)
-        color_fondo = (60, 60, 60) if hover else (40, 40, 40)
-        
-        # Rectángulo de la carta
-        pygame.draw.rect(
-            self.pantalla,
-            color_fondo,
-            (x, y, ancho, alto)
-        )
+        # Fondo de la carta
+        color_fondo = (60, 60, 70) if hover else (40, 40, 50)
+        pygame.draw.rect(self.pantalla, color_fondo, (x, y, ancho, alto), border_radius=12)
         
         # Borde (dorado si hover)
-        color_borde = COLOR_XP if hover else COLOR_TEXTO
-        pygame.draw.rect(
-            self.pantalla,
-            color_borde,
-            (x, y, ancho, alto),
-            3
-        )
-        
-        # Título según tipo de mejora
-        tipo = opcion["tipo"]
-        
-        if tipo == "nueva_arma":
-            titulo = "NUEVA ARMA"
-            descripcion = opcion["valor"]
-        elif tipo == "mejorar_arma":
-            titulo = "MEJORAR ARMA"
-            descripcion = f"{opcion['valor']} Nv.{opcion['nivel']}"
-        else:
-            titulo = "MEJORA PASIVA"
-            descripcion = opcion["descripcion"]
-        
-        # Dibujar título
-        texto_titulo = self.fuente_media.render(titulo, True, COLOR_XP)
-        rect_titulo = texto_titulo.get_rect()
-        rect_titulo.centerx = x + ancho // 2
-        rect_titulo.top = y + 30
-        self.pantalla.blit(texto_titulo, rect_titulo)
-        
-        # Dibujar descripción
-        texto_desc = self.fuente_grande.render(descripcion, True, COLOR_TEXTO)
-        rect_desc = texto_desc.get_rect()
-        rect_desc.center = (x + ancho // 2, y + alto // 2)
-        self.pantalla.blit(texto_desc, rect_desc)
+        color_borde = (255, 215, 0) if hover else (100, 100, 120)
+        grosor_borde = 3 if hover else 2
+        pygame.draw.rect(self.pantalla, color_borde, (x, y, ancho, alto), grosor_borde, border_radius=12)
         
         # Número de la carta
-        texto_num = self.fuente_pequeña.render(f"[{indice + 1}]", True, COLOR_TEXTO)
-        rect_num = texto_num.get_rect()
-        rect_num.centerx = x + ancho // 2
-        rect_num.bottom = y + alto - 20
-        self.pantalla.blit(texto_num, rect_num)
+        numero = self.fuente_grande.render(str(indice + 1), True, COLOR_XP if hover else (150, 150, 150))
+        rect_numero = numero.get_rect()
+        rect_numero.center = (x + ancho // 2, y + 45)
+        self.pantalla.blit(numero, rect_numero)
+        
+        # Título de la mejora
+        titulo = opcion.get("descripcion", "Mejora")
+        sup_titulo = self.fuente_media.render(titulo, True, (255, 255, 255))
+        rect_titulo = sup_titulo.get_rect()
+        rect_titulo.center = (x + ancho // 2, y + 120)
+        self.pantalla.blit(sup_titulo, rect_titulo)
+        
+        # Tipo de mejora
+        tipo_texto = opcion.get("tipo", "").replace("_", " ").title()
+        sup_tipo = self.fuente_pequeña.render(tipo_texto, True, (180, 180, 180))
+        rect_tipo = sup_tipo.get_rect()
+        rect_tipo.center = (x + ancho // 2, y + 170)
+        self.pantalla.blit(sup_tipo, rect_tipo)
+        
+        # Texto "Seleccionar" abajo
+        if hover:
+            sup_seleccionar = self.fuente_pequeña.render("▶ Seleccionar", True, COLOR_XP)
+            rect_sel = sup_seleccionar.get_rect()
+            rect_sel.center = (x + ancho // 2, y + alto - 40)
+            self.pantalla.blit(sup_seleccionar, rect_sel)
     
     def manejar_click_mejora(self, pos_mouse, opciones):
         """
-        Detectar click en carta de mejora
+        Verificar si el click fue en una carta de mejora
         
         Args:
-            pos_mouse: Tupla (x, y) con posición del mouse
-            opciones: Lista de opciones de mejora
+            pos_mouse: Posición del mouse (x, y)
+            opciones: Lista de opciones
             
         Returns:
-            int: Índice de opción elegida, o None
+            int o None: Índice de la carta clickeada
         """
-        mouse_x, mouse_y = pos_mouse
+        carta_ancho = 280
+        carta_alto = 350
+        espaciado = 40
+        total_ancho = carta_ancho * 3 + espaciado * 2
+        inicio_x = (ANCHO_VENTANA - total_ancho) // 2
+        inicio_y = (ALTO_VENTANA - carta_alto) // 2 + 30
         
-        ancho_carta = 300
-        alto_carta = 400
-        espacio = 50
-        x_inicial = (ANCHO_VENTANA - (ancho_carta * 3 + espacio * 2)) // 2
-        y_carta = 200
-        
-        for i, opcion in enumerate(opciones):
-            x_carta = x_inicial + (ancho_carta + espacio) * i
+        for i in range(min(3, len(opciones))):
+            carta_x = inicio_x + i * (carta_ancho + espaciado)
+            carta_y = inicio_y
             
-            # Verificar si click está dentro de la carta
-            if (x_carta < mouse_x < x_carta + ancho_carta and
-                y_carta < mouse_y < y_carta + alto_carta):
-                
-                return i  # Índice de opción elegida
+            if (carta_x <= pos_mouse[0] <= carta_x + carta_ancho and
+                carta_y <= pos_mouse[1] <= carta_y + carta_alto):
+                return i
         
         return None
     
     def dibujar_menu_pausa(self):
-        """Menú de pausa"""
-        # Overlay
-        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
-        overlay.set_alpha(180)
-        overlay.fill((0, 0, 0))
+        """Dibujar pantalla de pausa"""
+        # Overlay oscuro
+        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))
         self.pantalla.blit(overlay, (0, 0))
         
-        # Título
-        titulo = self.fuente_grande.render("PAUSA", True, COLOR_TEXTO)
+        # Título PAUSA
+        titulo = self.fuente_grande.render("PAUSA", True, (255, 255, 255))
         rect = titulo.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, 200)
+        rect.center = (ANCHO_VENTANA // 2, ALTO_VENTANA // 2 - 60)
         self.pantalla.blit(titulo, rect)
         
         # Opciones
-        opciones = ["Reanudar (ESC)", "Salir al Menú (Q)"]
-        y_offset = 300
-        
-        for opcion in opciones:
-            texto = self.fuente_media.render(opcion, True, COLOR_TEXTO)
-            rect = texto.get_rect()
-            rect.center = (ANCHO_VENTANA // 2, y_offset)
-            self.pantalla.blit(texto, rect)
-            y_offset += 60
-    
-    def dibujar_game_over(self):
-        """Pantalla de Game Over con estadísticas"""
-        # Overlay rojo oscuro
-        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
-        overlay.set_alpha(200)
-        overlay.fill((80, 0, 0))
-        self.pantalla.blit(overlay, (0, 0))
-        
-        # Título GAME OVER
-        titulo = self.fuente_grande.render("GAME OVER", True, COLOR_VIDA)
-        rect = titulo.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, 100)
-        self.pantalla.blit(titulo, rect)
-        
-        # Estadísticas finales
-        minutos = int(self.jugador.tiempo_supervivencia // 60)
-        segundos = int(self.jugador.tiempo_supervivencia % 60)
-        
-        stats = [
-            f"Nivel Alcanzado: {self.jugador.nivel}",
-            f"Tiempo Supervivido: {minutos}:{segundos:02d}",
-            f"Enemigos Eliminados: {self.jugador.enemigos_matados}",
+        opciones = [
+            "Reanudar (ESC)",
+            "Salir al Menú (Q)"
         ]
         
-        y_offset = 200
-        for stat in stats:
-            texto = self.fuente_media.render(stat, True, COLOR_TEXTO)
+        y_offset = ALTO_VENTANA // 2 + 10
+        for opcion in opciones:
+            texto = self.fuente_media.render(opcion, True, (200, 200, 200))
             rect = texto.get_rect()
             rect.center = (ANCHO_VENTANA // 2, y_offset)
             self.pantalla.blit(texto, rect)
             y_offset += 50
-        
-        # Instrucciones
-        instruccion = "Presiona ESPACIO para reiniciar o ESC para salir"
-        texto = self.fuente_pequeña.render(instruccion, True, COLOR_TEXTO)
-        rect = texto.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, ALTO_VENTANA - 50)
-        self.pantalla.blit(texto, rect)
     
-    def dibujar_pantalla_inicio(self):
-        """Pantalla de inicio del juego"""
-        # Fondo
-        self.pantalla.fill((0, 0, 0))
+    def dibujar_game_over(self):
+        """Dibujar pantalla de Game Over"""
+        # Overlay rojo oscuro
+        overlay = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA), pygame.SRCALPHA)
+        overlay.fill((80, 0, 0, 200))
+        self.pantalla.blit(overlay, (0, 0))
         
-        # Título del juego
-        titulo = self.fuente_grande.render("CAMPESINO PARAGUAYO", True, COLOR_XP)
+        # Título GAME OVER
+        titulo = self.fuente_grande.render("GAME OVER", True, (255, 50, 50))
         rect = titulo.get_rect()
         rect.center = (ANCHO_VENTANA // 2, 150)
         self.pantalla.blit(titulo, rect)
         
-        subtitulo = self.fuente_media.render("Survival", True, COLOR_TEXTO)
-        rect = subtitulo.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, 200)
-        self.pantalla.blit(subtitulo, rect)
+        # Estadísticas
+        minutos = int(self.jugador.tiempo_supervivencia) // 60
+        segundos = int(self.jugador.tiempo_supervivencia) % 60
         
-        # Instrucciones
-        instrucciones = [
-            "Usa WASD o Flechas para moverte",
-            "Las armas atacan automáticamente",
-            "Recolecta XP para subir de nivel",
-            "¡Sobrevive el mayor tiempo posible!",
-            "",
-            "Presiona ESPACIO para comenzar"
+        stats = [
+            f"Nivel alcanzado: {self.jugador.nivel}",
+            f"Tiempo sobrevivido: {minutos:02d}:{segundos:02d}",
+            f"Enemigos derrotados: {self.jugador.enemigos_matados}"
         ]
         
-        y_offset = 300
-        for linea in instrucciones:
-            texto = self.fuente_pequeña.render(linea, True, COLOR_TEXTO)
+        y_offset = ALTO_VENTANA // 2 - 60
+        for stat in stats:
+            texto = self.fuente_media.render(stat, True, (220, 220, 220))
             rect = texto.get_rect()
             rect.center = (ANCHO_VENTANA // 2, y_offset)
             self.pantalla.blit(texto, rect)
-            y_offset += 35
+            y_offset += 45
+        
+        # Instrucciones
+        instrucciones = [
+            "ESPACIO - Reiniciar",
+            "ESC - Salir al Menú"
+        ]
+        
+        y_offset = ALTO_VENTANA - 120
+        for instruccion in instrucciones:
+            texto = self.fuente_pequeña.render(instruccion, True, (180, 180, 180))
+            rect = texto.get_rect()
+            rect.center = (ANCHO_VENTANA // 2, y_offset)
+            self.pantalla.blit(texto, rect)
+            y_offset += 30
     
     def actualizar(self, dt):
         """
-        Actualizar animaciones de UI si las hay
+        Actualizar UI
         
         Args:
             dt: Delta time en segundos
         """
-        # Por ahora, la UI es estática
         pass
