@@ -29,7 +29,7 @@ XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650]
 
 # ========== CONFIGURACIÓN DE ENEMIGOS ==========
 ENEMIGO_CONFIGS = {
-    "MOSQUITO": {
+    "MOSQUITO": { 
         "vida": 10,
         "velocidad": 110,
         "daño": 2,
