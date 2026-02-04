@@ -44,7 +44,36 @@ class Weapon:
         self.buff_activo = False
         self.timer_buff = 0
         self.duracion_buff = 0
-    
+
+    def subir_nivel(self):
+        """
+        Subir el nivel del arma (máximo 4)
+
+        Returns:
+            bool: True si subió de nivel, False si ya está al máximo
+        """
+        max_nivel = len(self.config["niveles"])
+        if self.nivel < max_nivel:
+            self.nivel += 1
+
+            # Actualizar cooldown si el nivel tiene uno específico
+            config_nivel = self.config["niveles"][self.nivel - 1]
+            if "cooldown" in config_nivel:
+                self.cooldown = config_nivel["cooldown"]
+
+            return True
+        return False
+
+    def puede_mejorar(self):
+        """
+        Verificar si el arma puede subir de nivel
+
+        Returns:
+            bool: True si puede mejorar, False si está al máximo
+        """
+        max_nivel = len(self.config["niveles"])
+        return self.nivel < max_nivel
+
     def actualizar(self, dt, enemigos):
         """
         Actualizar arma y sus proyectiles/efectos
@@ -110,20 +139,21 @@ class Weapon:
     def ataque_machete(self, enemigos):
         """
         Ataque melee circular alrededor del jugador con efecto visual
-        
+        Usa colisión de hitbox para detectar enemigos
+
         Args:
             enemigos: Lista de enemigos
         """
         config_nivel = self.config["niveles"][self.nivel - 1]
         daño = config_nivel["daño"]
         alcance = config_nivel["alcance"]
-        
+
         # Determinar dirección del slash basado en el último movimiento
         direccion = self.dueño.direccion
         if direccion.length() == 0:
             # Si está quieto, slash hacia la derecha por defecto
             direccion = pygame.math.Vector2(1, 0)
-        
+
         # Crear efecto visual del slash
         efecto_slash = EfectoSlashMachete(
             self.dueño.x,
@@ -132,21 +162,30 @@ class Weapon:
             alcance
         )
         self.efectos.append(efecto_slash)
-        
-        # Aplicar daño a enemigos en alcance
+
+        # Crear área de ataque (rectángulo centrado en el jugador)
+        area_ataque = pygame.Rect(
+            self.dueño.x - alcance,
+            self.dueño.y - alcance,
+            alcance * 2,
+            alcance * 2
+        )
+
+        # Aplicar daño a enemigos cuyo hitbox colisiona con el área de ataque
         for enemigo in enemigos:
             if not enemigo.esta_vivo:
                 continue
-            
-            # Calcular distancia
-            dx = enemigo.x - self.dueño.x
-            dy = enemigo.y - self.dueño.y
-            distancia = math.sqrt(dx * dx + dy * dy)
-            
-            if distancia <= alcance:
+
+            # Verificar colisión de hitbox
+            if area_ataque.colliderect(enemigo.rect):
                 # Aplicar daño
                 enemigo.recibir_daño(daño)
-                
+
+                # Calcular dirección para knockback (desde centro del jugador al enemigo)
+                dx = enemigo.x - self.dueño.x
+                dy = enemigo.y - self.dueño.y
+                distancia = math.sqrt(dx * dx + dy * dy)
+
                 # Aplicar knockback
                 if distancia > 0:
                     direccion_kb = pygame.math.Vector2(dx / distancia, dy / distancia)
@@ -154,48 +193,43 @@ class Weapon:
     
     def ataque_hacha(self, enemigos):
         """
-        Lanzar proyectiles de hacha hacia enemigos cercanos
-        
+        Disparar un solo proyectil de rifle hacia el enemigo más cercano
+
         Args:
             enemigos: Lista de enemigos
         """
         config_nivel = self.config["niveles"][self.nivel - 1]
         daño = config_nivel["daño"]
-        cantidad = config_nivel["cantidad"]
         velocidad = config_nivel["velocidad"]
-        
-        # Encontrar enemigos más cercanos
+
+        # Encontrar enemigo más cercano
         enemigos_vivos = [e for e in enemigos if e.esta_vivo]
         if not enemigos_vivos:
             return
-        
-        # Ordenar por distancia
-        enemigos_ordenados = sorted(
+
+        # Encontrar el más cercano
+        enemigo_objetivo = min(
             enemigos_vivos,
             key=lambda e: math.sqrt((e.x - self.dueño.x)**2 + (e.y - self.dueño.y)**2)
         )
-        
-        # Lanzar hachas hacia los más cercanos
-        for i in range(min(cantidad, len(enemigos_ordenados))):
-            enemigo_objetivo = enemigos_ordenados[i]
-            
-            # Calcular dirección
-            dx = enemigo_objetivo.x - self.dueño.x
-            dy = enemigo_objetivo.y - self.dueño.y
-            distancia = math.sqrt(dx * dx + dy * dy)
-            
-            if distancia > 0:
-                direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
-                
-                # Crear proyectil
-                proyectil = ProyectilHacha(
-                    self.dueño.x,
-                    self.dueño.y,
-                    direccion,
-                    velocidad,
-                    daño
-                )
-                self.proyectiles.append(proyectil)
+
+        # Calcular dirección hacia el enemigo más cercano
+        dx = enemigo_objetivo.x - self.dueño.x
+        dy = enemigo_objetivo.y - self.dueño.y
+        distancia = math.sqrt(dx * dx + dy * dy)
+
+        if distancia > 0:
+            direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
+
+            # Crear un solo proyectil de rifle
+            proyectil = ProyectilRifle(
+                self.dueño.x,
+                self.dueño.y,
+                direccion,
+                velocidad,
+                daño
+            )
+            self.proyectiles.append(proyectil)
     
     def ataque_azada(self, enemigos):
         """
@@ -271,8 +305,8 @@ class Weapon:
             efecto.dibujar(pantalla, camara)
 
 
-class ProyectilHacha:
-    """Proyectil de hacha que rota"""
+class ProyectilRifle:
+    """Proyectil de rifle (bala)"""
     
     def __init__(self, x, y, direccion, velocidad, daño):
         """
@@ -299,7 +333,7 @@ class ProyectilHacha:
         
         # Distancia recorrida
         self.distancia_recorrida = 0
-        self.alcance_maximo = PROYECTIL_HACHA_ALCANCE
+        self.alcance_maximo = PROYECTIL_RIFLE_ALCANCE
         
         # Rotación
         self.angulo = 0
@@ -327,7 +361,7 @@ class ProyectilHacha:
         self.distancia_recorrida += desplazamiento
         
         # Rotar
-        self.angulo += PROYECTIL_HACHA_ROTACION * dt
+        self.angulo += PROYECTIL_RIFLE_ROTACION * dt
         
         # Verificar si debe eliminarse
         if self.distancia_recorrida >= self.alcance_maximo:
@@ -358,7 +392,7 @@ class ProyectilHacha:
                 distancia = math.sqrt(dx * dx + dy * dy)
                 if distancia > 0:
                     direccion = pygame.math.Vector2(dx / distancia, dy / distancia)
-                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_HACHA)
+                    enemigo.recibir_knockback(direccion, KNOCKBACK_FUERZA_RIFLE)
     
     def dibujar(self, pantalla, camara):
         """
