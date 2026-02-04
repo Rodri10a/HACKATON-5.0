@@ -1,139 +1,139 @@
 <div align="center">
 
-# 👨‍🌾 KARAI SURVIVAL
+# KARAI SURVIVAL
 
-### 🇵🇾 Sobreviví a las Leyendas del Paraguay 🇵🇾
+### Sobrevivi a las Leyendas del Paraguay
 
 <img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
 <img src="https://img.shields.io/badge/Pygame-2.6-green?style=for-the-badge&logo=python&logoColor=white" alt="Pygame">
 <img src="https://img.shields.io/badge/Genre-Roguelike-red?style=for-the-badge" alt="Genre">
 <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" alt="Status">
 
-**Un roguelike de acción y supervivencia en 2D inspirado en el folklore paraguayo**
+**Un roguelike de accion y supervivencia en 2D inspirado en el folklore paraguayo**
 
-[🎮 Jugar Ahora](#instalación) • [📖 Documentación](#características) • [👥 Equipo](#equipo-de-desarrollo) • [🚀 Roadmap](#roadmap)
+[Jugar Ahora](#instalacion) | [Documentacion](#caracteristicas) | [Equipo](#equipo-de-desarrollo) | [Roadmap](#roadmap)
 
 ---
 
 </div>
 
-## 🌟 Sobre el Juego
+## Sobre el Juego
 
-**KARAI SURVIVAL** te sumerge en las tierras paraguayas donde deberás encarnar a un valiente **Campesino** enfrentando oleadas interminables de criaturas del folklore local. A medida que el tiempo avanza, la fauna hostil se vuelve cada vez más implacable y despiadada.
+**KARAI SURVIVAL** te sumerge en las tierras paraguayas donde deberas encarnar a un valiente **Campesino** enfrentando oleadas interminables de criaturas del folklore local. A medida que el tiempo avanza, la fauna hostil se vuelve cada vez mas implacable y despiadada.
 
-### 🎯 Objetivo Principal
-Sobreviví el mayor tiempo posible mientras recolectás **experiencia** para transformar tus humildes herramientas de trabajo en **armas de destrucción masiva**. Cada segundo cuenta, cada decisión importa.
+### Objetivo Principal
+Sobrevivi el mayor tiempo posible mientras recolectas **experiencia** para transformar tus humildes herramientas de trabajo en **armas de destruccion masiva**. Cada segundo cuenta, cada decision importa.
 
-### ✨ Lo que hace único a KARAI SURVIVAL
-- 🏞️ **Ambientación 100% Paraguaya**: Enemigos basados en leyendas y mitos locales
-- ⚔️ **Sistema de Progresión Dinámico**: Las armas evolucionan con vos
-- 🎵 **Soundtrack Paraguayo Auténtico**: Música que te conecta con la tierra
-- 🎨 **Arte Pixel Art 2D**: Estética retro con identidad regional
-- 💀 **Dificultad Creciente**: Cada minuto que sobrevivís, el desafío aumenta
+### Lo que hace unico a KARAI SURVIVAL
+- **Ambientacion 100% Paraguaya**: Enemigos basados en leyendas y mitos locales
+- **Sistema de Progresion Dinamico**: Las armas evolucionan con vos
+- **Soundtrack Paraguayo Autentico**: Musica que te conecta con la tierra
+- **Arte Pixel Art 2D**: Estetica retro con identidad regional
+- **Dificultad Creciente**: Cada minuto que sobrevivis, el desafio aumenta
 
 ---
 
-## 👥 Equipo de Desarrollo
+## Equipo de Desarrollo
 
 <table align="center">
 <tr>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/rodrigo.png" width="100px" style="border-radius:50%"/><br>
-<b>Rodrigo Argüello</b><br>
+<b>Rodrigo Arguello</b><br>
 <i>Team Lead</i><br>
-<sub>🎮 Lógica del Juego</sub><br>
-<sub>🏗️ Arquitectura</sub><br>
-<sub>🔀 Git/GitHub</sub><br>
-<sub>👨‍💼 Gestión de Tareas</sub>
+<sub>Logica del Juego</sub><br>
+<sub>Arquitectura</sub><br>
+<sub>Git/GitHub</sub><br>
+<sub>Gestion de Tareas</sub>
 </td>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/eduardo.png" width="100px" style="border-radius:50%"/><br>
 <b>Eduardo Lugo</b><br>
 <i>Visual & Audio Designer</i><br>
-<sub>🎨 Diseño de Armas</sub><br>
-<sub>🔊 Efectos de Sonido</sub><br>
-<sub>🎵 Música</sub>
+<sub>Diseno de Armas</sub><br>
+<sub>Efectos de Sonido</sub><br>
+<sub>Musica</sub>
 </td>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/edgar.png" width="100px" style="border-radius:50%"/><br>
 <b>Edgar Ojeda</b><br>
 <i>Character Artist</i><br>
-<sub>👨‍🌾 Diseño de Personajes</sub><br>
-<sub>👹 Diseño de Enemigos</sub><br>
-<sub>🎨 Sprites & Animaciones</sub>
+<sub>Diseno de Personajes</sub><br>
+<sub>Diseno de Enemigos</sub><br>
+<sub>Sprites & Animaciones</sub>
 </td>
 </tr>
 <tr>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/marcos.png" width="100px" style="border-radius:50%"/><br>
-<b>Marcos Cáceres</b><br>
+<b>Marcos Caceres</b><br>
 <i>Game Systems Developer</i><br>
-<sub>⚙️ Configuración del Juego</sub><br>
-<sub>👤 Sistema de Personajes</sub><br>
-<sub>🎮 Player Controller</sub>
+<sub>Configuracion del Juego</sub><br>
+<sub>Sistema de Personajes</sub><br>
+<sub>Player Controller</sub>
 </td>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/oscar.png" width="100px" style="border-radius:50%"/><br>
-<b>Óscar López</b><br>
+<b>Oscar Lopez</b><br>
 <i>Level Designer</i><br>
-<sub>🗺️ Sistema de Mapas</sub><br>
-<sub>🌍 Diseño de Niveles</sub><br>
-<sub>🏞️ Ambientación</sub>
+<sub>Sistema de Mapas</sub><br>
+<sub>Diseno de Niveles</sub><br>
+<sub>Ambientacion</sub>
 </td>
 <td align="center" width="200px">
 <img src="https://github.com/identicons/alexis.png" width="100px" style="border-radius:50%"/><br>
 <b>Alexis Samudio</b><br>
 <i>UI/UX Designer</i><br>
-<sub>🖥️ Interfaz Gráfica</sub><br>
-<sub>📊 HUD & Menús</sub><br>
-<sub>✨ Experiencia de Usuario</sub>
+<sub>Interfaz Grafica</sub><br>
+<sub>HUD & Menus</sub><br>
+<sub>Experiencia de Usuario</sub>
 </td>
 </tr>
 </table>
 
 ---
 
-## 💻 Stack Tecnológico
+## Stack Tecnologico
 
 <div align="center">
 
-| Categoría | Tecnología | Versión | Propósito |
+| Categoria | Tecnologia | Version | Proposito |
 |-----------|-----------|---------|-----------|
-| **Lenguaje** | ![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white) | 3.12 | Desarrollo principal |
-| **Game Engine** | ![Pygame](https://img.shields.io/badge/Pygame-2.6-green?style=flat) | 2.6 | Motor de juego 2D |
-| **Version Control** | ![Git](https://img.shields.io/badge/Git-F05032?style=flat&logo=git&logoColor=white) | Latest | Control de versiones |
-| **Hosting** | ![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat&logo=github) | - | Repositorio del proyecto |
+| **Lenguaje** | Python | 3.12 | Desarrollo principal |
+| **Game Engine** | Pygame | 2.6 | Motor de juego 2D |
+| **Version Control** | Git | Latest | Control de versiones |
+| **Hosting** | GitHub | - | Repositorio del proyecto |
 | **Arte** | Pixel Art 2D | - | Estilo visual retro |
-| **Audio** | WAV/MP3 | - | Efectos y música |
+| **Audio** | WAV/MP3 | - | Efectos y musica |
 
 </div>
 
 ---
 
-## 🎮 Características del Juego
+## Caracteristicas del Juego
 
-### 👹 Enemigos del Folklore Paraguayo
+### Enemigos del Folklore Paraguayo
 
 <table>
 <tr>
 <td width="50%">
 
 **Criaturas Terrestres**
-- 🐺 **Lobo** - Rápido y agresivo
-- 🦎 **Yacaré** - Lento pero resistente
-- 🐍 **Serpiente** - Movimientos impredecibles
-- 👻 **Luison** - El séptimo hijo, criatura de la noche
-- 🐕 **Aoao** - Espíritu protector convertido en amenaza
+- **Lobo** - Rapido y agresivo
+- **Yacare** - Lento pero resistente
+- **Serpiente** - Movimientos impredecibles
+- **Luison** - El septimo hijo, criatura de la noche
+- **Aoao** - Espiritu protector convertido en amenaza
 
 </td>
 <td width="50%">
 
 **Criaturas Voladoras**
-- 🦟 **Mosquito** - Pequeño pero molesto
-- 🦇 **[Próximamente]** - Más enemigos en desarrollo
+- **Mosquito** - Pequeno pero molesto
+- **[Proximamente]** - Mas enemigos en desarrollo
 
-**💀 Escalada de Dificultad**
-- Enemigos más rápidos con el tiempo
+**Escalada de Dificultad**
+- Enemigos mas rapidos con el tiempo
 - Mayor cantidad de spawns
 - Combinaciones letales de enemigos
 
@@ -141,54 +141,54 @@ Sobreviví el mayor tiempo posible mientras recolectás **experiencia** para tra
 </tr>
 </table>
 
-### ⚔️ Arsenal del Campesino
+### Arsenal del Campesino
 
-| Arma | Tipo | Evolución |
+| Arma | Tipo | Evolucion |
 |------|------|-----------|
-| 🔪 **Machete** | Cuerpo a cuerpo | ⭐ → ⭐⭐ → ⭐⭐⭐ |
-| 🔫 **Rifle** | Distancia | ⭐ → ⭐⭐ → ⭐⭐⭐ |
+| **Machete** | Cuerpo a cuerpo | Nv1 -> Nv2 -> Nv3 -> Nv4 |
+| **Rifle** | Distancia | Nv1 -> Nv2 -> Nv3 -> Nv4 |
+| **Carrulin** | Area | Nv1 -> Nv2 -> Nv3 -> Nv4 |
+| **Terere** | Buff | Nv1 -> Nv2 -> Nv3 -> Nv4 |
 
-> **Sistema de Mejora**: Las armas suben de nivel automáticamente al ganar experiencia
+> **Sistema de Mejora**: Las armas suben de nivel automaticamente al ganar experiencia
 
-### 🎁 Power-Ups
+### Power-Ups
 
-- 🫚 **Jengibre** - Restaura vida instantáneamente
-- ⚡ **Boost de Velocidad** - Aumenta la velocidad de movimiento temporalmente
-- 🧉 **Tereré** *(Próximamente)* - Regeneración de vida
+- **Jengibre** - Restaura vida instantaneamente
+- **Boost de Velocidad** - Aumenta la velocidad de movimiento temporalmente
+- **Terere** - Regeneracion de vida
 
 ---
 
-## 🎯 Gameplay y Controles
+## Gameplay y Controles
 
 <div align="center">
 
-### 🕹️ Controles
+### Controles
 ```
-┌─────────────────────────────────────┐
-│  ⬆️ W         → Mover Arriba       │
-│  ⬇️ S         → Mover Abajo        │
-│  ⬅️ A         → Mover Izquierda    │
-│  ➡️ D         → Mover Derecha      │
-│  SPACE BAR    → Atacar              │
-│  MOUSE        → Apuntar             │
-└─────────────────────────────────────┘
+W         -> Mover Arriba
+S         -> Mover Abajo
+A         -> Mover Izquierda
+D         -> Mover Derecha
+SPACE BAR -> Atacar
+MOUSE     -> Apuntar
 ```
 
-### 🎮 Mecánicas Principales
+### Mecanicas Principales
 
-| Mecánica | Descripción |
+| Mecanica | Descripcion |
 |----------|-------------|
-| 💀 **Sobrevivir** | Resiste oleadas infinitas de enemigos |
-| ⭐ **Recolectar XP** | Derrota enemigos y recoge orbs de experiencia |
-| 📈 **Subir de Nivel** | Desbloquea mejoras para tus armas |
-| 🎯 **Estrategia** | Los enemigos dropean buffs ocasionales |
-| ⏱️ **Contra Reloj** | Cada minuto que pasa, aumenta la dificultad |
+| **Sobrevivir** | Resiste oleadas infinitas de enemigos |
+| **Recolectar XP** | Derrota enemigos y recoge orbs de experiencia |
+| **Subir de Nivel** | Desbloquea mejoras para tus armas |
+| **Estrategia** | Los enemigos dropean buffs ocasionales |
+| **Contra Reloj** | Cada minuto que pasa, aumenta la dificultad |
 
 </div>
 
 ---
 
-## 🚀 Instalación y Ejecución
+## Instalacion y Ejecucion
 
 ### Requisitos Previos
 ```bash
@@ -199,20 +199,20 @@ python --version
 pip --version
 ```
 
-### Instalación
+### Instalacion
 
-1️⃣ **Clonar el repositorio**
+1. **Clonar el repositorio**
 ```bash
 git clone https://github.com/Rodri10a/HACKATON-5.0.git
 cd HACKATON-5.0
 ```
 
-2️⃣ **Instalar dependencias**
+2. **Instalar dependencias**
 ```bash
 pip install -r requirements.txt
 ```
 
-3️⃣ **Ejecutar el juego**
+3. **Ejecutar el juego**
 ```bash
 python main.py
 ```
@@ -222,78 +222,58 @@ python main.py
 KARAI-SURVIVAL/
 ├── assets/
 │   ├── sprites/      # Personajes, enemigos, armas
-│   ├── audio/        # Música y efectos de sonido
+│   ├── audio/        # Musica y efectos de sonido
 │   └── ui/           # Elementos de interfaz
 ├── src/
-│   ├── game/         # Lógica principal del juego
+│   ├── game/         # Logica principal del juego
 │   ├── entities/     # Clases de personajes y enemigos
 │   ├── systems/      # Sistemas de juego (colisiones, spawn, etc.)
-│   └── ui/           # Interfaces y menús
-├── config/           # Archivos de configuración
+│   └── ui/           # Interfaces y menus
+├── config/           # Archivos de configuracion
 ├── main.py           # Punto de entrada
 └── requirements.txt  # Dependencias
 ```
 
 ---
 
-## 🎨 Capturas de Pantalla
+## Logros y Desafios
 
-<div align="center">
+### Desafios Superados
+- Implementacion completa de **Pygame** desde cero
+- Sistema de **logica de juego** roguelike funcional
+- **Sistema de colisiones** optimizado y preciso
+- Integracion de **arte, sonido y codigo** en tiempo record
+- Trabajo colaborativo mediante **Git flow** profesional
 
-### 🏠 Menú Principal
-![Menu](docs/screenshots/menu.png)
-*Interfaz principal con diseño paraguayo*
-
-### 🎮 Gameplay
-![Gameplay](docs/screenshots/gameplay.png)
-*Acción intensa contra criaturas del folklore*
-
-### 💀 Game Over
-![GameOver](docs/screenshots/gameover.png)
-*Estadísticas finales y puntuación*
-
-</div>
-
----
-
-## 🏆 Logros y Desafíos
-
-### 💪 Desafíos Superados
-- ✅ Implementación completa de **Pygame** desde cero
-- ✅ Sistema de **lógica de juego** roguelike funcional
-- ✅ **Sistema de colisiones** optimizado y preciso
-- ✅ Integración de **arte, sonido y código** en tiempo récord
-- ✅ Trabajo colaborativo mediante **Git flow** profesional
-
-### 🎯 Aprendizajes Clave
-- Gestión de proyectos con Git y GitHub
+### Aprendizajes Clave
+- Gestion de proyectos con Git y GitHub
 - Desarrollo de juegos con Pygame
-- Diseño de sistemas roguelike
-- Trabajo en equipo bajo presión
-- Optimización de rendimiento en Python
+- Diseno de sistemas roguelike
+- Trabajo en equipo bajo presion
+- Optimizacion de rendimiento en Python
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### 🔜 Próximas Actualizaciones
+### Proximas Actualizaciones
 
-#### Versión 1.1 - Expansión de Contenido
+#### Version 1.1 - Expansion de Contenido
 - [ ] 5+ Nuevos enemigos del folklore paraguayo
 - [ ] 3+ Nuevas armas tradicionales
 - [ ] Sistema de personajes jugables
-- [ ] Jefes finales épicos
+- [ ] Jefes finales epicos
 
-#### Versión 1.2 - Nuevos Mundos
-- [ ] Mapas adicionales (Selva, Pueblo, Río)
-- [ ] Biomas con mecánicas únicas
-- [ ] Sistema de clima dinámico
+#### Version 1.2 - Nuevos Mundos
+- [ ] Mapas adicionales (Selva, Pueblo, Rio)
+- [ ] Biomas con mecanicas unicas
+- [ ] Sistema de clima dinamico
 
-#### Versión 2.0 - Multiplataforma
-- [ ] 📱 Versión móvil (Android/iOS)
-- [ ] 💾 Sistema de guardado en la nube
-- [ ] 🏆 Tablas de clasificación globales
-- [ ] 🎮 Soporte para gamepad
+#### Version 2.0 - Multiplataforma
+- [ ] Version movil (Android/iOS)
+- [ ] Sistema de guardado en la nube
+- [ ] Tablas de clasificacion globales
+- [ ] Soporte para gamepad
 
 #### Futuro
 - [ ] Modo multijugador cooperativo
@@ -303,35 +283,35 @@ KARAI-SURVIVAL/
 
 ---
 
-## 📜 Licencia
+## Licencia
 
 Este proyecto fue desarrollado durante la **Hackathon 5.0** como proyecto educativo.
 
 ---
 
-## 🙏 Agradecimientos
+## Agradecimientos
 
-- 🎓 A los organizadores de la Hackathon 5.0
-- 🇵🇾 A la rica cultura y folklore paraguayo que inspiró este juego
-- 👥 A cada miembro del equipo por su dedicación y talento
-- 🎮 A la comunidad de Pygame por sus recursos
+- A los organizadores de la Hackathon 5.0
+- A la rica cultura y folklore paraguayo que inspiro este juego
+- A cada miembro del equipo por su dedicacion y talento
+- A la comunidad de Pygame por sus recursos
 
 ---
 
-## 📞 Contacto y Contribuciones
+## Contacto y Contribuciones
 
 <div align="center">
 
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/Rodri10a/HACKATON-5.0)
 
-**¿Encontraste un bug? ¿Tenés una idea?**
+**Encontraste un bug? Tenes una idea?**
 
-[Reportar Bug](https://github.com/Rodri10a/HACKATON-5.0/issues) • [Sugerir Feature](https://github.com/Rodri10a/HACKATON-5.0/issues) • [Contribuir](https://github.com/Rodri10a/HACKATON-5.0/pulls)
+[Reportar Bug](https://github.com/Rodri10a/HACKATON-5.0/issues) | [Sugerir Feature](https://github.com/Rodri10a/HACKATON-5.0/issues) | [Contribuir](https://github.com/Rodri10a/HACKATON-5.0/pulls)
 
 ---
 
-<sub>Desarrollado con ❤️ y 🧉 en Paraguay</sub>
+<sub>Desarrollado con amor y terere en Paraguay</sub>
 
-**© 2025 KARAI SURVIVAL Team - Hackathon 5.0**
+**2025 KARAI SURVIVAL Team - Hackathon 5.0**
 
 </div>

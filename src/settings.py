@@ -25,11 +25,11 @@ CAMPESINO_RADIO_RECOLECCION = 80  # Más grande para recoger XP más fácil
 
 # ========== SISTEMA DE EXPERIENCIA (MÁS FÁCIL) ==========
 # Cada nivel se completa en aprox 30-45 segundos
-XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650] 
+XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650]
 
 # ========== CONFIGURACIÓN DE ENEMIGOS ==========
 ENEMIGO_CONFIGS = {
-    "MOSQUITO": { 
+    "MOSQUITO": {
         "vida": 10,
         "velocidad": 110,
         "daño": 2,
@@ -74,7 +74,7 @@ ENEMIGO_CONFIGS = {
         "ancho": 80,          # Fantasma vertical con brazos
         "alto": 100,
     },
-    
+
     "LUISON": {
         "vida": 350,
         "velocidad": 40,
@@ -106,8 +106,8 @@ ARMAS_CONFIG = {
         "niveles": [
         {"daño": 30, "alcance": 95},
         {"daño": 35, "alcance": 100},
-        {"daño": 40, "alcance": 110}, 
-        {"daño": 50, "alcance": 120}    
+        {"daño": 40, "alcance": 110},
+        {"daño": 50, "alcance": 120}
 ]
     },
     "RIFLE": {
@@ -127,14 +127,25 @@ ARMAS_CONFIG = {
         "alcance": 100,
         "cooldown": 4.0,        # Más rápido
         "tipo": "aoe",
-        "niveles": [ 
+        "niveles": [
             {"daño": 25, "radio": 70},
             {"daño": 38, "radio": 90},
             {"daño": 55, "radio": 120},
             {"daño": 80, "radio": 160}
         ]
+    },
+    "TERERE": {
+        "daño_base": 0,
+        "cooldown": 20.0,
+        "tipo": "buff",
+        "niveles": [
+            {"vida_por_seg": 3, "duracion": 6},
+            {"vida_por_seg": 6, "duracion": 8},
+            {"vida_por_seg": 8, "duracion": 10},
+            {"vida_por_seg": 10, "duracion": 12}
+        ]
     }
-    
+
 }
 
 # ========== CONFIGURACIÓN DE MAPA ==========
@@ -142,7 +153,7 @@ TILE_SIZE = 64
 MAPA_ANCHO_TILES = 20
 MAPA_ALTO_TILES = 20
 MAPA_ANCHO_PIXELES = MAPA_ANCHO_TILES * TILE_SIZE
-MAPA_ALTO_PIXELES = MAPA_ALTO_TILES * TILE_SIZE 
+MAPA_ALTO_PIXELES = MAPA_ALTO_TILES * TILE_SIZE
 
 # ========== CONFIGURACIÓN DE CÁMARA ==========
 CAMARA_VELOCIDAD_SEGUIMIENTO = 5
