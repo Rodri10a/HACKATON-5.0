@@ -134,18 +134,6 @@ ARMAS_CONFIG = {
             {"daño": 80, "radio": 160}
         ]
     },
-    "TERERE": {
-        "daño_base": 0,
-        "cooldown": 20.0,
-        "tipo": "buff",
-        "niveles": [
-            {"vida_por_seg": 3, "duracion": 6},
-            {"vida_por_seg": 6, "duracion": 8},
-            {"vida_por_seg": 8, "duracion": 10},
-            {"vida_por_seg": 10, "duracion": 12}
-        ]
-    }
-
 }
 
 # ========== CONFIGURACIÓN DE MAPA ==========

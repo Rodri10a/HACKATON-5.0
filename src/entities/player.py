@@ -21,8 +21,8 @@ class Player(BaseEntity):
             y: Posición Y inicial
             assets: Referencia al AssetLoader para sonidos
         """
-        # Llamar constructor padre con sprite
-        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player_frame1.png")
+        # Llamar constructor padre con sprite - Tamaño más grande
+        super().__init__(x, y, 70, 160, (255, 200, 0), sprite_path="assets/sprites/player_frame1.png")
 
         # Referencia a assets para sonidos
         self.assets = assets
@@ -76,22 +76,26 @@ class Player(BaseEntity):
         self.duracion_regeneracion = 7.0  # segundos
         self.vida_regenerada_por_segundo = 10
 
+        # Tereré automático cada 25 segundos
+        self.tiempo_para_terere = 0
+        self.intervalo_terere = 25.0  # segundos
+
     def cargar_frames_animacion(self):
         """Cargar los 2 frames de animación del jugador"""
         try:
-            # Frame 1
+            # Frame 1 - Tamaño más grande (70x160)
             frame1 = pygame.image.load("assets/sprites/karai1.png").convert_alpha()
-            frame1 = pygame.transform.scale(frame1, (50, 130))
+            frame1 = pygame.transform.scale(frame1, (70, 160))
             self.frames_animacion.append(frame1)
 
-            # Frame 2
+            # Frame 2 - Tamaño más grande (70x160)
             frame2 = pygame.image.load("assets/sprites/karai2.png").convert_alpha()
-            frame2 = pygame.transform.scale(frame2, (50, 130))
+            frame2 = pygame.transform.scale(frame2, (70, 160))
             self.frames_animacion.append(frame2)
 
         except:
             # Si falla cargar los frames, usar placeholder
-            placeholder = pygame.Surface((50, 50))
+            placeholder = pygame.Surface((70, 160))
             placeholder.fill((255, 200, 0))
             self.frames_animacion.append(placeholder)
             self.frames_animacion.append(placeholder.copy())
@@ -460,6 +464,23 @@ class Player(BaseEntity):
                 self.regenerando = False
                 self.tiempo_regeneracion = 0
 
+    def actualizar_terere_automatico(self, dt):
+        """
+        Activar tereré automáticamente cada 25 segundos
+
+        Args:
+            dt: Delta time en segundos
+        """
+        self.tiempo_para_terere += dt
+
+        if self.tiempo_para_terere >= self.intervalo_terere:
+            self.tiempo_para_terere = 0
+            self.aplicar_buff_terere()
+
+            # Reproducir sonido si está disponible
+            if self.assets:
+                self.assets.reproducir_sonido("terere", volumen=0.4)
+
     def actualizar(self, dt):
         """
         Actualización principal del jugador
@@ -484,6 +505,9 @@ class Player(BaseEntity):
 
         # Actualizar regeneración
         self.actualizar_regeneracion(dt)
+
+        # Actualizar tereré automático
+        self.actualizar_terere_automatico(dt)
 
         # Actualizar tiempo de supervivencia
         self.tiempo_supervivencia += dt
