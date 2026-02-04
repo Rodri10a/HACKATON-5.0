@@ -57,6 +57,12 @@ class Player(BaseEntity):
         
         # Flag para subida de nivel
         self.subio_nivel = False
+        
+        # Sistema de regeneración (por terere)
+        self.regenerando = False
+        self.tiempo_regeneracion = 0
+        self.duracion_regeneracion = 7.0  # segundos
+        self.vida_regenerada_por_segundo = 10
     
     def manejar_input(self):
         """Procesar input del teclado para movimiento"""
@@ -342,6 +348,30 @@ class Player(BaseEntity):
         else:
             super().dibujar(pantalla, camara)
     
+    def aplicar_buff_terere(self):
+        """Aplicar buff de regeneración del terere"""
+        self.regenerando = True
+        self.tiempo_regeneracion = 0
+    
+    def actualizar_regeneracion(self, dt):
+        """
+        Actualizar sistema de regeneración
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        if self.regenerando:
+            self.tiempo_regeneracion += dt
+            
+            # Regenerar vida cada segundo
+            vida_a_regenerar = self.vida_regenerada_por_segundo * dt
+            self.vida_actual = min(self.vida_actual + vida_a_regenerar, self.vida_maxima)
+            
+            # Detener regeneración después de la duración
+            if self.tiempo_regeneracion >= self.duracion_regeneracion:
+                self.regenerando = False
+                self.tiempo_regeneracion = 0
+    
     def actualizar(self, dt):
         """
         Actualización principal del jugador
@@ -360,6 +390,9 @@ class Player(BaseEntity):
         
         # Actualizar invulnerabilidad
         self.actualizar_invulnerabilidad(dt)
+        
+        # Actualizar regeneración
+        self.actualizar_regeneracion(dt)
         
         # Actualizar tiempo de supervivencia
         self.tiempo_supervivencia += dt
