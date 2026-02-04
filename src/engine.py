@@ -10,6 +10,7 @@ from constants import GameState
 from settings import *
 from entities.player import Player
 from entities.weapon import Weapon
+from entities.enemy import TerrereItem
 from World.map import Map
 from World.camera import Camera
 from managers.spawn_manager import SpawnManager
@@ -44,7 +45,10 @@ class GameEngine:
         # Cargar assets
         print("Cargando assets...")
         self.assets = AssetLoader()
-        
+
+        # Reproducir música del menú al iniciar
+        self.assets.reproducir_musica("menu", volumen=0.2)
+
         # Sistemas del juego (se inicializan después)
         self.mapa = None
         self.jugador = None
@@ -52,6 +56,11 @@ class GameEngine:
         self.spawn_manager = None
         self.combat_manager = None
         self.ui_manager = None
+        
+        # Sistema de items (tereres)
+        self.tereres = []
+        self.timer_spawn_terere = 0
+        self.intervalo_spawn_terere = 25.0  # cada 15 segundos
         
         # Estadísticas de sesión
         self.tiempo_total_juego = 0
@@ -70,10 +79,10 @@ class GameEngine:
         # Crear jugador en el centro del mapa
         pos_inicial_x = MAPA_ANCHO_PIXELES // 2
         pos_inicial_y = MAPA_ALTO_PIXELES // 2
-        self.jugador = Player(pos_inicial_x, pos_inicial_y)
+        self.jugador = Player(pos_inicial_x, pos_inicial_y, self.assets)
         
         # Equipar machete inicial
-        machete = Weapon("MACHETE", self.jugador)
+        machete = Weapon("MACHETE", self.jugador, self.assets)
         self.jugador.armas_equipadas.append(machete)
         
         # Crear cámara
@@ -262,7 +271,7 @@ class GameEngine:
         self.jugador.aplicar_mejora(tipo, valor)
         
         if tipo == "nueva_arma":
-            nueva_arma = Weapon(valor, self.jugador)
+            nueva_arma = Weapon(valor, self.jugador, self.assets)
             self.jugador.armas_equipadas.append(nueva_arma)
     
     def actualizar(self):
@@ -295,6 +304,9 @@ class GameEngine:
 
         self.combat_manager.actualizar(self.dt)
         self.ui_manager.actualizar(self.dt)
+        
+        # Actualizar sistema de tereres
+        self.actualizar_tereres(self.dt)
         
         # Verificar si el jugador murió
         if not self.jugador.esta_vivo:
@@ -440,6 +452,11 @@ class GameEngine:
         self.mapa.dibujar(self.pantalla, self.camara)
         self.combat_manager.dibujar(self.pantalla, self.camara)
         self.spawn_manager.dibujar(self.pantalla, self.camara)
+        
+        # Dibujar tereres
+        for terere in self.tereres:
+            terere.dibujar(self.pantalla, self.camara)
+        
         self.jugador.dibujar(self.pantalla, self.camara)
         self.ui_manager.dibujar_hud()
         
@@ -473,6 +490,41 @@ class GameEngine:
         self.ui_manager.mostrar_pantalla_mejora = True
         pygame.mixer.music.set_volume(0.1)
     
+    def actualizar_tereres(self, dt):
+        """
+        Actualizar sistema de tereres
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        # Incrementar timer de spawn
+        self.timer_spawn_terere += dt
+        
+        # Spawnear nuevo terere si es tiempo
+        if self.timer_spawn_terere >= self.intervalo_spawn_terere:
+            self.spawnear_terere()
+            self.timer_spawn_terere = 0
+        
+        # Actualizar tereres
+        for terere in self.tereres[:]:
+            terere.actualizar(dt)
+            
+            # Verificar colisión con jugador
+            if self.jugador.rect.colliderect(terere.rect):
+                self.jugador.aplicar_buff_terere()
+                self.tereres.remove(terere)
+    
+    def spawnear_terere(self):
+        """Spawnear un terere en posición aleatoria"""
+        import random
+        
+        # Posición aleatoria en el mapa
+        x = random.uniform(100, MAPA_ANCHO_PIXELES - 100)
+        y = random.uniform(100, MAPA_ALTO_PIXELES - 100)
+        
+        terere = TerrereItem(x, y)
+        self.tereres.append(terere)
+    
     def game_over(self):
         """Manejar Game Over"""
         self.estado = GameState.GAME_OVER
@@ -484,6 +536,7 @@ class GameEngine:
         """Volver al menú principal"""
         self.estado = GameState.MENU
         self.assets.detener_musica()
+        self.assets.reproducir_musica("menu", volumen=0.3)
         self.limpiar_partida()
     
     def limpiar_partida(self):
@@ -493,6 +546,8 @@ class GameEngine:
         if self.combat_manager:
             self.combat_manager.orbes_xp.clear()
             self.combat_manager.efectos.clear()
+        
+        self.tereres.clear()
         
         self.mapa = None
         self.jugador = None

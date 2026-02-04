@@ -86,11 +86,11 @@ class Map:
                 fondo, 
                 (self.ancho_tiles * TILE_SIZE, self.alto_tiles * TILE_SIZE)
             )
-            superficie.blit(fondo, (0, 0))
+            superficie.blit(fondo, (0, 0)) 
             print("✓ Fondo del mapa cargado exitosamente")
         except Exception as e:
             print(f"✗ No se pudo cargar pasto_juego.png: {e}")
-            print("  Usando tiles de colores por defecto")
+            print("  Usando tiles de colores por defecto") 
             
             # Si no encuentra la imagen, usar tiles como antes
             for fila in range(self.alto_tiles):

@@ -98,7 +98,7 @@ class AssetLoader:
     
     def cargar_sprites_armas(self):
         """Cargar sprites de armas y proyectiles"""
-        armas = ["machete", "hacha", "azada", "terere"]
+        armas = ["machete", "rifle", "carrulim", "terere"]
         
         for arma in armas:
             ruta = os.path.join(self.dir_sprites, f"{arma}.png")

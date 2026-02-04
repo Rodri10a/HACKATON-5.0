@@ -12,16 +12,21 @@ from settings import *
 class Player(BaseEntity):
     """Clase del jugador - Campesino Paraguayo"""
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, assets=None):
         """
         Inicializar jugador
-        
+
         Args:
             x: Posición X inicial
             y: Posición Y inicial
+            assets: Referencia al AssetLoader para sonidos
         """
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png") 
+        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png")
+
+        # Referencia a assets para sonidos
+        self.assets = assets
+
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
         self.vida_actual = CAMPESINO_VIDA_MAX
@@ -40,6 +45,12 @@ class Player(BaseEntity):
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
         self.direccion = pygame.math.Vector2(0, 0)
         
+        #Rotacion y flip del sprite segun direccion
+        self.imagen_original = self.image.copy()
+        self.voltear_horizontalmente = False
+        self.ultima_direccion_x = 1  # 1: derecha, -1: izquierda
+
+
         # Cooldown de invulnerabilidad al recibir daño
         self.invulnerable = False
         self.tiempo_invulnerabilidad = 0
@@ -51,6 +62,12 @@ class Player(BaseEntity):
         
         # Flag para subida de nivel
         self.subio_nivel = False
+        
+        # Sistema de regeneración (por terere)
+        self.regenerando = False
+        self.tiempo_regeneracion = 0
+        self.duracion_regeneracion = 7.0  # segundos
+        self.vida_regenerada_por_segundo = 10
     
     def manejar_input(self):
         """Procesar input del teclado para movimiento"""
@@ -70,6 +87,10 @@ class Player(BaseEntity):
         if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
             self.direccion.x = 1
     
+    #actualizar direccion visual segun movimiento horizontal
+        if self.direccion.x != 0:
+            self.ultima_direccion_x = self.direccion.x
+            self.voltear_horizontalmente = (self.direccion.x < 0)
     def ganar_xp(self, cantidad):
         """
         Sumar XP y verificar subida de nivel
@@ -98,9 +119,13 @@ class Player(BaseEntity):
         
         # Curación completa al subir nivel
         self.vida_actual = self.vida_maxima
-        
+
         # Marcar que subió nivel (para que el engine pause)
         self.subio_nivel = True
+
+        # Reproducir sonido de subida de nivel
+        if self.assets:
+            self.assets.reproducir_sonido("subir_nivel", volumen=0.5)
     
     def generar_opciones_mejora(self):
         """
@@ -124,9 +149,34 @@ class Player(BaseEntity):
                 "descripcion": f"Desbloquear {arma}"
             })
         
-        # Opción 2: Mejorar arma existente (placeholder - implementar con sistema de armas)
-        # Por ahora agregamos mejoras pasivas
-        
+                # Opción 2: Mejorar arma existente (si puede mejorar)
+        for arma in self.armas_equipadas:
+            if arma.puede_mejorar():
+                nivel_actual = arma.nivel
+                nivel_siguiente = nivel_actual + 1
+
+                # Obtener descripción según tipo de arma
+                # Usar nivel_siguiente - 1 como índice (0-based indexing)
+                if arma.tipo_ataque == "melee":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "proyectil":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "aoe":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "buff":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                else:
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+
+                opciones_disponibles.append({
+                    "tipo": "mejorar_arma",
+                    "valor": arma,  # Referencia al objeto arma
+                    "descripcion": descripcion
+                })
         # Opción 3: Mejoras pasivas
         opciones_disponibles.append({
             "tipo": "aumentar_vida_max",
@@ -174,7 +224,10 @@ class Player(BaseEntity):
             # Agregar arma a disponibles
             if valor not in self.armas_disponibles:
                 self.armas_disponibles.append(valor)
-        
+        elif tipo_mejora == "mejorar_arma":
+            # Mejorar el arma referenciado en 'valor'
+            arma = valor
+            arma.subir_nivel()        
         elif tipo_mejora == "aumentar_vida_max":
             self.vida_maxima += valor
             self.vida_actual += valor  # También cura
@@ -260,6 +313,10 @@ class Player(BaseEntity):
                 if self.colisiona_con(orbe):
                     self.ganar_xp(orbe.cantidad)
                     orbes_a_eliminar.append(orbe)
+
+                    # Reproducir sonido de recolección
+                    if self.assets:
+                        self.assets.reproducir_sonido("recolectar_xp", volumen=0.2)
         
         # Eliminar orbes recolectadas
         for orbe in orbes_a_eliminar:
@@ -293,12 +350,40 @@ class Player(BaseEntity):
             pantalla: Surface de pygame
             camara: Objeto Camera
         """
+        #Aplicar flip horizontal si se voltea
+        imagen_actual = pygame.transform.flip(self.imagen_original, self.voltear_horizontalmente, False)
+        #Actualizar la imagen del jugador para dibujar
+        self.image = imagen_actual
         if self.invulnerable:
             # Parpadear cada 0.1 segundos
             if int(self.tiempo_invulnerabilidad * 10) % 2 == 0:
                 super().dibujar(pantalla, camara)
         else:
             super().dibujar(pantalla, camara)
+    
+    def aplicar_buff_terere(self):
+        """Aplicar buff de regeneración del terere"""
+        self.regenerando = True
+        self.tiempo_regeneracion = 0
+    
+    def actualizar_regeneracion(self, dt):
+        """
+        Actualizar sistema de regeneración
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        if self.regenerando:
+            self.tiempo_regeneracion += dt
+            
+            # Regenerar vida cada segundo
+            vida_a_regenerar = self.vida_regenerada_por_segundo * dt
+            self.vida_actual = min(self.vida_actual + vida_a_regenerar, self.vida_maxima)
+            
+            # Detener regeneración después de la duración
+            if self.tiempo_regeneracion >= self.duracion_regeneracion:
+                self.regenerando = False
+                self.tiempo_regeneracion = 0
     
     def actualizar(self, dt):
         """
@@ -318,6 +403,9 @@ class Player(BaseEntity):
         
         # Actualizar invulnerabilidad
         self.actualizar_invulnerabilidad(dt)
+        
+        # Actualizar regeneración
+        self.actualizar_regeneracion(dt)
         
         # Actualizar tiempo de supervivencia
         self.tiempo_supervivencia += dt
