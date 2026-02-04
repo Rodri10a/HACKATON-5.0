@@ -22,29 +22,36 @@ class Player(BaseEntity):
             assets: Referencia al AssetLoader para sonidos
         """
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png")
+        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player_frame1.png")
 
         # Referencia a assets para sonidos
         self.assets = assets
+
+        # Sistema de animación con 2 frames
+        self.frames_animacion = []
+        self.cargar_frames_animacion()
+        self.frame_actual = 0
+        self.tiempo_animacion = 0
+        self.velocidad_animacion = 0.15  # Segundos por frame (ajusta para más rápido/lento)
 
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
         self.vida_actual = CAMPESINO_VIDA_MAX
         self.velocidad = CAMPESINO_VELOCIDAD
-        
+
         # Sistema de experiencia y nivel
         self.nivel = 1
         self.xp_actual = 0
         self.xp_necesaria = XP_POR_NIVEL[0]
-        
+
         # Inventario de armas
         self.armas_equipadas = []
         self.armas_disponibles = ["MACHETE"]  # Empieza con machete
-        
+
         # Radio de recolección de XP
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
         self.direccion = pygame.math.Vector2(0, 0)
-        
+
         #Rotacion y flip del sprite segun direccion
         self.imagen_original = self.image.copy()
         self.voltear_horizontalmente = False
@@ -62,7 +69,50 @@ class Player(BaseEntity):
         
         # Flag para subida de nivel
         self.subio_nivel = False
-    
+
+    def cargar_frames_animacion(self):
+        """Cargar los 2 frames de animación del jugador"""
+        try:
+            # Frame 1
+            frame1 = pygame.image.load("assets/sprites/karai1.png").convert_alpha()
+            frame1 = pygame.transform.scale(frame1, (50, 130))
+            self.frames_animacion.append(frame1)
+
+            # Frame 2
+            frame2 = pygame.image.load("assets/sprites/karai2.png").convert_alpha()
+            frame2 = pygame.transform.scale(frame2, (50, 130))
+            self.frames_animacion.append(frame2)
+
+        except:
+            # Si falla cargar los frames, usar placeholder
+            placeholder = pygame.Surface((50, 50))
+            placeholder.fill((255, 200, 0))
+            self.frames_animacion.append(placeholder)
+            self.frames_animacion.append(placeholder.copy())
+
+    def actualizar_animacion(self, dt):
+        """
+        Actualizar frame de animación
+
+        Args:
+            dt: Delta time en segundos
+        """
+        # Solo animar si el jugador se está moviendo
+        if self.direccion.length() > 0:
+            self.tiempo_animacion += dt
+
+            # Cambiar de frame cuando pase el tiempo
+            if self.tiempo_animacion >= self.velocidad_animacion:
+                self.tiempo_animacion = 0
+                self.frame_actual = (self.frame_actual + 1) % len(self.frames_animacion)
+
+                # Actualizar imagen original con el nuevo frame
+                self.imagen_original = self.frames_animacion[self.frame_actual]
+        else:
+            # Si no se mueve, usar frame 0 (idle)
+            self.frame_actual = 0
+            self.imagen_original = self.frames_animacion[0]
+
     def manejar_input(self):
         """Procesar input del teclado para movimiento"""
         teclas = pygame.key.get_pressed()
@@ -357,21 +407,24 @@ class Player(BaseEntity):
     def actualizar(self, dt):
         """
         Actualización principal del jugador
-        
+
         Args:
             dt: Delta time en segundos
         """
         # Manejar input
         self.manejar_input()
-        
+
+        # Actualizar animación
+        self.actualizar_animacion(dt)
+
         # Mover
         self.mover(dt)
-        
+
         # Limitar al mapa
         self.limitar_al_mapa()
-        
+
         # Actualizar invulnerabilidad
         self.actualizar_invulnerabilidad(dt)
-        
+
         # Actualizar tiempo de supervivencia
         self.tiempo_supervivencia += dt
