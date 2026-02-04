@@ -12,16 +12,21 @@ from settings import *
 class Player(BaseEntity):
     """Clase del jugador - Campesino Paraguayo"""
     
-    def __init__(self, x, y):
+    def __init__(self, x, y, assets=None):
         """
         Inicializar jugador
-        
+
         Args:
             x: Posición X inicial
             y: Posición Y inicial
+            assets: Referencia al AssetLoader para sonidos
         """
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png") 
+        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png")
+
+        # Referencia a assets para sonidos
+        self.assets = assets
+
         # Stats del campesino
         self.vida_maxima = CAMPESINO_VIDA_MAX
         self.vida_actual = CAMPESINO_VIDA_MAX
@@ -108,9 +113,13 @@ class Player(BaseEntity):
         
         # Curación completa al subir nivel
         self.vida_actual = self.vida_maxima
-        
+
         # Marcar que subió nivel (para que el engine pause)
         self.subio_nivel = True
+
+        # Reproducir sonido de subida de nivel
+        if self.assets:
+            self.assets.reproducir_sonido("subir_nivel", volumen=0.5)
     
     def generar_opciones_mejora(self):
         """
@@ -298,6 +307,10 @@ class Player(BaseEntity):
                 if self.colisiona_con(orbe):
                     self.ganar_xp(orbe.cantidad)
                     orbes_a_eliminar.append(orbe)
+
+                    # Reproducir sonido de recolección
+                    if self.assets:
+                        self.assets.reproducir_sonido("recolectar_xp", volumen=0.2)
         
         # Eliminar orbes recolectadas
         for orbe in orbes_a_eliminar:
