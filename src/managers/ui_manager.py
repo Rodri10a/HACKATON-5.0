@@ -257,7 +257,7 @@ class UIManager:
     
     def dibujar_carta_mejora(self, x, y, ancho, alto, opcion, hover, indice):
         """
-        Dibujar una carta de mejora
+        Dibujar una carta de mejora mejorada
         
         Args:
             x: Posición X
@@ -269,39 +269,90 @@ class UIManager:
             indice: Índice de la carta
         """
         # Fondo de la carta
-        color_fondo = (60, 60, 70) if hover else (40, 40, 50)
+        color_fondo = (70, 70, 90) if hover else (45, 45, 60)
         pygame.draw.rect(self.pantalla, color_fondo, (x, y, ancho, alto), border_radius=12)
         
         # Borde (dorado si hover)
-        color_borde = (255, 215, 0) if hover else (100, 100, 120)
-        grosor_borde = 3 if hover else 2
+        color_borde = (255, 215, 0) if hover else (120, 120, 150)
+        grosor_borde = 4 if hover else 2
         pygame.draw.rect(self.pantalla, color_borde, (x, y, ancho, alto), grosor_borde, border_radius=12)
         
-        # Número de la carta
-        numero = self.fuente_grande.render(str(indice + 1), True, COLOR_XP if hover else (150, 150, 150))
-        rect_numero = numero.get_rect()
-        rect_numero.center = (x + ancho // 2, y + 45)
-        self.pantalla.blit(numero, rect_numero)
+        # Área para imagen
+        imagen_x = x + 10
+        imagen_y = y + 10
+        imagen_ancho = ancho - 20
+        # Aumentar el área de imagen para permitir imágenes más grandes (cuadradas)
+        imagen_alto = 140
         
-        # Título de la mejora
-        titulo = opcion.get("descripcion", "Mejora")
+        # Intentar cargar y mostrar imagen (forzar cuadrado)
+        imagen_ruta = opcion.get("imagen", "")
+        if imagen_ruta:
+            try:
+                img = pygame.image.load(imagen_ruta).convert_alpha()
+                # Forzar tamaño cuadrado: usar el menor lado disponible
+                max_w = imagen_ancho - 10
+                max_h = imagen_alto - 10
+                # Tamaño objetivo máximo (px) para la imagen cuadrada
+                objetivo_max = 140
+                size = min(objetivo_max, max_w, max_h)
+                # Escalar manteniendo calidad
+                img = pygame.transform.smoothscale(img, (size, size))
+                img_rect = img.get_rect()
+                img_rect.center = (imagen_x + imagen_ancho // 2, imagen_y + imagen_alto // 2)
+                self.pantalla.blit(img, img_rect)
+            except:
+                # Placeholder si la imagen no existe
+                pygame.draw.rect(self.pantalla, (100, 100, 120), (imagen_x, imagen_y, imagen_ancho, imagen_alto), 2)
+                placeholder = self.fuente_pequeña.render("?", True, (150, 150, 170))
+                placeholder_rect = placeholder.get_rect()
+                placeholder_rect.center = (imagen_x + imagen_ancho // 2, imagen_y + imagen_alto // 2)
+                self.pantalla.blit(placeholder, placeholder_rect)
+        
+        # Línea divisoria
+        linea_y = imagen_y + imagen_alto + 10
+        pygame.draw.line(self.pantalla, (100, 100, 120), (x + 10, linea_y), (x + ancho - 10, linea_y), 1)
+        
+        # Título
+        titulo = opcion.get("titulo", opcion.get("descripcion", "Mejora"))
         sup_titulo = self.fuente_media.render(titulo, True, (255, 255, 255))
         rect_titulo = sup_titulo.get_rect()
-        rect_titulo.center = (x + ancho // 2, y + 120)
+        rect_titulo.center = (x + ancho // 2, linea_y + 35)
         self.pantalla.blit(sup_titulo, rect_titulo)
         
-        # Tipo de mejora
-        tipo_texto = opcion.get("tipo", "").replace("_", " ").title()
-        sup_tipo = self.fuente_pequeña.render(tipo_texto, True, (180, 180, 180))
-        rect_tipo = sup_tipo.get_rect()
-        rect_tipo.center = (x + ancho // 2, y + 170)
-        self.pantalla.blit(sup_tipo, rect_tipo)
+        # Descripción
+        descripcion = opcion.get("descripcion", "")
+        sup_desc = self.fuente_pequeña.render(descripcion, True, (220, 220, 0))
+        rect_desc = sup_desc.get_rect()
+        rect_desc.center = (x + ancho // 2, linea_y + 70)
+        self.pantalla.blit(sup_desc, rect_desc)
         
-        # Texto "Seleccionar" abajo
+        # Detalles adicionales
+        detalles = opcion.get("detalles", "")
+        if detalles:
+            sup_detalles = self.fuente_tiny.render(detalles, True, (180, 180, 180))
+            rect_detalles = sup_detalles.get_rect()
+            rect_detalles.center = (x + ancho // 2, linea_y + 100)
+            self.pantalla.blit(sup_detalles, rect_detalles)
+        
+        # Información de nivel si aplica
+        if opcion.get("nivel_actual"):
+            nivel_texto = f"Nv. {opcion.get('nivel_actual')} → {opcion.get('nivel_siguiente')}"
+            sup_nivel = self.fuente_tiny.render(nivel_texto, True, (100, 200, 255))
+            rect_nivel = sup_nivel.get_rect()
+            rect_nivel.center = (x + ancho // 2, linea_y + 125)
+            self.pantalla.blit(sup_nivel, rect_nivel)
+        
+        # Número/índice en la esquina superior izquierda
+        numero = self.fuente_media.render(str(indice + 1), True, COLOR_XP if hover else (150, 150, 150))
+        rect_numero = numero.get_rect()
+        rect_numero.topleft = (x + 15, y + 15)
+        self.pantalla.blit(numero, rect_numero)
+        
+        # Texto "Seleccionar" abajo si hover
         if hover:
-            sup_seleccionar = self.fuente_pequeña.render("▶ Seleccionar", True, COLOR_XP)
+            sup_seleccionar = self.fuente_pequeña.render("▶ SELECCIONAR", True, COLOR_XP)
             rect_sel = sup_seleccionar.get_rect()
-            rect_sel.center = (x + ancho // 2, y + alto - 40)
+            rect_sel.center = (x + ancho // 2, y + alto - 30)
             self.pantalla.blit(sup_seleccionar, rect_sel)
     
     def manejar_click_mejora(self, pos_mouse, opciones):
