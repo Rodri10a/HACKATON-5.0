@@ -137,7 +137,10 @@ class Player(BaseEntity):
             opciones_disponibles.append({
                 "tipo": "nueva_arma",
                 "valor": arma,
-                "descripcion": f"Desbloquear {arma}"
+                "titulo": f"Desbloquear {arma}",
+                "descripcion": f"Obtén un nuevo arma: {arma}",
+                "detalles": f"Tipo: {ARMAS_CONFIG[arma]['tipo'].upper()}",
+                "imagen": f"assets/sprites/{arma.lower()}.png"
             })
         
                 # Opción 2: Mejorar arma existente (si puede mejorar)
@@ -150,41 +153,63 @@ class Player(BaseEntity):
                 # Usar nivel_siguiente - 1 como índice (0-based indexing)
                 if arma.tipo_ataque == "melee":
                     config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
-                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                    daño = config_siguiente.get("daño", 0)
+                    alcance = config_siguiente.get("alcance", 0)
+                    detalles = f"Daño: {daño} | Alcance: {alcance}"
                 elif arma.tipo_ataque == "proyectil":
                     config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
-                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                    daño = config_siguiente.get("daño", 0)
+                    cooldown = config_siguiente.get("cooldown", 0)
+                    detalles = f"Daño: {daño} | Velocidad: {cooldown:.1f}s"
                 elif arma.tipo_ataque == "aoe":
                     config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
-                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                    daño = config_siguiente.get("daño", 0)
+                    radio = config_siguiente.get("radio", 0)
+                    detalles = f"Daño: {daño} | Radio: {radio}px"
                 elif arma.tipo_ataque == "buff":
                     config_siguiente = arma.config["niveles"][nivel_siguiente - 1]
-                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                    vida_seg = config_siguiente.get("vida_por_seg", 0)
+                    duracion = config_siguiente.get("duracion", 0)
+                    detalles = f"Vida/s: {vida_seg} | Duración: {duracion}s"
                 else:
-                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                    detalles = f"Mejora nivel {nivel_siguiente}"
 
                 opciones_disponibles.append({
                     "tipo": "mejorar_arma",
-                    "valor": arma,  # Referencia al objeto arma
-                    "descripcion": descripcion
+                    "valor": arma,
+                    "titulo": f"Mejorar {arma.tipo}",
+                    "descripcion": f"Sube a nivel {nivel_siguiente}",
+                    "detalles": detalles,
+                    "imagen": f"assets/sprites/{arma.tipo.lower()}.png",
+                    "nivel_actual": nivel_actual,
+                    "nivel_siguiente": nivel_siguiente
                 })
         # Opción 3: Mejoras pasivas
         opciones_disponibles.append({
             "tipo": "aumentar_vida_max",
             "valor": MEJORAS_VALORES["vida_max"],
-            "descripcion": f"+{MEJORAS_VALORES['vida_max']} Vida Máxima"
+            "titulo": "Aumentar Vida",
+            "descripcion": f"+{MEJORAS_VALORES['vida_max']} de Vida Máxima",
+            "detalles": "Mejora tu resistencia",
+            "imagen": "assets/sprites/health.png"
         })
         
         opciones_disponibles.append({
             "tipo": "aumentar_velocidad",
             "valor": MEJORAS_VALORES["velocidad"],
-            "descripcion": f"+{MEJORAS_VALORES['velocidad']} Velocidad"
+            "titulo": "Aumentar Velocidad",
+            "descripcion": f"+{MEJORAS_VALORES['velocidad']} de Velocidad",
+            "detalles": "Muévete más rápido",
+            "imagen": "assets/sprites/speed.png"
         })
         
         opciones_disponibles.append({
             "tipo": "aumentar_radio_recoleccion",
             "valor": MEJORAS_VALORES["radio_recoleccion"],
-            "descripcion": f"+{MEJORAS_VALORES['radio_recoleccion']} Radio Recolección"
+            "titulo": "Expandir Radio",
+            "descripcion": f"+{MEJORAS_VALORES['radio_recoleccion']}px Radio",
+            "detalles": "Recolecta XP desde más lejos",
+            "imagen": "assets/sprites/radius.png"
         })
         
         # Si hay menos de 3 opciones, duplicar algunas
