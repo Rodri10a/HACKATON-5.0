@@ -44,7 +44,10 @@ class GameEngine:
         # Cargar assets
         print("Cargando assets...")
         self.assets = AssetLoader()
-        
+
+        # Reproducir música del menú al iniciar
+        self.assets.reproducir_musica("menu", volumen=0.2)
+
         # Sistemas del juego (se inicializan después)
         self.mapa = None
         self.jugador = None
@@ -70,10 +73,10 @@ class GameEngine:
         # Crear jugador en el centro del mapa
         pos_inicial_x = MAPA_ANCHO_PIXELES // 2
         pos_inicial_y = MAPA_ALTO_PIXELES // 2
-        self.jugador = Player(pos_inicial_x, pos_inicial_y)
+        self.jugador = Player(pos_inicial_x, pos_inicial_y, self.assets)
         
         # Equipar machete inicial
-        machete = Weapon("MACHETE", self.jugador)
+        machete = Weapon("MACHETE", self.jugador, self.assets)
         self.jugador.armas_equipadas.append(machete)
         
         # Crear cámara
@@ -262,7 +265,7 @@ class GameEngine:
         self.jugador.aplicar_mejora(tipo, valor)
         
         if tipo == "nueva_arma":
-            nueva_arma = Weapon(valor, self.jugador)
+            nueva_arma = Weapon(valor, self.jugador, self.assets)
             self.jugador.armas_equipadas.append(nueva_arma)
     
     def actualizar(self):
@@ -484,6 +487,7 @@ class GameEngine:
         """Volver al menú principal"""
         self.estado = GameState.MENU
         self.assets.detener_musica()
+        self.assets.reproducir_musica("menu", volumen=0.3)
         self.limpiar_partida()
     
     def limpiar_partida(self):
