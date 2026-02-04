@@ -41,6 +41,9 @@ class SpawnManager:
         
         # Límite de enemigos en pantalla
         self.max_enemigos = MAX_ENEMIGOS_PANTALLA
+        
+        # Referencia al combat_manager (se asigna desde engine)
+        self.combat_manager = None
     
     def actualizar(self, dt):
         """
@@ -97,30 +100,55 @@ class SpawnManager:
         Returns:
             string: Tipo de enemigo
         """
+        # Boss único a los 75 segundos
+        if int(self.tiempo_juego) == 75:
+            return "LUISON"
+
         # Crear lista ponderada de tipos
         opciones = []
         
         for tipo, config in ENEMIGO_CONFIGS.items():
             peso = config["spawn_peso"]
             
-            # Ajustar peso según tiempo de juego
-            # Enemigos más fuertes aparecen más seguido con el tiempo
-            if tipo == "AGUARA_GUAZU":  # Boss
-                # Solo aparece después de 5 minutos
-                if self.tiempo_juego < 300:
+ # Sistema de desbloqueo por tiempo específico
+            if tipo == "MOSQUITO":
+                # Disponible desde el inicio (siempre)
+                pass
+
+            elif tipo == "SERPIENTE":
+                # Desbloquea a los 10 segundos
+                if self.tiempo_juego < 10:
                     peso = 0
-                else:
-                    peso = int(peso * (self.tiempo_juego / 300))
-            
+
+            elif tipo == "YACARE":
+                # Desbloquea a los 18 segundos
+                if self.tiempo_juego < 18:
+                    peso = 0
+
+            elif tipo == "AOAO":
+                # Desbloquea a los 25 segundos
+                if self.tiempo_juego < 25:
+                    peso = 0
+
+            elif tipo == "PORA":
+                # Desbloquea a los 35 segundos
+                if self.tiempo_juego < 35:
+                    peso = 0
+
+            elif tipo == "LUISON":
+                # No aparece en el pool normal, solo en el segundo 75
+                peso = 0
+
             # Agregar tipo 'peso' veces a la lista
-            for _ in range(int(peso)):
-                opciones.append(tipo)
+            if peso > 0:
+                for _ in range(int(peso)):
+                    opciones.append(tipo)
         
         # Elegir aleatoriamente
         if opciones:
             return random.choice(opciones)
         else:
-            return "CARPINCHO"  # Fallback
+            return "MOSQUITO"  # Fallback
     
     def escalar_dificultad(self):
         """Aumentar dificultad progresivamente"""
@@ -146,6 +174,15 @@ class SpawnManager:
     
     def limpiar_enemigos_muertos(self):
         """Eliminar enemigos muertos de la lista"""
+        """Eliminar enemigos muertos de la lista y crear orbes de XP"""
+        # Primero crear orbes de XP para los enemigos muertos
+        if self.combat_manager:
+            for enemigo in self.enemigos:
+                if not enemigo.esta_vivo:
+                    # Crear orbe de XP en la posición del enemigo
+                    self.combat_manager.crear_orbe_xp(enemigo.x, enemigo.y, enemigo.xp_drop)
+
+        # Luego eliminar los enemigos muertos
         self.enemigos = [e for e in self.enemigos if e.esta_vivo]
     
     def obtener_enemigos_en_rango(self, x, y, rango):

@@ -10,7 +10,7 @@ import math
 class BaseEntity:
     """Clase base para todas las entidades del juego"""
     
-    def __init__(self, x, y, ancho, alto, color):
+    def __init__(self, x, y, ancho, alto, color, sprite_path=None):
         """
         Inicializar entidad base
         
@@ -20,14 +20,25 @@ class BaseEntity:
             ancho: Ancho de la entidad
             alto: Alto de la entidad
             color: Color RGB de la entidad
+            sprite_path: Ruta opcional del sprite
         """
         # Posición
         self.x = float(x)
         self.y = float(y)
         
         # Crear superficie y rect para colisiones
-        self.image = pygame.Surface((ancho, alto))
-        self.image.fill(color)
+        if sprite_path:
+            try:
+                self.image = pygame.image.load(sprite_path).convert_alpha()
+                self.image = pygame.transform.scale(self.image, (ancho, alto))
+            except:
+                # Si falla, usar color sólido
+                self.image = pygame.Surface((ancho, alto))
+                self.image.fill(color)
+        else:
+            self.image = pygame.Surface((ancho, alto))
+            self.image.fill(color)
+        
         self.rect = self.image.get_rect()
         self.rect.center = (int(self.x), int(self.y))
         

@@ -83,9 +83,12 @@ class GameEngine:
         
         # Crear spawn manager
         self.spawn_manager = SpawnManager(self.mapa, self.camara, self.jugador)
-        
+
         # Crear combat manager
         self.combat_manager = CombatManager(self.jugador, self.spawn_manager)
+
+        # Asignar combat_manager al spawn_manager para que pueda crear orbes
+        self.spawn_manager.combat_manager = self.combat_manager
         
         # Crear UI manager
         self.ui_manager = UIManager(self.pantalla, self.jugador)
@@ -120,7 +123,7 @@ class GameEngine:
         """Loop principal del juego"""
         while self.corriendo:
             # Calcular delta time
-            self.dt = self.clock.tick(FPS) / 1000.0  # Convertir ms a segundos
+            self.dt = self.clock.tick(FPS) / 1000.0
             self.fps_actual = self.clock.get_fps()
             
             # Actualizar tiempo total
@@ -149,11 +152,9 @@ class GameEngine:
             if evento.type == pygame.QUIT:
                 self.corriendo = False
             
-            # Eventos de teclado
             if evento.type == pygame.KEYDOWN:
                 self.manejar_tecla_presionada(evento.key)
             
-            # Eventos de mouse
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 self.manejar_click_mouse(evento.pos, evento.button)
     
@@ -177,10 +178,17 @@ class GameEngine:
             if tecla == pygame.K_ESCAPE:
                 self.pausar_juego()
             
+            # Atacar con machete al presionar ESPACIO
+            if tecla == pygame.K_SPACE:
+                for arma in self.jugador.armas_equipadas:
+                    if arma.tipo == "MACHETE" and arma.puede_usar:
+                        arma.usar(self.spawn_manager.enemigos)
+                        break
+            
             # Debug: teclas especiales
             if DEBUG_MODE:
                 if tecla == pygame.K_F1:
-                    self.jugador.ganar_xp(100)  # XP instantánea
+                    self.jugador.ganar_xp(100)
                 if tecla == pygame.K_F3:
                     self.jugador.vida_actual = self.jugador.vida_maxima
         
@@ -193,7 +201,6 @@ class GameEngine:
         
         # MEJORA
         elif self.estado == GameState.MEJORA:
-            # Las mejoras se manejan con clicks de mouse
             pass
         
         # GAME OVER
@@ -209,10 +216,9 @@ class GameEngine:
         
         Args:
             pos: Tupla (x, y) con posición del click
-            boton: Botón del mouse (1=izquierdo, 2=medio, 3=derecho)
+            boton: Botón del mouse
         """
-        # Solo procesar click izquierdo
-        if boton != 1:
+        if boton != 1: 
             return
         
         # MEJORA - Seleccionar mejora
@@ -224,14 +230,24 @@ class GameEngine:
                 )
                 
                 if indice is not None:
-                    # Aplicar mejora seleccionada
                     opcion = self.ui_manager.opciones_mejora[indice]
                     self.aplicar_mejora_seleccionada(opcion)
                     
-                    # Cerrar pantalla de mejora y reanudar juego
                     self.ui_manager.mostrar_pantalla_mejora = False
                     self.jugador.subio_nivel = False
                     self.estado = GameState.JUGANDO
+        
+        
+        # MENÚ - Click en el botón INICIAR JUEGO 
+        if self.estado == GameState.MENU:
+            boton_ancho = 300
+            boton_alto = 65
+            boton_x = ANCHO_VENTANA // 2 - boton_ancho // 2
+            boton_y = ALTO_VENTANA - 220 
+            
+            if boton_x <= pos[0] <= boton_x + boton_ancho and boton_y <= pos[1] <= boton_y + boton_alto:
+                self.inicializar_juego_nuevo()
+                self.estado = GameState.JUGANDO
     
     def aplicar_mejora_seleccionada(self, opcion):
         """
@@ -243,10 +259,8 @@ class GameEngine:
         tipo = opcion["tipo"]
         valor = opcion["valor"]
         
-        # Aplicar mejora al jugador
         self.jugador.aplicar_mejora(tipo, valor)
         
-        # Si es nueva arma, equiparla
         if tipo == "nueva_arma":
             nueva_arma = Weapon(valor, self.jugador)
             self.jugador.armas_equipadas.append(nueva_arma)
@@ -260,45 +274,26 @@ class GameEngine:
             self.actualizar_juego()
         
         elif self.estado == GameState.PAUSA:
-            # No actualizar nada en pausa
             pass
         
         elif self.estado == GameState.MEJORA:
-            # No actualizar juego, solo esperar selección
             pass
         
         elif self.estado == GameState.GAME_OVER:
-            # No actualizar juego
             pass
     
     def actualizar_menu(self):
         """Actualizar lógica del menú"""
-        # Animaciones del menú (opcional)
         pass
     
     def actualizar_juego(self):
         """Actualizar toda la lógica del juego"""
-        # Actualizar jugador
         self.jugador.actualizar(self.dt)
-        
-        # Actualizar armas del jugador
         self.jugador.actualizar_armas(self.dt, self.spawn_manager.enemigos)
-        
-        # Actualizar cámara
         self.camara.actualizar(self.dt)
-        
-        # Actualizar spawn de enemigos
         self.spawn_manager.actualizar(self.dt)
-        
-        # Verificar enemigos muertos y crear orbes XP
-        for enemigo in self.spawn_manager.enemigos:
-            if not enemigo.esta_vivo and enemigo not in self.combat_manager.orbes_xp:
-                self.combat_manager.verificar_muerte_enemigo(enemigo)
-        
-        # Actualizar sistema de combate
+
         self.combat_manager.actualizar(self.dt)
-        
-        # Actualizar UI
         self.ui_manager.actualizar(self.dt)
         
         # Verificar si el jugador murió
@@ -318,72 +313,136 @@ class GameEngine:
             self.dibujar_juego()
         
         elif self.estado == GameState.PAUSA:
-            self.dibujar_juego()  # Dibujar juego congelado
+            self.dibujar_juego()
             self.ui_manager.dibujar_menu_pausa()
         
         elif self.estado == GameState.MEJORA:
-            self.dibujar_juego()  # Dibujar juego de fondo
+            self.dibujar_juego()
             self.ui_manager.dibujar_pantalla_mejora(self.ui_manager.opciones_mejora)
         
         elif self.estado == GameState.GAME_OVER:
-            self.dibujar_juego()  # Mostrar último frame
+            self.dibujar_juego()
             self.ui_manager.dibujar_game_over()
     
     def dibujar_menu(self):
-        """Dibujar pantalla de menú"""
-        # Fondo negro
-        self.pantalla.fill((0, 0, 0))
+        """Dibujar pantalla de menú - solo imagen de fondo y boton"""
+        # Cargar fondo
+        try:
+            fondo = pygame.image.load("assets/sprites/fondo_karai.jpeg")
+            fondo = pygame.transform.scale(fondo, (ANCHO_VENTANA, ALTO_VENTANA))
+            self.pantalla.blit(fondo, (0, 0))
+        except:
+            self.pantalla.fill((0, 0, 0))
         
-        # Crear fuentes temporales para el menú
-        fuente_grande = pygame.font.Font(None, 48)
-        fuente_media = pygame.font.Font(None, 32)
-        fuente_pequeña = pygame.font.Font(None, 24)
+        # ========== BOTÓN ESTILO ORIGINAL ==========
+        boton_ancho = 300
+        boton_alto = 65
+        boton_x = ANCHO_VENTANA // 2 - boton_ancho // 2
+        boton_y = ALTO_VENTANA - 220  # Más abajo
         
-        # Título del juego
-        titulo = fuente_grande.render("KARAI SURVIVAL", True, COLOR_XP)
-        rect = titulo.get_rect()
-        rect.center = (ANCHO_VENTANA // 2, 150)
-        self.pantalla.blit(titulo, rect)
+        # Detectar hover
+        pos_mouse = pygame.mouse.get_pos()
+        hover = (boton_x <= pos_mouse[0] <= boton_x + boton_ancho and 
+                boton_y <= pos_mouse[1] <= boton_y + boton_alto)
         
-        # Instrucciones
-        instrucciones = [
-            "Usa WASD o Flechas para moverte",
-            "Las armas atacan automáticamente",
-            "Recolecta XP para subir de nivel",
-            "¡Sobrevive el mayor tiempo posible!",
-            "",
-            "Presiona ESPACIO para comenzar"
+        # Sombra del botón
+        pygame.draw.rect(self.pantalla, (0, 0, 0), 
+                        (boton_x + 4, boton_y + 4, boton_ancho, boton_alto), 
+                        border_radius=8)
+        
+        # Fondo principal del botón (madera oscura)
+        color_fondo = (90, 55, 20) if hover else (70, 40, 15)
+        pygame.draw.rect(self.pantalla, color_fondo, 
+                        (boton_x, boton_y, boton_ancho, boton_alto), 
+                        border_radius=8)
+        
+        # Borde exterior grueso (madera)
+        pygame.draw.rect(self.pantalla, (50, 30, 10), 
+                        (boton_x, boton_y, boton_ancho, boton_alto), 
+                        4, border_radius=8)
+        
+        # Borde interior dorado
+        pygame.draw.rect(self.pantalla, (200, 160, 50), 
+                        (boton_x + 6, boton_y + 6, boton_ancho - 12, boton_alto - 12), 
+                        2, border_radius=5)
+        
+        # Línea horizontal decorativa arriba
+        pygame.draw.line(self.pantalla, (200, 160, 50), 
+                        (boton_x + 15, boton_y + 12), 
+                        (boton_x + boton_ancho - 15, boton_y + 12), 2)
+        
+        # Línea horizontal decorativa abajo
+        pygame.draw.line(self.pantalla, (200, 160, 50), 
+                        (boton_x + 15, boton_y + boton_alto - 12), 
+                        (boton_x + boton_ancho - 15, boton_y + boton_alto - 12), 2)
+        
+        # ===== FLECHA IZQUIERDA (roja) =====
+        flecha_izq_x = boton_x + 18
+        flecha_izq_y = boton_y + boton_alto // 2
+        flecha_color = (220, 50, 30) if hover else (180, 40, 20)
+        
+        # Triángulo izquierdo
+        puntos_izq = [
+            (flecha_izq_x, flecha_izq_y),                    # Punta izquierda
+            (flecha_izq_x + 18, flecha_izq_y - 12),          # Arriba derecha
+            (flecha_izq_x + 18, flecha_izq_y + 12)           # Abajo derecha
         ]
+        pygame.draw.polygon(self.pantalla, flecha_color, puntos_izq)
+        pygame.draw.polygon(self.pantalla, (255, 100, 60), puntos_izq, 2)
         
-        y_offset = 300
-        for linea in instrucciones:
-            texto = fuente_pequeña.render(linea, True, COLOR_TEXTO)
-            rect = texto.get_rect()
-            rect.center = (ANCHO_VENTANA // 2, y_offset)
-            self.pantalla.blit(texto, rect)
-            y_offset += 35
+        # ===== FLECHA DERECHA (roja) =====
+        flecha_der_x = boton_x + boton_ancho - 18
+        flecha_der_y = boton_y + boton_alto // 2
+        
+        # Triángulo derecho
+        puntos_der = [
+            (flecha_der_x, flecha_der_y),                    # Punta derecha
+            (flecha_der_x - 18, flecha_der_y - 12),          # Arriba izquierda
+            (flecha_der_x - 18, flecha_der_y + 12)           # Abajo izquierda
+        ]
+        pygame.draw.polygon(self.pantalla, flecha_color, puntos_der)
+        pygame.draw.polygon(self.pantalla, (255, 100, 60), puntos_der, 2)
+        
+        # ===== TEXTO "► INICIAR JUEGO" =====
+        fuente_boton = pygame.font.Font(None, 40)
+        
+        # Sombra del texto
+        texto_sombra = fuente_boton.render("INICIAR JUEGO", True, (0, 0, 0))
+        rect_sombra = texto_sombra.get_rect()
+        rect_sombra.center = (ANCHO_VENTANA // 2 + 2, boton_y + boton_alto // 2 + 2)
+        self.pantalla.blit(texto_sombra, rect_sombra)
+        
+        # Texto principal (brillo si hover)
+        color_texto = (255, 240, 180) if hover else (240, 220, 160)
+        texto_boton = fuente_boton.render("INICIAR JUEGO", True, color_texto)
+        rect_boton = texto_boton.get_rect()
+        rect_boton.center = (ANCHO_VENTANA // 2, boton_y + boton_alto // 2)
+        self.pantalla.blit(texto_boton, rect_boton)
+        
+        # ===== PEQUEÑO TEXTO "Presiona ESPACIO" debajo =====
+        fuente_pequeña = pygame.font.Font(None, 22)
+        
+        # Sombra
+        esp_sombra = fuente_pequeña.render("o presiona ESPACIO para comenzar", True, (0, 0, 0))
+        rect_esp_sombra = esp_sombra.get_rect()
+        rect_esp_sombra.center = (ANCHO_VENTANA // 2 + 1, boton_y + boton_alto + 22)
+        self.pantalla.blit(esp_sombra, rect_esp_sombra)
+        
+        # Texto
+        esp_texto = fuente_pequeña.render("o presiona ESPACIO para comenzar", True, (200, 200, 200))
+        rect_esp = esp_texto.get_rect()
+        rect_esp.center = (ANCHO_VENTANA // 2, boton_y + boton_alto + 21)
+        self.pantalla.blit(esp_texto, rect_esp)
     
     def dibujar_juego(self):
         """Dibujar todo el juego"""
-        # Limpiar pantalla
         self.pantalla.fill(COLOR_FONDO)
-        
-        # Dibujar mapa
         self.mapa.dibujar(self.pantalla, self.camara)
-        
-        # Dibujar orbes de XP y efectos
         self.combat_manager.dibujar(self.pantalla, self.camara)
-        
-        # Dibujar enemigos
         self.spawn_manager.dibujar(self.pantalla, self.camara)
-        
-        # Dibujar jugador
         self.jugador.dibujar(self.pantalla, self.camara)
-        
-        # Dibujar HUD
         self.ui_manager.dibujar_hud()
         
-        # Dibujar FPS si está activado
         if MOSTRAR_FPS:
             self.dibujar_fps()
     
@@ -408,51 +467,33 @@ class GameEngine:
     
     def mostrar_pantalla_mejora(self):
         """Mostrar pantalla de selección de mejoras"""
-        # Cambiar estado
         self.estado = GameState.MEJORA
-        
-        # Generar opciones de mejora
         opciones = self.jugador.generar_opciones_mejora()
         self.ui_manager.opciones_mejora = opciones
         self.ui_manager.mostrar_pantalla_mejora = True
-        
-        # Reducir volumen de música
         pygame.mixer.music.set_volume(0.1)
     
     def game_over(self):
         """Manejar Game Over"""
-        # Cambiar estado
         self.estado = GameState.GAME_OVER
-        
-        # Detener música de gameplay
         self.assets.detener_musica()
-        
-        # Reproducir música/sonido de game over
         self.assets.reproducir_sonido("game_over")
-        
         print(f"GAME OVER - Nivel: {self.jugador.nivel}, Tiempo: {int(self.jugador.tiempo_supervivencia)}s")
     
     def volver_al_menu(self):
         """Volver al menú principal"""
-        # Cambiar estado
         self.estado = GameState.MENU
-        
-        # Detener música actual
         self.assets.detener_musica()
-        
-        # Limpiar sistemas de juego
         self.limpiar_partida()
     
     def limpiar_partida(self):
         """Limpiar datos de la partida actual"""
         if self.spawn_manager:
             self.spawn_manager.enemigos.clear()
-        
         if self.combat_manager:
             self.combat_manager.orbes_xp.clear()
             self.combat_manager.efectos.clear()
         
-        # Resetear referencias
         self.mapa = None
         self.jugador = None
         self.camara = None
@@ -461,11 +502,7 @@ class GameEngine:
     
     def limpiar(self):
         """Limpiar recursos antes de salir"""
-        # Detener todos los sonidos
         self.assets.detener_musica()
         pygame.mixer.stop()
-        
-        # Limpiar assets
         self.assets.limpiar()
-        
         print("Recursos limpiados. Saliendo...")

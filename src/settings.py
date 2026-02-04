@@ -9,187 +9,212 @@ ANCHO_VENTANA = 1280
 ALTO_VENTANA = 720
 FPS = 60
 TITULO_JUEGO = "Karai Survival"
+
 # ========== COLORES (RGB) ==========
-COLOR_FONDO = (34, 139, 34)  # Verde tierra paraguaya
-COLOR_VIDA = (220, 20, 60)    # Rojo para barra de vida
-COLOR_XP = (255, 215, 0)      # Dorado para XP
-COLOR_TEXTO = (255, 255, 255) # Blanco
-COLOR_UI_FONDO = (0, 0, 0)    # Negro semi-transparente
+COLOR_FONDO = (34, 139, 34)
+COLOR_VIDA = (220, 20, 60)
+COLOR_XP = (255, 215, 0)
+COLOR_TEXTO = (255, 255, 255)
+COLOR_UI_FONDO = (0, 0, 0)
 
 # ========== STATS BASE DEL CAMPESINO ==========
 CAMPESINO_VIDA_MAX = 100
-CAMPESINO_VELOCIDAD = 200  # píxeles por segundo
+CAMPESINO_VELOCIDAD = 200
 CAMPESINO_DAÑO_BASE = 10
-CAMPESINO_RADIO_RECOLECCION = 50  # Radio para recoger XP
+CAMPESINO_RADIO_RECOLECCION = 80  # Más grande para recoger XP más fácil
 
-# ========== SISTEMA DE EXPERIENCIA ==========
-XP_POR_NIVEL = [100, 150, 225, 340, 510, 765, 1150, 1725, 2590, 3885]
-# Después del nivel 10, usar fórmula: XP_POR_NIVEL[-1] * 1.5^(nivel-10)
+# ========== SISTEMA DE EXPERIENCIA (MÁS FÁCIL) ==========
+# Cada nivel se completa en aprox 30-45 segundos
+XP_POR_NIVEL = [25, 40, 60, 90, 130, 180, 250, 350, 480, 650] 
 
 # ========== CONFIGURACIÓN DE ENEMIGOS ==========
 ENEMIGO_CONFIGS = {
-    "CARPINCHO": {
-        "vida": 30,
-        "velocidad": 80,
+    "MOSQUITO": {
+        "vida": 10,
+        "velocidad": 110,
+        "daño": 2,
+        "xp": 5,
+        "spawn_peso": 12,
+        "ancho": 35,          # Pequeño, ligeramente horizontal
+        "alto": 28,
+    },
+    "SERPIENTE": {
+        "vida": 25,
+        "velocidad": 75,
         "daño": 5,
-        "xp": 10,
-        "spawn_peso": 10  # Mayor peso = más común
+        "xp": 8,
+        "spawn_peso": 8,
+        "ancho": 100,         # Serpiente muy horizontal
+        "alto": 38,
     },
     "YACARE": {
-        "vida": 50,
-        "velocidad": 60,
-        "daño": 8,
+        "vida": 35,
+        "velocidad": 55,
+        "daño": 10,
         "xp": 15,
-        "spawn_peso": 7
+        "spawn_peso": 7,
+        "ancho": 120,          # Cocodrilo muy horizontal
+        "alto": 60,
     },
-    "TATU": {
-        "vida": 80,
-        "velocidad": 40,
-        "daño": 12,
-        "xp": 25,
-        "spawn_peso": 4
+    "AOAO": {
+        "vida": 50,
+        "velocidad": 50,
+        "daño": 15,
+        "xp": 20,
+        "spawn_peso": 10,
+        "ancho": 90,          # Criatura vertical grande
+        "alto": 100,
     },
-    "AGUARA_GUAZU": {
-        "vida": 150,
-        "velocidad": 100,
+    "PORA": {
+        "vida": 70,
+        "velocidad": 30,
         "daño": 20,
-        "xp": 50,
-        "spawn_peso": 2  # Boss menor
-    }
+        "xp": 15,
+        "spawn_peso": 8,
+        "ancho": 80,          # Fantasma vertical con brazos
+        "alto": 100,
+    },
+    
+    "LUISON": {
+        "vida": 350,
+        "velocidad": 40,
+        "daño":35,
+        "xp": 75,
+        "spawn_peso": 1,      # Raro - Boss
+        "ancho": 155,          # Boss grande, casi cuadrado
+        "alto": 155,
+    },
+
 }
 
-# ========== SISTEMA DE OLEADAS ==========
-TIEMPO_ENTRE_SPAWNS = 1.0  # segundos iniciales
-SPAWN_REDUCCION_POR_MINUTO = 0.05  # Cada minuto spawnean más rápido
-SPAWN_MINIMO = 0.2  # Tiempo mínimo entre spawns
-ENEMIGOS_POR_SPAWN = 1  # Inicial
-AUMENTO_ENEMIGOS_CADA = 120  # segundos (cada 2 min +1 enemigo)
+# ========== SISTEMA DE OLEADAS (ESCALAMIENTO RÁPIDO) ==========
+# --- En la sección SISTEMA DE OLEADAS ---
+TIEMPO_ENTRE_SPAWNS = 1.2        # Antes 0.8 (Tardan más en aparecer)
+ENEMIGOS_POR_SPAWN = 1           # Antes 2 (Sale solo 1 a la vez al inicio)
+AUMENTO_ENEMIGOS_CADA = 120      # Antes 60 (La dificultad sube cada 2 minutos, no cada 1)
 
-# ========== CONFIGURACIÓN DE ARMAS/HERRAMIENTAS ==========
+SPAWN_MINIMO = 0.3               # Tiempo mínimo entre spawns (no puede bajar de esto)
+SPAWN_REDUCCION_POR_MINUTO = 0.1 # Cuánto se reduce el tiempo entre spawns cada minuto
+# ========== CONFIGURACIÓN DE ARMAS ==========
 ARMAS_CONFIG = {
     "MACHETE": {
-        "daño_base": 15,
-        "alcance": 60,
-        "cooldown": 0.5,
+        "daño_base": 20,
+        "alcance": 90,          # Más alcance
+        "cooldown": 0.4,        # Más rápido
         "tipo": "melee",
+        # Modifica la lista de "niveles" dentro de "MACHETE":
         "niveles": [
-            {"daño": 15, "alcance": 60},
-            {"daño": 22, "alcance": 70},
-            {"daño": 33, "alcance": 80},
-            {"daño": 50, "alcance": 100}
-        ]
+        {"daño": 30, "alcance": 95},
+        {"daño": 35, "alcance": 100},
+        {"daño": 40, "alcance": 110}, 
+        {"daño": 50, "alcance": 120}    
+]
     },
-    "HACHA": {
-        "daño_base": 25,
+    "RIFLE": {
+        "daño_base": 30,
         "alcance": 80,
-        "cooldown": 1.2,
+        "cooldown": 5.5,        # Cooldown base (se sobrescribe por nivel)
         "tipo": "proyectil",
         "niveles": [
-            {"daño": 25, "cantidad": 1, "velocidad": 400},
-            {"daño": 35, "cantidad": 2, "velocidad": 400},
-            {"daño": 50, "cantidad": 3, "velocidad": 400},
-            {"daño": 75, "cantidad": 4, "velocidad": 400}
+            {"daño": 40, "cantidad": 1, "velocidad": 450, "cooldown": 5.0},   # Nv.1
+            {"daño": 48, "cantidad": 1, "velocidad": 450, "cooldown": 4.0},   # Nv.2 - Más rápido
+            {"daño": 55, "cantidad": 1, "velocidad": 450, "cooldown": 3.0},   # Nv.3 - Aún más rápido
+            {"daño": 60, "cantidad": 1, "velocidad": 450, "cooldown": 2.5}    # Nv.4 - Máxima velocidad
         ]
     },
-    "AZADA": {
-        "daño_base": 20,
+    "CARRULIN": {
+        "daño_base": 25,
         "alcance": 100,
-        "cooldown": 0.8,
-        "tipo": "aoe",  # Área de efecto
-        "niveles": [
-            {"daño": 20, "radio": 50},
-            {"daño": 30, "radio": 70},
-            {"daño": 45, "radio": 100},
-            {"daño": 70, "radio": 150}
+        "cooldown": 4.0,        # Más rápido
+        "tipo": "aoe",
+        "niveles": [ 
+            {"daño": 25, "radio": 70},
+            {"daño": 38, "radio": 90},
+            {"daño": 55, "radio": 120},
+            {"daño": 80, "radio": 160}
         ]
     },
     "TERERE": {
         "daño_base": 0,
-        "cooldown": 5.0,
-        "tipo": "buff",  # Regeneración
+        "cooldown": 20.0,
+        "tipo": "buff",
         "niveles": [
-            {"vida_por_seg": 2, "duracion": 5},
-            {"vida_por_seg": 4, "duracion": 7},
-            {"vida_por_seg": 7, "duracion": 10},
-            {"vida_por_seg": 12, "duracion": 15}
+            {"vida_por_seg": 3, "duracion": 6},
+            {"vida_por_seg": 6, "duracion": 8},
+            {"vida_por_seg": 8, "duracion": 10},
+            {"vida_por_seg": 10, "duracion": 12}
         ]
     }
 }
 
 # ========== CONFIGURACIÓN DE MAPA ==========
-TILE_SIZE = 64  # Tamaño de cada tile del mapa
-MAPA_ANCHO_TILES = 100  # Mapa grande para explorar
-MAPA_ALTO_TILES = 100
+TILE_SIZE = 64
+MAPA_ANCHO_TILES = 20
+MAPA_ALTO_TILES = 20
 MAPA_ANCHO_PIXELES = MAPA_ANCHO_TILES * TILE_SIZE
 MAPA_ALTO_PIXELES = MAPA_ALTO_TILES * TILE_SIZE
 
 # ========== CONFIGURACIÓN DE CÁMARA ==========
-CAMARA_VELOCIDAD_SEGUIMIENTO = 5  # Suavidad del seguimiento
+CAMARA_VELOCIDAD_SEGUIMIENTO = 5
 
 # ========== UI ==========
-TAMAÑO_BARRA_VIDA = (300, 30)
+TAMAÑO_BARRA_VIDA = (250, 28)
 POSICION_BARRA_VIDA = (20, 20)
-TAMAÑO_BARRA_XP = (300, 20)
-POSICION_BARRA_XP = (20, 60)
+TAMAÑO_BARRA_XP = (250, 16)
+POSICION_BARRA_XP = (20, 55)
 
 # ========== DROPS Y RECOMPENSAS ==========
-CHANCE_DROP_VIDA = 0.05  # 5% de chance de drop de vida al matar
+CHANCE_DROP_VIDA = 0.05
 VIDA_RECUPERADA_DROP = 20
 
 # ========== DEBUG ==========
-DEBUG_MODE = False  # Cambiar a True para ver hitboxes y info
+DEBUG_MODE = False
 MOSTRAR_FPS = True
 
-# ========== CONFIGURACIÓN DE PROYECTILES ==========
-PROYECTIL_HACHA_VELOCIDAD = 400  # píxeles por segundo
-PROYECTIL_HACHA_ALCANCE = 500  # distancia máxima
-PROYECTIL_HACHA_ROTACION = 720  # grados por segundo
+# ========== PROYECTILES ==========
+PROYECTIL_RIFLE_VELOCIDAD = 450
+PROYECTIL_RIFLE_ALCANCE = 500
+PROYECTIL_RIFLE_ROTACION = 720
 
-# ========== CONFIGURACIÓN DE KNOCKBACK ==========
-KNOCKBACK_FUERZA_MACHETE = 100
-KNOCKBACK_FUERZA_HACHA = 50
-KNOCKBACK_FUERZA_AZADA = 200
+# ========== KNOCKBACK ==========
+KNOCKBACK_FUERZA_MACHETE = 120
+KNOCKBACK_FUERZA_RIFLE = 60
+KNOCKBACK_FUERZA_AZADA = 220
 
-# ========== CONFIGURACIÓN DE INVULNERABILIDAD ==========
-INVULNERABILIDAD_DURACION = 0.5  # segundos después de recibir daño
+# ========== INVULNERABILIDAD ==========
+INVULNERABILIDAD_DURACION = 0.5
 
-# ========== CONFIGURACIÓN DE BALANCEO ==========
-VIDA_BONUS_POR_NIVEL = 20  # Vida extra al subir nivel
-VELOCIDAD_BONUS_POR_NIVEL = 10  # Velocidad extra al mejorar
-RADIO_RECOLECCION_BONUS = 20  # Radio extra al mejorar
+# ========== MEJORAS (más grandes) ==========
+VIDA_BONUS_POR_NIVEL = 25
+VELOCIDAD_BONUS_POR_NIVEL = 10
+RADIO_RECOLECCION_BONUS = 25
 
-# ========== LÍMITES DEL JUEGO ==========
-MAX_ENEMIGOS_PANTALLA = 300
+# ========== LÍMITES ==========
+MAX_ENEMIGOS_PANTALLA = 100
 MAX_PROYECTILES = 200
 MAX_ORBES_XP = 500
 MAX_ARMAS_EQUIPADAS = 6
 
-# ========== CONFIGURACIÓN DE TILES DEL MAPA ==========
-TILE_COLORES = {
-    "PASTO_OSCURO": (34, 139, 34),   # Verde oscuro
-    "PASTO_CLARO": (50, 205, 50),    # Verde claro
-    "PASTO_MEDIO": (60, 179, 113)    # Verde medio
-}
+# ========== SPAWN ==========
+SPAWN_MARGEN_PANTALLA = 100
 
-# ========== CONFIGURACIÓN DE SPAWN DE ENEMIGOS ==========
-SPAWN_MARGEN_PANTALLA = 100  # Píxeles fuera de pantalla para spawn
-
-# ========== CONFIGURACIÓN DE MEJORAS ==========
-MEJORAS_POR_NIVEL = 3  # Cantidad de opciones al subir nivel
+# ========== MEJORAS VALORES (más grandes) ==========
+MEJORAS_POR_NIVEL = 3
 MEJORAS_VALORES = {
-    "vida_max": 20,
-    "velocidad": 20,
-    "radio_recoleccion": 20,
-    "daño": 5,
+    "vida_max": 30,                 # Más vida por mejora
+    "velocidad": 25,                # Más velocidad
+    "radio_recoleccion": 25,        # Más radio
+    "daño": 8,
     "cooldown_reduccion": 0.1
 }
 
-# ========== INFORMACIÓN DE VERSIÓN ==========
+
+# ========== VERSIÓN ==========
 VERSION_MAJOR = 1
 VERSION_MINOR = 0
 VERSION_PATCH = 0
 VERSION_BUILD = "MVP"
 VERSION_STRING = f"v{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_PATCH}-{VERSION_BUILD}"
 
-# ========== METADATA DEL JUEGO ==========
+# ========== METADATA ==========
 GAME_NAME = "Karai Survival"
