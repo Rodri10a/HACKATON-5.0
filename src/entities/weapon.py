@@ -13,16 +13,18 @@ from settings import *
 class Weapon:
     """Clase base de armas"""
     
-    def __init__(self, tipo, dueño):
+    def __init__(self, tipo, dueño, assets=None):
         """
         Inicializar arma
-        
+
         Args:
             tipo: Tipo de arma (string)
             dueño: Referencia al jugador
+            assets: Referencia al AssetLoader para sonidos
         """
         self.tipo = tipo
         self.dueño = dueño
+        self.assets = assets
         self.nivel = 1
         
         # Obtener configuración del arma
@@ -163,6 +165,10 @@ class Weapon:
         )
         self.efectos.append(efecto_slash)
 
+        # Reproducir sonido del machete
+        if self.assets:
+            self.assets.reproducir_sonido("ataque_machete", volumen=0.4)
+
         # Crear área de ataque (rectángulo centrado en el jugador)
         area_ataque = pygame.Rect(
             self.dueño.x - alcance,
@@ -230,6 +236,10 @@ class Weapon:
                 daño
             )
             self.proyectiles.append(proyectil)
+
+            # Reproducir sonido del rifle
+            if self.assets:
+                self.assets.reproducir_sonido("ataque_rifle", volumen=0.3)
     
     def ataque_azada(self, enemigos):
         """
@@ -325,9 +335,16 @@ class ProyectilRifle:
         self.velocidad = velocidad
         self.daño = daño
         
-        # Crear sprite
-        self.image = pygame.Surface((20, 20))
-        self.image.fill((192, 192, 192))  # Gris plateado
+        # Crear sprite - Intentar cargar imagen, si falla usar superficie de color
+        try:
+            self.image = pygame.image.load("assets/sprites/proyectil_rifle.png").convert_alpha()
+            # Escalar la imagen a un tamaño de bala más pequeño
+            self.image = pygame.transform.scale(self.image, (16, 16))
+        except:
+            # Fallback: superficie de color si no existe la imagen
+            self.image = pygame.Surface((16, 16))
+            self.image.fill((192, 192, 192))  # Gris plateado
+
         self.rect = self.image.get_rect()
         self.rect.center = (int(self.x), int(self.y))
         
