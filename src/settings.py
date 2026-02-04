@@ -53,8 +53,8 @@ ENEMIGO_CONFIGS = {
         "daño": 10,
         "xp": 15,
         "spawn_peso": 7,
-        "ancho": 120,          # Cocodrilo muy horizontal
-        "alto": 60,
+        "ancho": 144,          # Cocodrilo muy horizontal
+        "alto": 72,
     },
     "AOAO": {
         "vida": 50,
