@@ -40,6 +40,12 @@ class Player(BaseEntity):
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
         self.direccion = pygame.math.Vector2(0, 0)
         
+        #Rotacion y flip del sprite segun direccion
+        self.imagen_original = self.image.copy()
+        self.voltear_horizontalmente = False
+        self.ultima_direccion_x = 1  # 1: derecha, -1: izquierda
+
+
         # Cooldown de invulnerabilidad al recibir daño
         self.invulnerable = False
         self.tiempo_invulnerabilidad = 0
@@ -70,6 +76,10 @@ class Player(BaseEntity):
         if teclas[pygame.K_d] or teclas[pygame.K_RIGHT]:
             self.direccion.x = 1
     
+    #actualizar direccion visual segun movimiento horizontal
+        if self.direccion.x != 0:
+            self.ultima_direccion_x = self.direccion.x
+            self.voltear_horizontalmente = (self.direccion.x < 0)
     def ganar_xp(self, cantidad):
         """
         Sumar XP y verificar subida de nivel
@@ -124,9 +134,33 @@ class Player(BaseEntity):
                 "descripcion": f"Desbloquear {arma}"
             })
         
-        # Opción 2: Mejorar arma existente (placeholder - implementar con sistema de armas)
-        # Por ahora agregamos mejoras pasivas
-        
+                # Opción 2: Mejorar arma existente (si puede mejorar)
+        for arma in self.armas_equipadas:
+            if arma.puede_mejorar():
+                nivel_actual = arma.nivel
+                nivel_siguiente = nivel_actual + 1
+
+                # Obtener descripción según tipo de arma
+                if arma.tipo_ataque == "melee":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "proyectil":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "aoe":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                elif arma.tipo_ataque == "buff":
+                    config_siguiente = arma.config["niveles"][nivel_siguiente]
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+                else:
+                    descripcion = f"Mejorar {arma.tipo} Nv.{nivel_siguiente}"
+
+                opciones_disponibles.append({
+                    "tipo": "mejorar_arma",
+                    "valor": arma,  # Referencia al objeto arma
+                    "descripcion": descripcion
+                })
         # Opción 3: Mejoras pasivas
         opciones_disponibles.append({
             "tipo": "aumentar_vida_max",
@@ -174,7 +208,10 @@ class Player(BaseEntity):
             # Agregar arma a disponibles
             if valor not in self.armas_disponibles:
                 self.armas_disponibles.append(valor)
-        
+        elif tipo_mejora == "mejorar_arma":
+            # Mejorar el arma referenciado en 'valor'
+            arma = valor
+            arma.subir_nivel()        
         elif tipo_mejora == "aumentar_vida_max":
             self.vida_maxima += valor
             self.vida_actual += valor  # También cura
@@ -293,6 +330,10 @@ class Player(BaseEntity):
             pantalla: Surface de pygame
             camara: Objeto Camera
         """
+        #Aplicar flip horizontal si se voltea
+        imagen_actual = pygame.transform.flip(self.imagen_original, self.voltear_horizontalmente, False)
+        #Actualizar la imagen del jugador para dibujar
+        self.image = imagen_actual
         if self.invulnerable:
             # Parpadear cada 0.1 segundos
             if int(self.tiempo_invulnerabilidad * 10) % 2 == 0:
