@@ -22,7 +22,7 @@ class Player(BaseEntity):
             assets: Referencia al AssetLoader para sonidos
         """
         # Llamar constructor padre con sprite
-        super().__init__(x, y, 80, 130, (255, 200, 0), sprite_path="assets/sprites/player.png")
+        super().__init__(x, y, 75, 180, (255, 200, 0), sprite_path="assets/sprites/player.png")
 
         # Referencia a assets para sonidos
         self.assets = assets
@@ -31,19 +31,25 @@ class Player(BaseEntity):
         self.vida_maxima = CAMPESINO_VIDA_MAX
         self.vida_actual = CAMPESINO_VIDA_MAX
         self.velocidad = CAMPESINO_VELOCIDAD
-        
+
         # Sistema de experiencia y nivel
         self.nivel = 1
         self.xp_actual = 0
         self.xp_necesaria = XP_POR_NIVEL[0]
-        
+
         # Inventario de armas
         self.armas_equipadas = []
         self.armas_disponibles = ["MACHETE"]  # Empieza con machete
-        
+
         # Radio de recolección de XP
         self.radio_recoleccion = CAMPESINO_RADIO_RECOLECCION
         self.direccion = pygame.math.Vector2(0, 0)
+        
+        # Sistema de animación
+        self.frames_animacion = assets.sprites.get("player_frames", [self.image]) if assets else [self.image]
+        self.frame_actual = 0
+        self.tiempo_frame = 0
+        self.duracion_frame = 0.2  # Cambiar frame cada 0.2 segundos
         
         #Rotacion y flip del sprite segun direccion
         self.imagen_original = self.image.copy()
@@ -410,25 +416,43 @@ class Player(BaseEntity):
                 self.regenerando = False
                 self.tiempo_regeneracion = 0
     
+    def actualizar_animacion(self, dt):
+        """
+        Actualizar frame de animación del jugador
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        self.tiempo_frame += dt
+        
+        if self.tiempo_frame >= self.duracion_frame:
+            self.tiempo_frame = 0
+            self.frame_actual = (self.frame_actual + 1) % len(self.frames_animacion)
+            # Actualizar la imagen original con el nuevo frame
+            self.imagen_original = self.frames_animacion[self.frame_actual].copy()
+    
     def actualizar(self, dt):
         """
         Actualización principal del jugador
-        
+
         Args:
             dt: Delta time en segundos
         """
         # Manejar input
         self.manejar_input()
-        
+
+        # Actualizar animación
+        self.actualizar_animacion(dt)
+
         # Mover
         self.mover(dt)
-        
+
         # Limitar al mapa
         self.limitar_al_mapa()
-        
+
         # Actualizar invulnerabilidad
         self.actualizar_invulnerabilidad(dt)
-        
+   
         # Actualizar regeneración
         self.actualizar_regeneracion(dt)
         

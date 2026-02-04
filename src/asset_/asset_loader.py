@@ -59,19 +59,27 @@ class AssetLoader:
         self.cargar_sprites_efectos()
     
     def cargar_sprite_jugador(self):
-        """Cargar sprite del jugador"""
-        ruta = os.path.join(self.dir_sprites, "player.png")
+        """Cargar sprites de animación del jugador"""
+        # Cargar frames de animación del jugador
+        frames_jugador = []
+        for i in range(1, 3):  # Cargar player.png y player_2.png
+            ruta = os.path.join(self.dir_sprites, f"player{'' if i == 1 else '_' + str(i)}.png")
+            
+            if os.path.exists(ruta):
+                imagen = pygame.image.load(ruta).convert_alpha()
+                # Escalar al tamaño deseado (50x120 para coincidir con hitbox)
+                imagen = pygame.transform.scale(imagen, (75, 180))
+                frames_jugador.append(imagen)
+            else:
+                # Usar placeholder (rectángulo amarillo)
+                placeholder = pygame.Surface((75, 180))
+                placeholder.fill((255, 200, 0))
+                frames_jugador.append(placeholder)
         
-        if os.path.exists(ruta):
-            imagen = pygame.image.load(ruta).convert_alpha()
-            # Escalar al tamaño deseado
-            imagen = pygame.transform.scale(imagen, (50, 50))
-            self.sprites["player"] = imagen
-        else:
-            # Usar placeholder (cuadrado amarillo)
-            placeholder = pygame.Surface((50, 50))
-            placeholder.fill((255, 200, 0))
-            self.sprites["player"] = placeholder
+        # Guardar frames de animación
+        self.sprites["player_frames"] = frames_jugador
+        # También guardar el primer frame como "player" para compatibilidad
+        self.sprites["player"] = frames_jugador[0]
     
     def cargar_sprites_enemigos(self):
         """Cargar sprites de todos los enemigos"""
