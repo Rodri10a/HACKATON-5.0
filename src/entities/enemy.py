@@ -278,3 +278,64 @@ class OrbXP:
             bool: True si hay colisión
         """
         return self.rect.colliderect(entidad.rect)
+
+
+class TerrereItem:
+    """Item de Terere que regenera vida al jugador"""
+    
+    def __init__(self, x, y):
+        """
+        Inicializar item de terere
+        
+        Args:
+            x: Posición X en el mundo
+            y: Posición Y en el mundo
+        """
+        self.x = float(x)
+        self.y = float(y)
+        
+        # Crear sprite
+        try:
+            self.image = pygame.image.load("assets/sprites/terere.png").convert_alpha()
+            self.image = pygame.transform.scale(self.image, (40, 40))
+        except:
+            # Placeholder - círculo verde
+            self.image = pygame.Surface((40, 40), pygame.SRCALPHA)
+            pygame.draw.circle(self.image, (0, 200, 0), (20, 20), 18)
+            pygame.draw.circle(self.image, (100, 255, 100), (20, 20), 15)
+        
+        self.rect = self.image.get_rect()
+        self.rect.center = (int(x), int(y))
+        
+        # Animación de flotación
+        self.tiempo_vida = 0
+        self.duracion_total = float('inf')  # No expira automáticamente
+    
+    def actualizar(self, dt):
+        """
+        Actualizar animación de flotación
+        
+        Args:
+            dt: Delta time en segundos
+        """
+        self.tiempo_vida += dt
+        
+        # Efecto de flotación sutil
+        offset_y = math.sin(self.tiempo_vida * 3) * 3
+        self.rect.centery = int(self.y + offset_y)
+    
+    def dibujar(self, pantalla, camara):
+        """
+        Dibujar item en pantalla
+        
+        Args:
+            pantalla: Surface de pygame
+            camara: Objeto Camera
+        """
+        pantalla_x = self.rect.x - camara.offset_x
+        pantalla_y = self.rect.y - camara.offset_y
+        
+        # Solo dibujar si está visible
+        if (0 <= pantalla_x <= camara.ancho and 
+            0 <= pantalla_y <= camara.alto):
+            pantalla.blit(self.image, (pantalla_x, pantalla_y))
