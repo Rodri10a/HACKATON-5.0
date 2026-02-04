@@ -113,7 +113,7 @@ ARMAS_CONFIG = {
     "RIFLE": {
         "daño_base": 30,
         "alcance": 80,
-        "cooldown": 5.5,        # Cooldown base (se sobrescribe por nivel)
+        "cooldown": 4.5,        # Cooldown base (se sobrescribe por nivel)
         "tipo": "proyectil",
         "niveles": [
             {"daño": 40, "cantidad": 1, "velocidad": 450, "cooldown": 5.0},   # Nv.1
@@ -133,18 +133,8 @@ ARMAS_CONFIG = {
             {"daño": 55, "radio": 120},
             {"daño": 80, "radio": 160}
         ]
-    },
-    "TERERE": {
-        "daño_base": 0,
-        "cooldown": 20.0,
-        "tipo": "buff",
-        "niveles": [
-            {"vida_por_seg": 3, "duracion": 6},
-            {"vida_por_seg": 6, "duracion": 8},
-            {"vida_por_seg": 8, "duracion": 10},
-            {"vida_por_seg": 10, "duracion": 12}
-        ]
     }
+    
 }
 
 # ========== CONFIGURACIÓN DE MAPA ==========
