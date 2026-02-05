@@ -105,7 +105,7 @@ class Enemy(BaseEntity):
             self.esta_atacando = True
     
     def actualizar_cooldown_ataque(self, dt):
-        """
+        """-
         Actualizar timer de ataque
         
         Args:

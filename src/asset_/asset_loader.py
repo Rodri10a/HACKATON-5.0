@@ -24,6 +24,10 @@ class AssetLoader:
         self.sonidos = {}
         self.musica = {}
         
+        # Sistema de volumen por contexto
+        self.volumen_actual = 0.5
+        self.volumen_por_contexto = {}  # Guardar volumen de cada contexto
+        
         # Verificar si existen los directorios
         self.verificar_directorios()
         
@@ -277,6 +281,37 @@ class AssetLoader:
                     sonido.set_volume(volumen)
                 except:
                     pass
+    
+    def guardar_volumen_contexto(self, contexto):
+        """
+        Guardar volumen actual de un contexto
+        
+        Args:
+            contexto: Nombre del contexto (ej: 'gameplay', 'menu')
+        """
+        self.volumen_por_contexto[contexto] = self.volumen_actual
+    
+    def restaurar_volumen_contexto(self, contexto):
+        """
+        Restaurar volumen de un contexto anterior
+        
+        Args:
+            contexto: Nombre del contexto
+        """
+        if contexto in self.volumen_por_contexto:
+            volumen = self.volumen_por_contexto[contexto]
+            pygame.mixer.music.set_volume(volumen)
+            self.volumen_actual = volumen
+    
+    def establecer_volumen_musica(self, volumen):
+        """
+        Establecer volumen de la música actual
+        
+        Args:
+            volumen: Volumen (0.0 a 1.0)
+        """
+        self.volumen_actual = volumen
+        pygame.mixer.music.set_volume(volumen)
     
     def limpiar(self):
         """Liberar recursos de memoria"""

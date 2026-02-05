@@ -5,13 +5,13 @@ Clase principal que orquesta todos los sistemas del juego
 """
 
 import pygame
-import sys
+import sys 
 from constants import GameState
 from settings import *
 from entities.player import Player
 from entities.weapon import Weapon
 from entities.enemy import TerrereItem
-from World.map import Map
+from World.map import Map 
 from World.camera import Camera
 from managers.spawn_manager import SpawnManager
 from managers.combat_manager import CombatManager
@@ -103,7 +103,9 @@ class GameEngine:
         self.ui_manager = UIManager(self.pantalla, self.jugador)
         
         # Reproducir música de gameplay
-        self.assets.reproducir_musica("gameplay", volumen=0.3)
+        self.assets.reproducir_musica("gameplay", volumen=1)
+        # Guardar volumen de gameplay para poder restaurarlo después
+        self.assets.guardar_volumen_contexto("gameplay")
         
         # Incrementar contador de partidas
         self.partidas_jugadas += 1
@@ -244,6 +246,8 @@ class GameEngine:
                     
                     self.ui_manager.mostrar_pantalla_mejora = False
                     self.jugador.subio_nivel = False
+                    # Restaurar volumen de gameplay
+                    self.assets.restaurar_volumen_contexto("gameplay")
                     self.estado = GameState.JUGANDO
         
         
@@ -488,7 +492,8 @@ class GameEngine:
         opciones = self.jugador.generar_opciones_mejora()
         self.ui_manager.opciones_mejora = opciones
         self.ui_manager.mostrar_pantalla_mejora = True
-        pygame.mixer.music.set_volume(0.1)
+        # Bajar volumen solo de la música (no afecta a gameplay cuando se cierre)
+        self.assets.establecer_volumen_musica(0.1)
     
     def actualizar_tereres(self, dt):
         """

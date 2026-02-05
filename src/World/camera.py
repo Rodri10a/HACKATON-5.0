@@ -4,7 +4,7 @@ CAMERA.PY - SISTEMA DE CÁMARA
 Cámara que sigue al jugador suavemente
 """
 
-import pygame
+import pygame 
 from settings import *
 
 

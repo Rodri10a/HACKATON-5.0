@@ -1,7 +1,7 @@
 """
-UI_MANAGER.PY - GESTOR DE INTERFAZ DE USUARIO
+UI_MANAGER.PY - GESTOR DE INTERFAZ DE USUARIO 
 ==============================================
-Todas las pantallas y elementos HUD del juego
+Todas las pantallas y elementos HUD del juego 
 """
 
 import pygame
